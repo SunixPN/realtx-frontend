@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Header } from "@/widgets/header";
 import "./globals.css";
 
 const inter = Inter({
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="ru" className={inter.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-surface-page text-text-base antialiased">
+        <Header />
         {children}
       </body>
     </html>
