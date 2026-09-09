@@ -2,14 +2,15 @@ import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from 'rea
 import { cn } from '@/shared/helpers/cn';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  hint?:  string;
-  error?: string;
-  icon?:  ReactNode;
+  label?:     string;
+  hint?:      string;
+  error?:     string;
+  icon?:      ReactNode;
+  rightSlot?: ReactNode;
 }
 
 export const UIInput = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, hint, error, icon, id, className, disabled, ...props }, ref) => {
+  ({ label, hint, error, icon, rightSlot, id, className, disabled, ...props }, ref) => {
     const autoId = useId();
     const inputId = id ?? autoId;
 
@@ -25,15 +26,15 @@ export const UIInput = forwardRef<HTMLInputElement, InputProps>(
 
         <div
           className={cn(
-            'flex h-10 w-full items-center gap-2 rounded-sm border bg-surface-page px-3',
+            'flex h-11 w-full items-center gap-2 rounded-md border bg-surface-page px-3',
             'transition-colors',
             hasError
               ? 'border-error focus-within:ring-2 focus-within:ring-error/20'
-              : 'border-border-strong hover:border-text-faint focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20',
+              : 'border-border hover:border-border-strong focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20',
             disabled && 'bg-surface-subtle cursor-not-allowed opacity-60',
           )}
         >
-          {icon && <span className="text-text-faint shrink-0">{icon}</span>}
+          {icon && <span className="flex items-center text-text-faint shrink-0">{icon}</span>}
           <input
             ref={ref}
             id={inputId}
@@ -42,6 +43,7 @@ export const UIInput = forwardRef<HTMLInputElement, InputProps>(
             className="flex-1 bg-transparent text-sm text-text-base placeholder:text-text-faint outline-none disabled:cursor-not-allowed"
             {...props}
           />
+          {rightSlot && <span className="flex items-center shrink-0">{rightSlot}</span>}
         </div>
 
         {error ? (

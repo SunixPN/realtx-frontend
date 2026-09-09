@@ -3,29 +3,29 @@
 /* ─── Light mode ──────────────────────────────────────────────────── */
 :root {
   /* Brand */
-  --brand:        #2563eb;
-  --brand-hover:  #1d4ed8;
-  --brand-bg:     #eff6ff;
+  --brand:        #4f46e5;
+  --brand-hover:  #4338ca;
+  --brand-bg:     #eef2ff;
   --brand-fg:     #ffffff;
 
   /* Surfaces */
   --surface-page:    #ffffff;
   --surface-raised:  #ffffff;
-  --surface-subtle:  #f7f7f8;
-  --surface-muted:   #efefef;
+  --surface-subtle:  #f9fafb;
+  --surface-muted:   #f3f4f6;
   --surface-overlay: rgba(0, 0, 0, 0.4);
 
   /* Text */
-  --text-base:      #111111;
-  --text-muted:     #555555;
-  --text-faint:     #999999;
-  --text-disabled:  #c0c0c0;
+  --text-base:      #111827;
+  --text-muted:     #4b5563;
+  --text-faint:     #9ca3af;
+  --text-disabled:  #d1d5db;
   --text-on-brand:  #ffffff;
   --text-link:      var(--brand);
 
   /* Border */
-  --border-default: #e0e0e0;
-  --border-strong:  #c0c0c0;
+  --border-default: #e5e7eb;
+  --border-strong:  #d1d5db;
 
   /* Feedback */
   --success:    #16a34a;
@@ -34,8 +34,8 @@
   --warning-bg: #fffbeb;
   --error:      #dc2626;
   --error-bg:   #fef2f2;
-  --info:       #2563eb;
-  --info-bg:    #eff6ff;
+  --info:       #4f46e5;
+  --info-bg:    #eef2ff;
 }
 
 /* ─── Dark mode (system preference) ──────────────────────────────── */
