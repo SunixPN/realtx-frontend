@@ -1,14 +1,20 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from '@/shared/helpers/cn';
 import { ROUTES } from '@/shared/const/routes';
-import { IconMoon, IconSun } from '@/shared/ui/ui-icons';
+import { IconLoader, IconMoon, IconSun } from '@/shared/ui/ui-icons';
+import { UserMenu } from '@/widgets/header/_ui/user-menu/user-menu';
+import {useQuery} from "@tanstack/react-query";
+import {authQuery} from "@/entities/me/api/auth-query";
 
 export function Header() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
+
+  const { isLoading: isPending, data } = useQuery(authQuery)
 
   useEffect(() => {
     setMounted(true);
@@ -28,13 +34,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border bg-surface-raised px-4">
-      <Link href={ROUTES.ROOT} className="flex items-center gap-2 hover:opacity-100">
-        <span className="flex size-8 items-center justify-center rounded-md bg-brand text-base font-bold text-white">
-          R
-        </span>
-        <span className="text-base font-semibold tracking-tight text-text-base">
-          RealtX
-        </span>
+      <Link href={ROUTES.ROOT} className="flex items-center hover:opacity-80">
+        <Image src="/logo.png" alt="RealtX" width={108} height={32} priority />
       </Link>
 
       <div className="flex items-center gap-1">
@@ -56,15 +57,26 @@ export function Header() {
 
         <span className="mx-1.5 h-6 w-px bg-border" />
 
-        <Link
-          href={ROUTES.SIGN_IN}
-          className={cn(
-            'flex h-9 items-center rounded-md bg-brand px-3.5 text-sm font-medium text-white',
-            'hover:bg-brand-hover hover:opacity-100',
-          )}
-        >
-          Войти
-        </Link>
+        {isPending ? (
+          <div
+            aria-label="Проверка авторизации"
+            className="flex size-9 items-center justify-center rounded-xl text-text-muted"
+          >
+            <IconLoader size={18} />
+          </div>
+        ) : data?.user ? (
+          <UserMenu user={data.user} />
+        ) : (
+          <Link
+            href={ROUTES.SIGN_IN}
+            className={cn(
+              'flex h-9 items-center rounded-md bg-brand px-3.5 text-sm font-medium text-white',
+              'hover:bg-brand-hover hover:opacity-100',
+            )}
+          >
+            Войти
+          </Link>
+        )}
       </div>
     </header>
   );

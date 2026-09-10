@@ -11,20 +11,20 @@
   /* Surfaces */
   --surface-page:    #ffffff;
   --surface-raised:  #ffffff;
-  --surface-subtle:  #f9fafb;
+  --surface-subtle:  #F8FAFC;
   --surface-muted:   #f3f4f6;
   --surface-overlay: rgba(0, 0, 0, 0.4);
 
   /* Text */
   --text-base:      #111827;
   --text-muted:     #4b5563;
-  --text-faint:     #9ca3af;
+  --text-faint:     #64748B;
   --text-disabled:  #d1d5db;
   --text-on-brand:  #ffffff;
   --text-link:      var(--brand);
 
   /* Border */
-  --border-default: #e5e7eb;
+  --border-default: #CBD5E1;
   --border-strong:  #d1d5db;
 
   /* Feedback */
