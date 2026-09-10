@@ -40,7 +40,7 @@ export const UIInput = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             disabled={disabled}
             aria-invalid={hasError || undefined}
-            className="flex-1 bg-transparent text-sm text-text-base placeholder:text-text-faint outline-none disabled:cursor-not-allowed"
+            className="flex-1  bg-transparent text-sm text-text-base placeholder:text-text-faint outline-none disabled:cursor-not-allowed"
             {...props}
           />
           {rightSlot && <span className="flex items-center shrink-0">{rightSlot}</span>}
