@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/shared/helpers/cn';
 import { AuthUserType } from '@/entities/me/types/me-type';
 import { IconClock, IconLogOut, IconUser } from '@/shared/ui/ui-icons';
+import { useLogout } from '@/features/logout-feature/_hooks/use-logout';
 
 type UserMenuProps = {
     user: AuthUserType;
@@ -23,6 +24,7 @@ function getInitials(user: AuthUserType): string {
 export function UserMenu({ user }: UserMenuProps) {
     const [open, setOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const { logout, isPending } = useLogout();
 
     useEffect(() => {
         if (!open) return;
@@ -75,7 +77,13 @@ export function UserMenu({ user }: UserMenuProps) {
                     </div>
 
                     <div className="border-t border-border">
-                        <MenuItem icon={<IconLogOut size={16} />} label="Выйти" tone="danger" />
+                        <MenuItem
+                            icon={<IconLogOut size={16} />}
+                            label="Выйти"
+                            tone="danger"
+                            disabled={isPending}
+                            onClick={() => { setOpen(false); logout(); }}
+                        />
                     </div>
                 </div>
             )}
@@ -87,17 +95,20 @@ type MenuItemProps = {
     icon: React.ReactNode;
     label: string;
     tone?: 'neutral' | 'danger';
+    disabled?: boolean;
     onClick?: () => void;
 };
 
-function MenuItem({ icon, label, tone = 'neutral', onClick }: MenuItemProps) {
+function MenuItem({ icon, label, tone = 'neutral', disabled, onClick }: MenuItemProps) {
     return (
         <button
             type="button"
             role="menuitem"
             onClick={onClick}
+            disabled={disabled}
             className={cn(
                 'flex w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-surface-subtle',
+                'disabled:cursor-not-allowed disabled:opacity-50',
                 tone === 'danger' ? 'text-danger' : 'text-text-base',
             )}
         >
