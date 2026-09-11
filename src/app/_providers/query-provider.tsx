@@ -3,6 +3,7 @@
 import {ReactNode} from "react";
 import {QueryClientProvider} from "@tanstack/react-query";
 import {queryClient} from "@/shared/api/query";
+import '@/entities/me/api/auth-api-interceptors';
 
 type QueryProviderProps = {
     children: ReactNode

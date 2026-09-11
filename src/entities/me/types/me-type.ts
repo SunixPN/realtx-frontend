@@ -2,6 +2,11 @@ export type UserCurrency = 'USD' | 'BYN' | 'EUR';
 export type UserTheme   = 'light' | 'dark' | 'system';
 export type UserLanguage = 'ru' | 'en' | 'be';
 
+export type AuthResponseType = {
+    accessToken: string;
+    user: AuthUserType;
+};
+
 export type AuthUserType = {
     id: string;
     email: string | null;
