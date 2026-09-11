@@ -18,7 +18,8 @@ export const useRegisterForm = () => {
     });
 
     const onSubmit = (values: RegisterValues) => {
-        register(values);
+        const name = values.name?.trim() || undefined;
+        register({ ...values, name });
     };
 
     return { form, onSubmit, isSubmitting };

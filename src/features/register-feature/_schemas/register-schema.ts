@@ -4,8 +4,7 @@ export const registerSchema = z.object({
     name: z
         .string()
         .max(100, 'Имя слишком длинное')
-        .optional()
-        .transform((v) => (v?.trim() === '' ? undefined : v?.trim())),
+        .optional(),
     email: z
         .string()
         .min(1, 'Введите email')
