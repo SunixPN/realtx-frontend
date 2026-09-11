@@ -18,5 +18,5 @@ export function PageSkeletonProvider({ isLoading, children }: PageSkeletonProvid
     const Skeleton = matchSkeleton(pathname);
     if (!Skeleton) return children;
 
-    return <Skeleton />;
+    return <Skeleton />
 }

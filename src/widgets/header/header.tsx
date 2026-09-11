@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from '@/shared/helpers/cn';
 import { ROUTES } from '@/shared/const/routes';
-import { IconLoader, IconMoon, IconSun } from '@/shared/ui/ui-icons';
+import { IconBell, IconGitCompare, IconHeart, IconLoader, IconMoon, IconSun } from '@/shared/ui/ui-icons';
 import { UserMenu } from '@/widgets/header/_ui/user-menu/user-menu';
 import {useQuery} from "@tanstack/react-query";
 import {authQuery} from "@/entities/me/api/auth-query";
@@ -39,6 +39,32 @@ export function Header() {
       </Link>
 
       <div className="flex items-center gap-1">
+        {data?.user && (
+            <>
+              <button
+                  type="button"
+                  aria-label="Избранное"
+                  className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
+              >
+                <IconHeart size={20} />
+              </button>
+              <button
+                  type="button"
+                  aria-label="Сохранённые поиски"
+                  className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
+              >
+                <IconBell size={20} />
+              </button>
+              <button
+                  type="button"
+                  aria-label="Сравнение"
+                  className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
+              >
+                <IconGitCompare size={20} />
+              </button>
+              <span className="mx-1.5 h-6 w-px bg-border" />
+            </>
+        )}
         <button
           type="button"
           onClick={toggleTheme}
