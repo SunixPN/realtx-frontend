@@ -8,15 +8,16 @@ import { queryClient } from '@/shared/api/query';
 import { QUERIES } from '@/shared/const/queries';
 
 type Body = {
-  email: string;
-  password: string;
+    name?: string;
+    email: string;
+    password: string;
 };
 
-export const signInMutation: MutationOptionsType<Body> = {
-    mutationKey: [MUTATIONS.SIGN_IN],
-    mutationFn: (body) => api.post<AuthResponseType>(API_ROUTES.AUTH.LOGIN, body),
+export const registerMutation: MutationOptionsType<Body> = {
+    mutationKey: [MUTATIONS.REGISTER],
+    mutationFn: (body) => api.post<AuthResponseType>(API_ROUTES.AUTH.REGISTER, body),
     onSuccess: () => {
-        showToast({ status: 'success', text: 'Вход выполнен' });
+        showToast({ status: 'success', text: 'Аккаунт создан' });
         queryClient.invalidateQueries({ queryKey: [QUERIES.AUTH_QUERY] });
     },
     onError: (error) => {
