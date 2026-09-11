@@ -6,6 +6,7 @@ export const authQuery = queryOptions({
     queryKey: [QUERIES.AUTH_QUERY],
     queryFn: async () => {
         const { data } = await refreshRequest();
+        console.log(data, "DATA")
         return {
             accessToken: data.accessToken,
             user: data.user

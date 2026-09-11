@@ -16,5 +16,5 @@ export default function UserHydrationProvider({ children }: UserHydrationProvide
         <PageSkeletonProvider isLoading={isLoading}>
             {children}
         </PageSkeletonProvider>
-    );
+    )
 }
