@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, ImageOff } from 'lucide-react'
+import { getMainPhoto, getThumbPhoto } from '@/entities/estate'
 
 type Props = {
     photos: string[]
@@ -24,6 +25,16 @@ export function PhotoSlider({ photos, loading }: Props) {
         if (!thumb) return
         thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
     }, [idx])
+
+    // Прелоадим соседние кадры в браузерный кэш — без прогрева переключение подлагивает
+    useEffect(() => {
+        if (count < 2) return
+        const neighbors = [(idx + 1) % count, (idx - 1 + count) % count]
+        for (const i of neighbors) {
+            const img = new Image()
+            img.src = getMainPhoto(photos[i])
+        }
+    }, [idx, photos, count])
 
     const prev = () => setIdx((i) => (i - 1 + count) % count)
     const next = () => setIdx((i) => (i + 1) % count)
@@ -51,10 +62,10 @@ export function PhotoSlider({ photos, loading }: Props) {
             <div className="relative aspect-[4/3] overflow-hidden bg-[var(--surface-muted)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                    key={photos[idx]}
-                    src={photos[idx]}
+                    src={getMainPhoto(photos[idx])}
                     alt=""
-                    className="size-full object-cover transition-opacity duration-200"
+                    decoding="async"
+                    className="size-full object-cover"
                 />
 
                 {/* Счётчик */}
@@ -103,9 +114,10 @@ export function PhotoSlider({ photos, loading }: Props) {
                         >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src={src}
+                                src={getThumbPhoto(src)}
                                 alt=""
                                 loading="lazy"
+                                decoding="async"
                                 className="size-full object-cover"
                             />
                             {/* Активный — бренд-рамка */}

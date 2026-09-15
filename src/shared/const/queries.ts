@@ -1,11 +1,14 @@
 export const QUERIES = {
-    AUTH_QUERY:  "auth-query",
-    RESET_VERIFY: "reset-verify",
-    VERIFY_EMAIL: "verify-email",
-    MAP_POINTS: "map-points",
-    ESTATE_BY_ID: "estate-by-id",
-    HOUSE_ESTATES: "house-estates",
-    SUGGEST: "suggest",
+    AUTH_QUERY:              "auth-query",
+    RESET_VERIFY:            "reset-verify",
+    VERIFY_EMAIL:            "verify-email",
+    MAP_POINTS:              "map-points",
+    DISTRICT_PROFITABILITY:  "district-profitability",
+    DISTRICTS_GEOJSON:       "districts-geojson",
+    ESTATE_BY_ID:            "estate-by-id",
+    HOUSE_ESTATES:           "house-estates",
+    SUGGEST:                 "suggest",
+    CURRENCY_RATES:          "currency-rates",
 } as const;
 
 export type QueryType = typeof QUERIES[keyof typeof QUERIES];

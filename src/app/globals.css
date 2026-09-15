@@ -182,6 +182,25 @@ html.dark {
   }
 }
 
+/* ─── Shimmer skeleton animation ─────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@layer utilities {
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--surface-muted) 25%,
+      var(--surface-page) 50%,
+      var(--surface-muted) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+}
+
 /* ─── Base styles ─────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after {
@@ -484,4 +503,57 @@ html.dark {
   transform: scale(1.05);
   background: var(--brand);
   color: #ffffff;
+}
+
+/* ─── District heat map labels ──────────────────────────────────────────── */
+/* Root — якорь для Mapbox (переписывает transform каждый кадр). Стили и
+ * анимации живут во __inner, иначе transform перезаписывается позицией. */
+.district-heat-label {
+  cursor: pointer;
+  user-select: none;
+}
+
+.district-heat-label__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+  transform-origin: center;
+  transition: transform 120ms, box-shadow 120ms;
+  animation: district-heat-label-in 320ms ease-out;
+}
+
+.district-heat-label:hover .district-heat-label__inner {
+  transform: scale(1.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+.district-heat-label__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.district-heat-label__sep {
+  color: rgba(248, 250, 252, 0.4);
+}
+
+.district-heat-label__price {
+  color: rgba(248, 250, 252, 0.65);
+  font-size: 11px;
+}
+
+@keyframes district-heat-label-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
 }

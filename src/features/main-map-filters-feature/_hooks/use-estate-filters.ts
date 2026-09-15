@@ -8,6 +8,17 @@ import {
     type MapFiltersType,
 } from '@/entities/estate'
 
+// URL-параметры, которые не относятся к фильтрам, но должны переживать
+// setFilters/clearFilters — режим карты и валюта отображения.
+const PRESERVED_PARAMS = ['currency', 'mapMode'] as const
+
+function preserve(source: URLSearchParams, target: URLSearchParams) {
+    for (const key of PRESERVED_PARAMS) {
+        const v = source.get(key)
+        if (v) target.set(key, v)
+    }
+}
+
 export function useEstateFilters() {
     const searchParams = useSearchParams()
     const router = useRouter()
@@ -22,8 +33,7 @@ export function useEstateFilters() {
             const current = parseFiltersFromSearchParams(searchParams)
             const next = typeof updater === 'function' ? updater(current) : updater
             const sp = serializeFiltersToSearchParams(next)
-            const currencyParam = searchParams.get('currency')
-            if (currencyParam) sp.set('currency', currencyParam)
+            preserve(new URLSearchParams(searchParams.toString()), sp)
             const qs = sp.toString()
             startTransition(() => {
                 router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
@@ -33,10 +43,13 @@ export function useEstateFilters() {
     )
 
     const clearFilters = useCallback(() => {
+        const sp = new URLSearchParams()
+        preserve(new URLSearchParams(searchParams.toString()), sp)
+        const qs = sp.toString()
         startTransition(() => {
-            router.replace(pathname, { scroll: false })
+            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
         })
-    }, [router, pathname])
+    }, [searchParams, router, pathname])
 
     return { filters, setFilters, clearFilters, isPending }
 }

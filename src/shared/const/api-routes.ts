@@ -15,11 +15,16 @@ export const API_ROUTES = {
     },
   },
   ESTATE: {
-    SEARCH:      '/estate/search',
-    MAP_POINTS:  '/estate/map-points',
-    HOUSE:       '/estate/house',
-    SUGGEST:     '/estate/suggest',
-    BY_ID:       (id: number | string) => `/estate/${id}`,
+    SEARCH:                 '/estate/search',
+    MAP_POINTS:             '/estate/map-points',
+    DISTRICT_PROFITABILITY: '/estate/district-profitability',
+    DISTRICTS_GEOJSON:      '/estate/districts-geojson',
+    HOUSE:                  '/estate/house',
+    SUGGEST:                '/estate/suggest',
+    BY_ID:                  (id: number | string) => `/estate/${id}`,
+  },
+  CURRENCY: {
+    RATES: '/currency/rates',
   },
 } as const;
 

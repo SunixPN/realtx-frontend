@@ -66,6 +66,7 @@ export type EstateType = {
     sellerType: number | null
     agencyName: string | null
     isActive: boolean
+    phone?: string | null
     publishedAt: string | null
     createdAt: string
     updatedAt: string
@@ -92,6 +93,33 @@ export type EstateShortType = {
 
 export type HouseEstatesResponseType = {
     items: EstateShortType[]
+}
+
+export type DistrictProfitabilityType = {
+    district: string
+    score: number
+    avgPricePerM2: number | null
+    currency: number
+    matchCount: number
+    mode: 'filters' | 'price'
+}
+
+export type DistrictFeatureProperties = {
+    name: string
+    fallback?: boolean
+    centroid: { lng: number; lat: number }
+}
+
+export type DistrictGeoJSONType = {
+    type: 'FeatureCollection'
+    features: Array<{
+        type: 'Feature'
+        properties: DistrictFeatureProperties
+        geometry: {
+            type: 'Polygon' | 'MultiPolygon'
+            coordinates: number[][][] | number[][][][]
+        }
+    }>
 }
 
 export type EstateSearchResponseType = {

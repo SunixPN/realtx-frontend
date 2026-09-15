@@ -9,7 +9,7 @@ export function UISkeleton({ className }: SkeletonProps) {
     <div
       role="status"
       aria-label="Загрузка"
-      className={cn('animate-pulse rounded-sm bg-surface-muted', className)}
+      className={cn('animate-shimmer rounded-sm', className)}
     />
   );
 }

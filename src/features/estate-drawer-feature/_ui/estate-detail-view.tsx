@@ -1,7 +1,8 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, ExternalLink, Heart, Train, X } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowLeft, ExternalLink, Heart, Maximize2, Train, X } from 'lucide-react'
 import { estateByIdQuery, REPAIR_STATE_LABELS, WALL_MATERIAL_LABELS } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { PhotoSlider } from './photo-slider'
@@ -98,16 +99,6 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            {estate.sourceUrl && (
-                                <a
-                                    href={estate.sourceUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex h-10 items-center justify-center gap-2 rounded-md border border-[var(--border-default)] px-4 text-sm font-medium text-[var(--text-base)] hover:bg-[var(--surface-muted)]"
-                                >
-                                    <ExternalLink className="size-4" /> На realt.by
-                                </a>
-                            )}
                             {
                                 isLoading ? (
                                     <div
@@ -129,6 +120,22 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                     </>
                                 )
                             }
+                            <Link
+                                href={`/property/${estate.id}?currency=${currency}`}
+                                className="flex h-10 items-center justify-center gap-2 rounded-md border border-[var(--border-default)] px-4 text-sm font-medium text-[var(--text-base)] hover:bg-[var(--surface-muted)]"
+                            >
+                                <Maximize2 className="size-4" /> Открыть полностью
+                            </Link>
+                            {estate.sourceUrl && (
+                                <a
+                                    href={estate.sourceUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex h-10 items-center justify-center gap-2 rounded-md border border-[var(--border-default)] px-4 text-sm font-medium text-[var(--text-base)] hover:bg-[var(--surface-muted)]"
+                                >
+                                    <ExternalLink className="size-4" /> На realt.by
+                                </a>
+                            )}
                         </div>
 
                         <div>

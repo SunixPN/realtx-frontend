@@ -1,7 +1,7 @@
 'use client'
 
 import { ImageOff, Train } from 'lucide-react'
-import type { EstateShortType } from '@/entities/estate'
+import { getThumbPhoto, type EstateShortType } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { PriceDisplay, PricePerM2Display } from './price-display'
 import { formatArea, formatRooms, formatStorey } from './format'
@@ -22,7 +22,7 @@ export function EstateListCard({ item, onClick }: Props) {
             <div className="relative size-24 shrink-0 overflow-hidden rounded-md bg-[var(--surface-muted)]">
                 {item.photo ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.photo} alt="" className="size-full object-cover" />
+                    <img src={getThumbPhoto(item.photo)} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
                 ) : (
                     <div className="flex size-full items-center justify-center text-[var(--text-faint)]">
                         <ImageOff className="size-6" aria-hidden />

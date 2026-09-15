@@ -17,7 +17,7 @@ export function EstateDrawerFeature() {
     const { stack, top, isOpen, openEstate, back, close } = useEstateSelection()
     const showBack = stack.length > 1
 
-    // Плавно центрируем карту на выбранной точке с учётом ширины drawer'а.
+
     useEffect(() => {
         if (!map || !top) return
         easeToWithOffset(map, top.center, { rightPanelPx: DRAWER_WIDTH_PX })
