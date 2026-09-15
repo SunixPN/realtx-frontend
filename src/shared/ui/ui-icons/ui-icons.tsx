@@ -179,3 +179,23 @@ export function IconLogOut({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
+
+export function IconArrowLeft({ size = 16, ...props }: IconProps) {
+  return (
+    <svg {...baseProps(size, props)}>
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </svg>
+  );
+}
+
+export function IconKey({ size = 16, ...props }: IconProps) {
+  return (
+    <svg {...baseProps(size, props)}>
+      <circle cx="8" cy="15" r="4" />
+      <path d="M10.85 12.15 19 4" />
+      <path d="m18 5 2 2" />
+      <path d="m15 8 2 2" />
+    </svg>
+  );
+}

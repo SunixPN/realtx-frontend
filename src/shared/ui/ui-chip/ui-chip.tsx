@@ -14,8 +14,9 @@ import { IconChevronDown, IconX } from '@/shared/ui/ui-icons';
 export interface ChipProps {
   /** Название фильтра, показывается когда значение не выбрано. */
   label:      string;
-  /** Отображаемое значение фильтра. Если задано — chip рендерится в filled-виде. */
-  value?:     string;
+  /** Отображаемое значение фильтра. Если задано — chip рендерится в filled-виде.
+   * Может быть строкой или React-нодом (например, чтобы вставить глиф валюты). */
+  value?:     ReactNode;
   /** Количество выбранных элементов (например, 2 комнаты). */
   count?:     number;
   /** Контент выпадающей панели: чекбоксы, диапазоны, что угодно. */
@@ -42,7 +43,7 @@ export function UIChip({
   const popoverRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
 
-  const hasValue = value !== undefined && value !== '';
+  const hasValue = value !== undefined && value !== null && value !== '';
   const variant = open ? 'open' : hasValue ? 'filled' : 'empty';
 
   const pos = usePopoverPosition(triggerRef, open);
@@ -51,7 +52,13 @@ export function UIChip({
     if (!open) return;
     const handler = (e: MouseEvent) => {
       const t = e.target as Node;
+      // Клик по вложенному портальному попапу (например, дропдаун UISelect,
+      // рендерящийся через createPortal в body) — не outside-click. Иначе
+      // клик по опции закрыл бы chip раньше, чем сработал onClick опции.
+      const inNestedPopover =
+        t instanceof Element && !!t.closest('[data-popover-portal="true"]');
       if (
+        !inNestedPopover &&
         triggerRef.current && !triggerRef.current.contains(t) &&
         popoverRef.current && !popoverRef.current.contains(t)
       ) {
@@ -132,6 +139,7 @@ export function UIChip({
           <div
             ref={popoverRef}
             role="dialog"
+            data-popover-portal="true"
             style={{
               position: 'fixed',
               top: pos.top + 4,

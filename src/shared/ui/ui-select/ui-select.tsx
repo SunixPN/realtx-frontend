@@ -10,7 +10,7 @@ import {
 import { createPortal } from 'react-dom';
 import { cn } from '@/shared/helpers/cn';
 import { usePopoverPosition } from '@/shared/helpers/use-popover-position';
-import { IconChevronDown, IconCheck } from '@/shared/ui/ui-icons';
+import { IconChevronDown, IconCheck, IconX } from '@/shared/ui/ui-icons';
 
 export interface SelectOption {
   value: string;
@@ -30,6 +30,8 @@ export interface SelectProps {
   disabled?:     boolean;
   className?:    string;
   name?:         string;
+  /** Показывает крестик очистки в триггере, когда есть значение. */
+  clearable?:    boolean;
 }
 
 export function UISelect({
@@ -44,6 +46,7 @@ export function UISelect({
   disabled,
   className,
   name,
+  clearable,
 }: SelectProps) {
   const autoId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -90,6 +93,13 @@ export function UISelect({
     setOpen(false);
   };
 
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isControlled) setInternalValue(undefined);
+    onChange?.('');
+    setOpen(false);
+  };
+
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       {label && (
@@ -122,13 +132,25 @@ export function UISelect({
           {selected?.icon}
           {selected?.label ?? placeholder}
         </span>
-        <IconChevronDown
-          size={16}
-          className={cn(
-            'shrink-0 text-text-faint transition-transform',
-            open && 'rotate-180',
-          )}
-        />
+        {clearable && selected ? (
+          <span
+            role="button"
+            aria-label="Очистить"
+            onClick={handleClear}
+            onMouseDown={(e) => e.stopPropagation()}
+            className="shrink-0 rounded-full p-0.5 text-text-faint hover:bg-surface-subtle hover:text-text-base"
+          >
+            <IconX size={14} />
+          </span>
+        ) : (
+          <IconChevronDown
+            size={16}
+            className={cn(
+              'shrink-0 text-text-faint transition-transform',
+              open && 'rotate-180',
+            )}
+          />
+        )}
       </button>
 
       {open && !disabled && pos && typeof window !== 'undefined' &&
@@ -136,6 +158,7 @@ export function UISelect({
           <ul
             ref={popoverRef}
             role="listbox"
+            data-popover-portal="true"
             style={{
               position: 'fixed',
               top: pos.top + 4,

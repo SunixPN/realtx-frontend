@@ -1,9 +1,9 @@
-import { useId } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { cn } from '@/shared/helpers/cn';
 
 export interface RangeFieldProps {
-  label?:        string;
-  unit?:         string;
+  label?:        ReactNode;
+  unit?:         ReactNode;
   hint?:         string;
   error?:        string;
   fromValue?:    string | number;
@@ -14,6 +14,47 @@ export interface RangeFieldProps {
   onToChange?:   (value: string) => void;
   disabled?:     boolean;
   className?:    string;
+  // Когда задан — вызовы onFromChange/onToChange откладываются на debounceMs мс
+  // после последнего keystroke. Внешнее значение принимается сразу, только если
+  // пользователь не печатает прямо сейчас (dirty=false).
+  debounceMs?:  number;
+}
+
+function useDebouncedInput(
+  externalValue: string | number | undefined,
+  onChange: ((v: string) => void) | undefined,
+  debounceMs: number | undefined,
+) {
+  const [local, setLocal] = useState(String(externalValue ?? ''))
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isDirtyRef = useRef(false)
+
+  // Синхронизируем внешнее значение → локальное, пока пользователь не печатает.
+  useEffect(() => {
+    if (!isDirtyRef.current) {
+      setLocal(String(externalValue ?? ''))
+    }
+  }, [externalValue])
+
+  const handleChange = (v: string) => {
+    setLocal(v)
+    if (!debounceMs) {
+      onChange?.(v)
+      return
+    }
+    isDirtyRef.current = true
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      isDirtyRef.current = false
+      timerRef.current = null
+      onChange?.(v)
+    }, debounceMs)
+  }
+
+  // Чистим таймер при размонтировании.
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current) }, [])
+
+  return { local, handleChange }
 }
 
 export function UIRangeField({
@@ -29,10 +70,14 @@ export function UIRangeField({
   onToChange,
   disabled,
   className,
+  debounceMs,
 }: RangeFieldProps) {
   const fromId = useId();
   const toId = useId();
   const hasError = !!error;
+
+  const { local: localFrom, handleChange: handleFromChange } = useDebouncedInput(fromValue, onFromChange, debounceMs)
+  const { local: localTo,   handleChange: handleToChange   } = useDebouncedInput(toValue,   onToChange,   debounceMs)
 
   const inputCls = cn(
     'flex h-10 flex-1 items-center rounded-sm border bg-surface-page px-3 transition-colors',
@@ -55,8 +100,8 @@ export function UIRangeField({
             id={fromId}
             type="number"
             inputMode="numeric"
-            value={fromValue ?? ''}
-            onChange={(e) => onFromChange?.(e.target.value)}
+            value={localFrom}
+            onChange={(e) => handleFromChange(e.target.value)}
             placeholder={fromPlaceholder}
             disabled={disabled}
             className="w-full bg-transparent text-sm tabular-nums text-text-base placeholder:text-text-faint outline-none"
@@ -69,8 +114,8 @@ export function UIRangeField({
             id={toId}
             type="number"
             inputMode="numeric"
-            value={toValue ?? ''}
-            onChange={(e) => onToChange?.(e.target.value)}
+            value={localTo}
+            onChange={(e) => handleToChange(e.target.value)}
             placeholder={toPlaceholder}
             disabled={disabled}
             className="w-full bg-transparent text-sm tabular-nums text-text-base placeholder:text-text-faint outline-none"

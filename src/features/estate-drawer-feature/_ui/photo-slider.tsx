@@ -1,0 +1,124 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight, ImageOff } from 'lucide-react'
+
+type Props = {
+    photos: string[]
+    loading?: boolean
+}
+
+export function PhotoSlider({ photos, loading }: Props) {
+    const [idx, setIdx] = useState(0)
+    const thumbsRef = useRef<HTMLDivElement>(null)
+    const count = photos.length
+
+    // Сбрасываем индекс при смене объекта
+    useEffect(() => { setIdx(0) }, [photos])
+
+    // Скроллим превью к активному
+    useEffect(() => {
+        const container = thumbsRef.current
+        if (!container) return
+        const thumb = container.children[idx] as HTMLElement | undefined
+        if (!thumb) return
+        thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+    }, [idx])
+
+    const prev = () => setIdx((i) => (i - 1 + count) % count)
+    const next = () => setIdx((i) => (i + 1) % count)
+
+    if (loading) {
+        return (
+            <div className="relative aspect-[4/3] animate-pulse bg-[var(--surface-muted)]" />
+        )
+    }
+
+    if (count === 0) {
+        return (
+            <div className="relative aspect-[4/3] bg-[var(--surface-muted)]">
+                <div className="flex size-full flex-col items-center justify-center gap-1.5 text-[var(--text-faint)]">
+                    <ImageOff className="size-8" aria-hidden />
+                    <span className="text-sm">Фотографий нет</span>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div>
+            {/* Главное фото */}
+            <div className="relative aspect-[4/3] overflow-hidden bg-[var(--surface-muted)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                    key={photos[idx]}
+                    src={photos[idx]}
+                    alt=""
+                    className="size-full object-cover transition-opacity duration-200"
+                />
+
+                {/* Счётчик */}
+                <div className="absolute bottom-2 right-2 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white tabular-nums">
+                    {idx + 1} / {count}
+                </div>
+
+                {/* Стрелки — только если фото больше одного */}
+                {count > 1 && (
+                    <>
+                        <button
+                            type="button"
+                            aria-label="Предыдущее фото"
+                            onClick={prev}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 flex size-8 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60"
+                        >
+                            <ChevronLeft className="size-5" />
+                        </button>
+                        <button
+                            type="button"
+                            aria-label="Следующее фото"
+                            onClick={next}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 flex size-8 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60"
+                        >
+                            <ChevronRight className="size-5" />
+                        </button>
+                    </>
+                )}
+            </div>
+
+            {/* Превью — горизонтальный скролл */}
+            {count > 1 && (
+                <div
+                    ref={thumbsRef}
+                    className="flex gap-2 overflow-x-auto scroll-smooth px-4 pt-3 pb-1"
+                    style={{ scrollbarWidth: 'none' }}
+                >
+                    {photos.map((src, i) => (
+                        <button
+                            key={src + i}
+                            type="button"
+                            aria-label={`Фото ${i + 1}`}
+                            onClick={() => setIdx(i)}
+                            className="relative shrink-0 overflow-hidden rounded-sm transition"
+                            style={{ width: 64, aspectRatio: '4/3' }}
+                        >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                                src={src}
+                                alt=""
+                                loading="lazy"
+                                className="size-full object-cover"
+                            />
+                            {/* Активный — бренд-рамка */}
+                            <span
+                                className="absolute inset-0 rounded-sm border-2 transition"
+                                style={{
+                                    borderColor: i === idx ? 'var(--brand)' : 'transparent',
+                                }}
+                            />
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    )
+}

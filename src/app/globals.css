@@ -1,4 +1,22 @@
 @import "tailwindcss";
+@import "mapbox-gl/dist/mapbox-gl.css";
+
+/* ─── Официальный шрифт-символ белорусского рубля (Нацбанк РБ) ────── */
+/* Символ BYN не имеет точки в Unicode; шрифт мапит его на U+E901 (PUA). */
+@font-face {
+  font-family: 'nbrb';
+  src: url('/nbrb.woff2') format('woff2'),
+       url('/nbrb.woff')  format('woff'),
+       url('/nbrb.ttf')   format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Layout ──────────────────────────────────────────────────────── */
+:root {
+  --header-height: 65px;
+}
 
 /* ─── Light mode ──────────────────────────────────────────────────── */
 :root {
@@ -141,6 +159,29 @@ html.dark {
   --shadow-xl: 0 20px 40px rgb(0 0 0 / 0.12);
 }
 
+/* ─── Dropdown animation ──────────────────────────────────────────── */
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdown-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+}
+
 /* ─── Base styles ─────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after {
@@ -195,6 +236,20 @@ html.dark {
     font: inherit;
   }
 
+  /* Единый курсор для всех интерактивных «кнопок» — селектов, чипов,
+   * опций списка, чекбоксов, свитчей и т.п. По дефолту браузер даёт
+   * cursor:default на <button>, что выглядит вяло. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='combobox']:not(:disabled),
+  [role='option'],
+  [role='switch']:not(:disabled),
+  summary,
+  label:has(> input[type='checkbox']:not(:disabled)),
+  label:has(> input[type='radio']:not(:disabled)) {
+    cursor: pointer;
+  }
+
   ::selection {
     background-color: var(--brand);
     color: #fff;
@@ -205,4 +260,228 @@ html.dark {
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }
+
+  /* ─── Scrollbar ───────────────────────────────────────────────────── */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-default) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--border-default);
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--border-strong);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+/* ─── Map pins ──────────────────────────────────────────────────────── */
+/* ВАЖНО: на .map-pin (root-элементе маркера) нельзя вешать transform или
+ * transition transform — Mapbox сам пишет ему inline `transform: translate(...)`
+ * на каждый pan/zoom для позиционирования. Любой наш transform его затирает,
+ * а transition превращает обновления позиции в анимацию → маркер дрейфует. */
+.map-pin {
+  cursor: pointer;
+  user-select: none;
+}
+
+.map-pin__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: bottom center;
+  transition: transform 120ms;
+  will-change: transform;
+}
+
+.map-pin__label {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: var(--brand);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid var(--brand-hover);
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Хвостик: CSS-триангл, чтобы визуальный кончик был точно на layout-bottom,
+ * т.е. ровно на геокоординате (anchor='bottom'). */
+.map-pin__tail {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--brand);
+  margin-top: -1px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+.map-pin:hover {
+  z-index: 10;
+}
+.map-pin:hover .map-pin__inner {
+  transform: scale(1.05);
+}
+
+.map-pin:hover .map-pin__label {
+  background: var(--brand-hover);
+}
+
+.map-pin--visited .map-pin__label {
+  background: #475569;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+.map-pin--visited .map-pin__tail {
+  border-top-color: #475569;
+}
+
+.map-pin--selected {
+  z-index: 20;
+}
+.map-pin--selected .map-pin__inner {
+  transform: scale(1.1);
+}
+.map-pin--selected .map-pin__label {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+.map-pin--selected .map-pin__tail {
+  border-top-color: #ffffff;
+}
+
+/* ─── Map clusters ──────────────────────────────────────────────────── */
+/* Та же логика, что у .map-pin: root — только «якорь» для Mapbox,
+ * визуальный контейнер и его transform/transition живут во __inner. */
+.map-cluster {
+  cursor: pointer;
+  user-select: none;
+}
+
+.map-cluster__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--brand);
+  color: #ffffff;
+  font-weight: 600;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  font-variant-numeric: tabular-nums;
+  transition: transform 120ms, background-color 120ms;
+  will-change: transform;
+}
+
+.map-cluster:hover .map-cluster__inner {
+  transform: scale(1.05);
+  background: var(--brand-hover);
+}
+
+.map-cluster--sm {
+  width: 36px;
+  height: 36px;
+  font-size: 12px;
+}
+
+.map-cluster--md {
+  width: 48px;
+  height: 48px;
+  font-size: 15px;
+}
+
+.map-cluster--lg {
+  width: 64px;
+  height: 64px;
+  font-size: 18px;
+}
+
+.mapboxgl-marker {
+  will-change: transform;
+}
+
+/* ─── FiltersDrawer transitions (react-transition-group) ─────────────── */
+/* overflow:hidden на .map-container не даёт горизонтальному скроллу
+ * появляться пока панель едет справа. */
+.map-container {
+  overflow: hidden;
+}
+
+.drawer-backdrop-enter        { opacity: 0; }
+.drawer-backdrop-enter-active { opacity: 1; transition: opacity 320ms ease-out; }
+.drawer-backdrop-exit         { opacity: 1; }
+.drawer-backdrop-exit-active  { opacity: 0; transition: opacity 320ms ease-out; }
+
+.drawer-panel-enter        { transform: translateX(100%); }
+.drawer-panel-enter-active { transform: translateX(0);    transition: transform 320ms cubic-bezier(.25, 1, .5, 1); }
+.drawer-panel-exit         { transform: translateX(0); }
+.drawer-panel-exit-active  { transform: translateX(100%); transition: transform 320ms cubic-bezier(.25, 1, .5, 1); }
+
+/* ─── Map house (co-located cluster = квартиры в одном доме) ─────────── */
+/* Тот же контракт что и .map-cluster: root — якорь для Mapbox (transform им
+ * переписывается на каждый кадр), визуал и hover-transform живут во __inner. */
+.map-house {
+  cursor: pointer;
+  user-select: none;
+}
+
+.map-house__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 6px;
+  background: #ffffff;
+  color: var(--brand);
+  border: 1.5px solid var(--brand);
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition: transform 120ms, background-color 120ms, color 120ms;
+  will-change: transform;
+}
+
+.map-house__icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.map-house__count {
+  padding: 0 2px;
+}
+
+.map-house:hover .map-house__inner {
+  transform: scale(1.05);
+  background: var(--brand);
+  color: #ffffff;
 }

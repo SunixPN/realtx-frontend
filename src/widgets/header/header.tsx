@@ -33,7 +33,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border bg-surface-raised px-4">
+    <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center justify-between gap-4 border-b border-border bg-surface-raised px-4">
       <Link href={ROUTES.ROOT} className="flex items-center hover:opacity-80">
         <Image src="/logo.png" alt="RealtX" width={108} height={32} priority />
       </Link>

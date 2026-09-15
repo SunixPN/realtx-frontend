@@ -5,7 +5,7 @@ import UIInputPassword from '@/shared/ui/ui-input-password/ui-input-password';
 import { UIButton } from '@/shared/ui/ui-button';
 import { UIPasswordStrength } from '@/shared/ui/ui-password-strength';
 import { useRegisterForm } from '@/features/register-feature/_hooks/use-register-form';
-import { usePasswordStrength } from '@/features/register-feature/_hooks/use-password-strength';
+import { usePasswordStrength } from '@/shared/hooks/use-password-strength';
 
 export default function RegisterForm() {
     const { form, onSubmit, isSubmitting } = useRegisterForm();

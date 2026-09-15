@@ -1,8 +1,12 @@
 export const ROUTES = {
     SIGN_IN: "/sign-in",
+    SIGN_IN_PHONE: "/sign-in/phone",
     REGISTER: "/register",
     ROOT: "/",
-    RESET: "/password-recovery"
+    RESET: "/reset",
+    RESET_NEW: "/reset/new",
+    VERIFY_EMAIL: "/verify-email",
+    PROFILE: "/profile",
 } as const
 
 export type RoutesType = typeof ROUTES[keyof typeof ROUTES]

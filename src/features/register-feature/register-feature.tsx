@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import RegisterHeader from '@/features/register-feature/_ui/register-header/register-header';
 import RegisterForm from '@/features/register-feature/_ui/register-form/register-form';
+import { UIAuthFooter } from '@/shared/ui/ui-auth-footer';
 
 type RegisterFeatureProps = {
     googleOAuth?: ReactNode;
@@ -32,16 +33,7 @@ export default function RegisterFeature({ googleOAuth, phoneOAuth }: RegisterFea
                 </div>
             </main>
 
-            <footer className="border-t border-border bg-surface-raised px-4 py-4 text-center text-xs text-text-faint">
-                Продолжая, вы соглашаетесь с{' '}
-                <a href="#" className="underline hover:text-text-muted">
-                    условиями использования
-                </a>{' '}
-                и{' '}
-                <a href="#" className="underline hover:text-text-muted">
-                    политикой конфиденциальности
-                </a>
-            </footer>
+            <UIAuthFooter />
         </div>
     );
 }
