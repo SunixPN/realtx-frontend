@@ -273,6 +273,7 @@
         "breadcrumbs_aria": "Breadcrumbs",
         "back_to_map_aria": "Back to map",
         "chart_thousands_suffix": "k",
+        "map_price_k": "{n}k",
         "chart_aria": "Price history",
         "wall_panel": "Panel",
         "wall_brick": "Brick",

@@ -1,8 +1,11 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 // Спиннер-бейдж в правом верхнем углу карты. При открытом drawer'е
 // смещается влево на его ширину (420px) + отступ (16px) — поверх блюра.
 export function MapLoadingBadge({ drawerOpen }: { drawerOpen: boolean }) {
+    const t = useTranslations('common')
     return (
         <div
             className="absolute top-4 z-[60] transition-[right] duration-[320ms]"
@@ -16,7 +19,7 @@ export function MapLoadingBadge({ drawerOpen }: { drawerOpen: boolean }) {
                     className="size-5 animate-spin"
                     viewBox="0 0 24 24"
                     fill="none"
-                    aria-label="Загрузка"
+                    aria-label={t('loading_aria')}
                 >
                     <circle
                         cx="12" cy="12" r="9"

@@ -273,6 +273,7 @@
         "breadcrumbs_aria": "Хлебные крошки",
         "back_to_map_aria": "Назад к карте",
         "chart_thousands_suffix": "к",
+        "map_price_k": "{n} тыс",
         "chart_aria": "История цены",
         "wall_panel": "Панельный",
         "wall_brick": "Кирпичный",

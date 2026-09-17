@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import mapboxgl from 'mapbox-gl'
+import type { FeatureCollection } from 'geojson'
 import { scoreToColor, HEAT_COLOR_EXPRESSION } from '@/shared/map/heat-palette'
 import type { DistrictProfitabilityType, DistrictGeoJSONType } from '@/entities/estate'
 import type { MapMode } from './use-map-mode'
@@ -13,19 +15,21 @@ const SELECTED_LAYER = 'district-heat-selected'
 
 const SELECTED_COLOR = '#8b5cf6' // violet-500 — контрастно поверх красно-жёлто-зелёной заливки
 
-function formatPpm(price: number | null, currency: number): string {
+function formatPpm(price: number | null, currency: number, locale: string, perM2: string): string {
     if (price === null) return ''
     const sym = currency === 840 ? '$' : currency === 933 ? 'Br' : '€'
-    return `${price.toLocaleString('ru-RU')} ${sym}/м²`
+    return `${price.toLocaleString(locale)} ${sym}${perM2}`
 }
 
 function createLabelEl(
     name: string,
     district: DistrictProfitabilityType | undefined,
     onClick: () => void,
+    locale: string,
+    perM2: string,
 ): HTMLDivElement {
     const color = district ? scoreToColor(district.score) : '#94a3b8'
-    const priceText = district ? formatPpm(district.avgPricePerM2, district.currency) : ''
+    const priceText = district ? formatPpm(district.avgPricePerM2, district.currency, locale, perM2) : ''
 
     const el = document.createElement('div')
     el.className = 'district-heat-label'
@@ -48,7 +52,7 @@ function createLabelEl(
 function buildEnrichedGeoJSON(
     geojson: DistrictGeoJSONType,
     scoreMap: Map<string, DistrictProfitabilityType>,
-): GeoJSON.FeatureCollection {
+): FeatureCollection {
     return {
         type: 'FeatureCollection',
         features: geojson.features.map(f => ({
@@ -59,7 +63,7 @@ function buildEnrichedGeoJSON(
             },
             geometry: f.geometry,
         })),
-    } as GeoJSON.FeatureCollection
+    } as FeatureCollection
 }
 
 /**
@@ -73,6 +77,12 @@ export function useDistrictHeatLayers(
     districts: DistrictProfitabilityType[],
     geojson: DistrictGeoJSONType | undefined,
 ) {
+    const locale = useLocale()
+    const tFilters = useTranslations('filters')
+    const perM2Ref = useRef(tFilters('per_m2'))
+    perM2Ref.current = tFilters('per_m2')
+    const localeRef = useRef(locale)
+    localeRef.current = locale
     const labelsRef = useRef<mapboxgl.Marker[]>([])
     const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null)
 
@@ -97,7 +107,7 @@ export function useDistrictHeatLayers(
                 type: 'fill',
                 source: SOURCE_ID,
                 paint: {
-                    'fill-color': HEAT_COLOR_EXPRESSION as unknown as mapboxgl.FillPaint['fill-color'],
+                    'fill-color': HEAT_COLOR_EXPRESSION as unknown as string,
                     'fill-opacity': 0,
                     'fill-opacity-transition': { duration: 400, delay: 0 },
                 },
@@ -107,7 +117,7 @@ export function useDistrictHeatLayers(
                 type: 'line',
                 source: SOURCE_ID,
                 paint: {
-                    'line-color': HEAT_COLOR_EXPRESSION as unknown as mapboxgl.LinePaint['line-color'],
+                    'line-color': HEAT_COLOR_EXPRESSION as unknown as string,
                     'line-width': 2,
                     'line-opacity': 0,
                     'line-opacity-transition': { duration: 400, delay: 0 },
@@ -145,7 +155,7 @@ export function useDistrictHeatLayers(
             const el = createLabelEl(name, districtData, () => {
                 setSelectedDistrict(name)
                 map.easeTo({ center: centroid, zoom: 12.5, duration: 700 })
-            })
+            }, localeRef.current, perM2Ref.current)
             const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
                 .setLngLat(centroid)
                 .addTo(map)

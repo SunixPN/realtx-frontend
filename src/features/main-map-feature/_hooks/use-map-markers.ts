@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import mapboxgl from 'mapbox-gl'
 import { PRICE_CURRENCY_LABELS, type EstateMapPointType, type HouseBbox } from '@/entities/estate'
 import { BYN_SIGN_HTML } from '@/shared/ui/byn-sign/byn-sign'
@@ -20,13 +21,13 @@ const HIDDEN_LAYER_ID = `${SOURCE_ID}__hidden`
 // с запасом одинаковый порог 0.0008 — здания вытянуты, лучше терпимее.
 const HOUSE_SPAN_DEG = 8e-4
 
-function formatPrice(price: number | null, currency: number | null): string {
+function formatPrice(price: number | null, currency: number | null, formatK: (n: number) => string): string {
     if (price === null) return ''
     const sym = currency === 933
         ? BYN_SIGN_HTML
         : (currency !== null ? (PRICE_CURRENCY_LABELS[currency] ?? '') : '')
     const thousands = Math.round(price / 1000)
-    return `${thousands} тыс ${sym}`.trim()
+    return `${formatK(thousands)} ${sym}`.trim()
 }
 
 function clusterSizeClass(count: number): 'sm' | 'md' | 'lg' {
@@ -35,12 +36,18 @@ function clusterSizeClass(count: number): 'sm' | 'md' | 'lg' {
     return 'sm'
 }
 
-function createPinElement(point: EstateMapPointType): HTMLDivElement {
+const HEART_PIN_SVG = `<svg class="map-pin__fav" viewBox="0 0 24 24" aria-hidden="true" width="10" height="10"><path fill="currentColor" d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>`
+const HEART_HOUSE_SVG = `<svg class="map-house__fav" viewBox="0 0 24 24" aria-hidden="true" width="10" height="10"><path fill="currentColor" d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>`
+
+function createPinElement(point: EstateMapPointType, isFavorite: boolean, formatK: (n: number) => string): HTMLDivElement {
     const el = document.createElement('div')
     el.className = 'map-pin'
     el.innerHTML =
         `<div class="map-pin__inner">` +
-        `<span class="map-pin__label">${formatPrice(point.price, point.priceCurrency)}</span>` +
+        `<span class="map-pin__label">` +
+        (isFavorite ? HEART_PIN_SVG : '') +
+        formatPrice(point.price, point.priceCurrency, formatK) +
+        `</span>` +
         `<span class="map-pin__tail"></span>` +
         `</div>`
     return el
@@ -57,7 +64,7 @@ function createClusterElement(count: number): HTMLDivElement {
 // Визуально отличается от обычного кластера (иконка дома + счётчик), чтобы
 // пользователь понял, что клик откроет карточку дома, а не разъедется по карте.
 // Обработчик клика пока не навешиваем — функционал детальной ждёт отдельного тикета.
-function createHouseElement(count: number): HTMLDivElement {
+function createHouseElement(count: number, hasFavorite: boolean): HTMLDivElement {
     const el = document.createElement('div')
     el.className = 'map-house'
     el.innerHTML =
@@ -66,6 +73,7 @@ function createHouseElement(count: number): HTMLDivElement {
         `<path d="M8 1.6 1.6 6.4v8h4.2V9.6h4.4v4.8h4.2v-8L8 1.6z" fill="currentColor"/>` +
         `</svg>` +
         `<span class="map-house__count">${count}</span>` +
+        (hasFavorite ? HEART_HOUSE_SVG : '') +
         `</div>`
     return el
 }
@@ -131,13 +139,17 @@ export function useMapMarkers(
     map: mapboxgl.Map | null,
     points: EstateMapPointType[],
     handlers?: MarkerClickHandlers,
+    favoriteIds?: Set<number>,
 ) {
+    const t = useTranslations('estate')
+    const formatKRef = useRef((n: number) => t('map_price_k', { n }))
+    formatKRef.current = (n: number) => t('map_price_k', { n })
     const markersRef = useRef<Record<string, mapboxgl.Marker>>({})
     const onScreenRef = useRef<Record<string, mapboxgl.Marker>>({})
     const pointsRef = useRef<EstateMapPointType[]>(points)
     pointsRef.current = points
-    // Кладём хендлеры в ref, чтобы обновление колбэков не пересоздавало
-    // подписки/маркеры и не приводило к перерегистрации всей карты.
+    const favoriteIdsRef = useRef<Set<number>>(favoriteIds ?? new Set())
+    favoriteIdsRef.current = favoriteIds ?? new Set()
     const handlersRef = useRef<MarkerClickHandlers | undefined>(handlers)
     handlersRef.current = handlers
 
@@ -211,7 +223,13 @@ export function useMapMarkers(
                     key = isHouse ? `house-${clusterId}` : `cluster-${clusterId}`
                     if (!markersRef.current[key]) {
                         if (isHouse) {
-                            el = createHouseElement(count)
+                            const hasFav = pointsRef.current.some(p =>
+                                p.lng !== null && p.lat !== null &&
+                                Number(p.lng) >= minLng && Number(p.lng) <= maxLng &&
+                                Number(p.lat) >= minLat && Number(p.lat) <= maxLat &&
+                                favoriteIdsRef.current.has(p.id)
+                            )
+                            el = createHouseElement(count, hasFav)
                             const bbox = { minLng, maxLng, minLat, maxLat }
                             const center: [number, number] = [(minLng + maxLng) / 2, (minLat + maxLat) / 2]
                             el.addEventListener('click', (e) => {
@@ -235,7 +253,7 @@ export function useMapMarkers(
                     if (!markersRef.current[key]) {
                         const point = pointsById.get(id)
                         if (!point) continue
-                        el = createPinElement(point)
+                        el = createPinElement(point, favoriteIdsRef.current.has(id), formatKRef.current)
                         el.addEventListener('click', (e) => {
                             e.stopPropagation()
                             handlersRef.current?.onEstateClick(id, [lng, lat])
@@ -288,7 +306,7 @@ export function useMapMarkers(
     }, [map])
 
     // Обновление данных без пересоздания source/подписок.
-    // Маркеры сбрасываем полностью: цены/валюта в point могли измениться,
+    // Маркеры сбрасываем полностью: цены/валюта/избранное изменились,
     // а DOM-элементы кешируются по id и не обновляются сами по себе.
     useEffect(() => {
         if (!map) return
@@ -298,5 +316,5 @@ export function useMapMarkers(
         onScreenRef.current = {}
         markersRef.current = {}
         src.setData(toFeatureCollection(points))
-    }, [map, points])
+    }, [map, points, favoriteIds])
 }
