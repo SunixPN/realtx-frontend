@@ -6,7 +6,20 @@
         "close": "Закрыть",
         "back": "Назад",
         "range_from": "от",
-        "range_to": "до"
+        "range_to": "до",
+        "close_aria": "Закрыть",
+        "clear_aria": "Очистить",
+        "loading_aria": "Загрузка",
+        "select_placeholder": "Выберите",
+        "show_password_aria": "Показать пароль",
+        "hide_password_aria": "Скрыть пароль",
+        "password_strength_aria": "Сложность пароля",
+        "strength_weak": "Слабый",
+        "strength_medium": "Средний",
+        "strength_strong": "Надёжный",
+        "error_title": "Что-то пошло не так",
+        "error_description": "Не удалось загрузить данные. Попробуйте ещё раз",
+        "retry": "Повторить"
     },
     "header": {
         "logo_alt": "RealtX",

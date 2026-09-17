@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 import { usePopoverPosition } from '@/shared/helpers/use-popover-position';
 import { IconChevronDown, IconX } from '@/shared/ui/ui-icons';
@@ -39,6 +40,7 @@ export function UIChip({
   disabled,
   className,
 }: ChipProps) {
+  const tCommon = useTranslations('common');
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -115,7 +117,7 @@ export function UIChip({
         {hasValue && onClear ? (
           <span
             role="button"
-            aria-label="Очистить"
+            aria-label={tCommon('clear_aria')}
             onClick={(e) => {
               e.stopPropagation();
               onClear();

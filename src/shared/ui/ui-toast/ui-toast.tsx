@@ -1,4 +1,7 @@
+'use client';
+
 import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 import {
   IconCheckCircle,
@@ -33,6 +36,7 @@ export function UIToast({
   onClose,
   className,
 }: ToastProps) {
+  const t = useTranslations('common');
   return (
     <div
       role="status"
@@ -56,7 +60,7 @@ export function UIToast({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Закрыть"
+          aria-label={t('close_aria')}
           className="text-text-faint hover:text-text-base"
         >
           <IconX size={16} />

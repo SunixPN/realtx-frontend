@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 import { usePopoverPosition } from '@/shared/helpers/use-popover-position';
 import { IconChevronDown, IconCheck, IconX } from '@/shared/ui/ui-icons';
@@ -39,7 +40,7 @@ export function UISelect({
   value: controlledValue,
   defaultValue,
   onChange,
-  placeholder = 'Выберите',
+  placeholder,
   label,
   hint,
   error,
@@ -48,6 +49,8 @@ export function UISelect({
   name,
   clearable,
 }: SelectProps) {
+  const tCommon = useTranslations('common');
+  const displayPlaceholder = placeholder ?? tCommon('select_placeholder');
   const autoId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLUListElement>(null);
@@ -130,12 +133,12 @@ export function UISelect({
       >
         <span className={cn('flex items-center gap-2 truncate', !selected && 'text-text-faint')}>
           {selected?.icon}
-          {selected?.label ?? placeholder}
+          {selected?.label ?? displayPlaceholder}
         </span>
         {clearable && selected ? (
           <span
             role="button"
-            aria-label="Очистить"
+            aria-label={tCommon('clear_aria')}
             onClick={handleClear}
             onMouseDown={(e) => e.stopPropagation()}
             className="shrink-0 rounded-full p-0.5 text-text-faint hover:bg-surface-subtle hover:text-text-base"

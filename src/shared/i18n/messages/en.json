@@ -6,7 +6,20 @@
         "close": "Close",
         "back": "Back",
         "range_from": "from",
-        "range_to": "to"
+        "range_to": "to",
+        "close_aria": "Close",
+        "clear_aria": "Clear",
+        "loading_aria": "Loading",
+        "select_placeholder": "Select",
+        "show_password_aria": "Show password",
+        "hide_password_aria": "Hide password",
+        "password_strength_aria": "Password strength",
+        "strength_weak": "Weak",
+        "strength_medium": "Medium",
+        "strength_strong": "Strong",
+        "error_title": "Something went wrong",
+        "error_description": "Failed to load data. Please try again.",
+        "retry": "Retry"
     },
     "header": {
         "logo_alt": "RealtX",

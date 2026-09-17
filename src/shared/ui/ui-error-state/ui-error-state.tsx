@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { UIEmptyState } from '@/shared/ui/ui-empty-state';
 import { UIButton } from '@/shared/ui/ui-button';
 import { IconAlertTriangle } from '@/shared/ui/ui-icons';
@@ -10,20 +13,21 @@ export interface ErrorStateProps {
 }
 
 export function UIErrorState({
-  title = 'Что-то пошло не так',
-  description = 'Не удалось загрузить данные. Попробуйте ещё раз',
+  title,
+  description,
   onRetry,
-  retryLabel = 'Повторить',
+  retryLabel,
 }: ErrorStateProps) {
+  const t = useTranslations('common');
   return (
     <UIEmptyState
       icon={<IconAlertTriangle size={24} />}
-      title={title}
-      description={description}
+      title={title ?? t('error_title')}
+      description={description ?? t('error_description')}
       action={
         onRetry && (
           <UIButton variant="secondary" onClick={onRetry}>
-            {retryLabel}
+            {retryLabel ?? t('retry')}
           </UIButton>
         )
       }

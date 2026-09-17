@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 
 export type PasswordStrength = 'weak' | 'medium' | 'strong';
@@ -10,21 +13,23 @@ interface UIPasswordStrengthProps {
 
 const SEGMENTS = 3;
 
-const CONFIG: Record<PasswordStrength, { filled: number; bar: string; text: string; label: string }> = {
-    weak:   { filled: 1, bar: 'bg-error',   text: 'text-error',   label: 'Слабый'   },
-    medium: { filled: 2, bar: 'bg-warning',  text: 'text-warning', label: 'Средний'  },
-    strong: { filled: 3, bar: 'bg-success',  text: 'text-success', label: 'Надёжный' },
+const CONFIG: Record<PasswordStrength, { filled: number; bar: string; text: string }> = {
+    weak:   { filled: 1, bar: 'bg-error',   text: 'text-error'   },
+    medium: { filled: 2, bar: 'bg-warning',  text: 'text-warning' },
+    strong: { filled: 3, bar: 'bg-success',  text: 'text-success' },
 };
 
 export function UIPasswordStrength({ value, isEmpty = false, className }: UIPasswordStrengthProps) {
-    const { filled, bar, text, label } = CONFIG[value];
+    const t = useTranslations('common');
+    const { filled, bar, text } = CONFIG[value];
+    const label = t(value === 'weak' ? 'strength_weak' : value === 'medium' ? 'strength_medium' : 'strength_strong');
 
     return (
         <div className={cn('mt-2 flex items-center gap-2', className)}>
             <div
                 className="flex flex-1 gap-1"
                 role="meter"
-                aria-label="Сложность пароля"
+                aria-label={t('password_strength_aria')}
                 aria-valuenow={isEmpty ? 0 : filled}
                 aria-valuemin={0}
                 aria-valuemax={SEGMENTS}
