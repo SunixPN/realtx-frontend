@@ -1,26 +1,41 @@
-import { api } from '@/shared/api/api';
-import { API_ROUTES } from '@/shared/const/api-routes';
-import { MUTATIONS } from '@/shared/const/mutations';
-import { MutationOptionsType } from '@/shared/types/mutation';
-import { showToast } from '@/shared/helpers/show-toast';
-import { AuthResponseType } from '@/entities/me/types/me-type';
-import { queryClient } from '@/shared/api/query';
-import { QUERIES } from '@/shared/const/queries';
+'use client'
+
+import useSWRMutation from 'swr/mutation'
+import { useSWRConfig } from 'swr'
+import { useTranslations } from 'next-intl'
+import { api } from '@/shared/api/api'
+import { API_ROUTES } from '@/shared/const/api-routes'
+import { MUTATIONS } from '@/shared/const/mutations'
+import { AuthResponseType } from '@/entities/me/types/me-type'
+import { showToast } from '@/shared/helpers/show-toast'
+import { authKey } from '@/entities/me/api/auth-query'
+import { saveAccessTokenAction } from '@/shared/actions/save-access-token-action'
 
 type Body = {
-    name?: string;
-    email: string;
-    password: string;
-};
+    name?: string
+    email: string
+    password: string
+}
 
-export const registerMutation: MutationOptionsType<Body> = {
-    mutationKey: [MUTATIONS.REGISTER],
-    mutationFn: (body) => api.post<AuthResponseType>(API_ROUTES.AUTH.REGISTER, body),
-    onSuccess: () => {
-        showToast({ status: 'success', text: 'Аккаунт создан' });
-        queryClient.invalidateQueries({ queryKey: [QUERIES.AUTH_QUERY] });
-    },
-    onError: (error) => {
-        showToast({ status: 'error', text: error?.message });
-    },
-};
+export function useRegisterMutation() {
+    const { mutate } = useSWRConfig()
+    const t = useTranslations('auth.register')
+    return useSWRMutation<AuthResponseType, Error, string, Body>(
+        MUTATIONS.REGISTER,
+        async (_key, { arg }) => {
+            const r = await api.post<AuthResponseType>(API_ROUTES.AUTH.REGISTER, arg)
+            return r.data
+        },
+        {
+            onSuccess: async (data) => {
+                await saveAccessTokenAction(data.accessToken)
+                showToast({ status: 'success', text: t('toast_success') })
+                mutate(authKey)
+            },
+            onError: (error) => {
+                showToast({ status: 'error', text: error?.message })
+            },
+            throwOnError: false,
+        },
+    )
+}

@@ -1,21 +1,32 @@
-import { queryOptions } from '@tanstack/react-query'
+'use client'
+
+import useSWR from 'swr'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
-import { QUERIES } from '@/shared/const/queries'
-import { normalizeFilters, type MapFiltersType } from '../model/estate-filters'
+import { type MapFiltersType } from '../model/estate-filters'
 import type { DistrictProfitabilityType } from './estate-types'
+import { districtProfitabilityKey } from './estate-query-keys'
 
-export const districtProfitabilityQuery = (
+export { districtProfitabilityKey }
+
+type Key = ReturnType<typeof districtProfitabilityKey>
+
+const fetcher = async ([, displayCurrency, normFilters]: Key): Promise<DistrictProfitabilityType[]> => {
+    const r = await api.get<DistrictProfitabilityType[]>(API_ROUTES.ESTATE.DISTRICT_PROFITABILITY, {
+        params: { ...normFilters, displayCurrency },
+    })
+    return r.data
+}
+
+export function useDistrictProfitability(
     filters: MapFiltersType = {},
     displayCurrency: 'USD' | 'BYN' | 'EUR' = 'USD',
-) => {
-    const params = { ...normalizeFilters(filters), displayCurrency }
-    return queryOptions({
-        queryKey: [QUERIES.DISTRICT_PROFITABILITY, displayCurrency, ...Object.values(normalizeFilters(filters))],
-        queryFn: async () => {
-            const r = await api.get<DistrictProfitabilityType[]>(API_ROUTES.ESTATE.DISTRICT_PROFITABILITY, { params })
-            return r.data
-        },
-        staleTime: 60 * 1000,
-    })
+    options?: { enabled?: boolean },
+) {
+    const enabled = options?.enabled ?? true
+    return useSWR<DistrictProfitabilityType[]>(
+        enabled ? districtProfitabilityKey(filters, displayCurrency) : null,
+        fetcher as (k: Key) => Promise<DistrictProfitabilityType[]>,
+        { keepPreviousData: true },
+    )
 }

@@ -1,10 +1,11 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import { resetConfirmMutation } from '@/features/reset-confirm-feature/_api/reset-confirm-mutation';
-import { resetConfirmSchema, ResetConfirmValues } from '@/features/reset-confirm-feature/_schemas/reset-confirm-schema';
+import { useTranslations } from 'next-intl';
+import { useResetConfirmMutation } from '@/features/reset-confirm-feature/_api/reset-confirm-mutation';
+import { createResetConfirmSchema, ResetConfirmValues } from '@/features/reset-confirm-feature/_schemas/reset-confirm-schema';
 
 type UseResetConfirmFormArgs = {
     token:     string;
@@ -12,21 +13,18 @@ type UseResetConfirmFormArgs = {
 };
 
 export const useResetConfirmForm = ({ token, onSuccess }: UseResetConfirmFormArgs) => {
+    const tV = useTranslations('validation');
+    const schema = useMemo(() => createResetConfirmSchema(tV), [tV]);
     const form = useForm<ResetConfirmValues>({
-        resolver: zodResolver(resetConfirmSchema),
+        resolver: zodResolver(schema),
         defaultValues: { password: '', passwordConfirm: '' },
     });
 
-    const { mutate: confirm, isPending: isSubmitting } = useMutation({
-        ...resetConfirmMutation,
-        onSuccess: (data, variables, onMutateResult, context) => {
-            resetConfirmMutation.onSuccess?.(data, variables, onMutateResult, context);
-            onSuccess();
-        },
-    });
+    const { trigger, isMutating: isSubmitting } = useResetConfirmMutation();
 
-    const onSubmit = (values: ResetConfirmValues) => {
-        confirm({ token, password: values.password });
+    const onSubmit = async (values: ResetConfirmValues) => {
+        const result = await trigger({ token, password: values.password });
+        if (result) onSuccess();
     };
 
     return { form, onSubmit, isSubmitting };

@@ -1,11 +1,13 @@
 import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import {Toaster} from "sonner";
+import {NextIntlClientProvider} from "next-intl";
+import {getLocale, getMessages, getTranslations} from "next-intl/server";
 import {Header} from "@/widgets/header";
 import "./globals.css";
 import QueryProvider from "@/app/_providers/query-provider";
-import UserHydrationProvider from "@/app/_providers/user-hydration-provider";
 import {ReactNode} from "react";
+import { TopLoader } from "@/shared/ui/top-loader/top-loader";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -13,24 +15,31 @@ const inter = Inter({
     display: "swap",
 });
 
-export const metadata: Metadata = {
-    title: "RealtX — агрегатор недвижимости",
-    description: "Поиск квартир, домов и коммерческой недвижимости в Беларуси",
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations("common");
+    return {
+        title: t("meta_title"),
+        description: t("app_description"),
+    };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: { children: ReactNode; }) {
+    const locale = await getLocale();
+    const messages = await getMessages();
+
     return (
-        <html lang="ru" className={inter.variable} suppressHydrationWarning>
+        <html lang={locale} className={inter.variable} suppressHydrationWarning>
             <QueryProvider>
-                <UserHydrationProvider>
-                    <body className="min-h-screen bg-surface-page text-text-base antialiased">
+                <body className="min-h-screen bg-surface-page text-text-base antialiased">
+                    <NextIntlClientProvider locale={locale} messages={messages}>
+                        <TopLoader />
                         <Header/>
                         {children}
                         <Toaster position="top-right" richColors closeButton />
-                    </body>
-                </UserHydrationProvider>
+                    </NextIntlClientProvider>
+                </body>
             </QueryProvider>
         </html>
     );

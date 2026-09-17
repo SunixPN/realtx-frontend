@@ -1,19 +1,33 @@
-import { api } from '@/shared/api/api';
-import { API_ROUTES } from '@/shared/const/api-routes';
-import { MUTATIONS } from '@/shared/const/mutations';
-import { MutationOptionsType } from '@/shared/types/mutation';
-import { showToast } from '@/shared/helpers/show-toast';
-import { queryClient } from '@/shared/api/query';
-import { QUERIES } from '@/shared/const/queries';
+'use client'
 
-export const logoutMutation: MutationOptionsType<void> = {
-    mutationKey: [MUTATIONS.LOGOUT],
-    mutationFn: () => api.post(API_ROUTES.AUTH.LOGOUT),
-    onSuccess: () => {
-        showToast({ status: 'success', text: 'Вы вышли из аккаунта' });
-        queryClient.setQueryData([QUERIES.AUTH_QUERY], null);
-    },
-    onError: (error) => {
-        showToast({ status: 'error', text: error?.message ?? 'Не удалось выйти' });
-    },
-};
+import useSWRMutation from 'swr/mutation'
+import { useSWRConfig } from 'swr'
+import { useTranslations } from 'next-intl'
+import { api } from '@/shared/api/api'
+import { API_ROUTES } from '@/shared/const/api-routes'
+import { MUTATIONS } from '@/shared/const/mutations'
+import { showToast } from '@/shared/helpers/show-toast'
+import { authKey } from '@/entities/me/api/auth-query'
+import { clearTokensAction } from '@/shared/actions/clear-tokens-action'
+
+export function useLogoutMutation() {
+    const { mutate } = useSWRConfig()
+    const t = useTranslations('auth.logout')
+    return useSWRMutation<void, Error, string, void>(
+        MUTATIONS.LOGOUT,
+        async () => {
+            await api.post(API_ROUTES.AUTH.LOGOUT)
+        },
+        {
+            onSuccess: async () => {
+                await clearTokensAction()
+                mutate(authKey, null, { revalidate: false })
+                showToast({ status: 'success', text: t('toast_success') })
+            },
+            onError: (error) => {
+                showToast({ status: 'error', text: error?.message ?? t('toast_error') })
+            },
+            throwOnError: false,
+        },
+    )
+}

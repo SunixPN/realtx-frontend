@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { UIInput } from '@/shared/ui/ui-input';
 import UIInputPassword from '@/shared/ui/ui-input-password/ui-input-password';
 import { UIButton } from '@/shared/ui/ui-button';
@@ -8,6 +9,7 @@ import { useRegisterForm } from '@/features/register-feature/_hooks/use-register
 import { usePasswordStrength } from '@/shared/hooks/use-password-strength';
 
 export default function RegisterForm() {
+    const t = useTranslations('auth.register');
     const { form, onSubmit, isSubmitting } = useRegisterForm();
     const password = form.watch('password') ?? '';
     const strength = usePasswordStrength(password);
@@ -19,8 +21,8 @@ export default function RegisterForm() {
             noValidate
         >
             <UIInput
-                label="Имя"
-                placeholder="Как к вам обращаться"
+                label={t('name_label')}
+                placeholder={t('name_placeholder')}
                 autoComplete="given-name"
                 error={form.formState.errors.name?.message}
                 {...form.register('name')}
@@ -31,15 +33,15 @@ export default function RegisterForm() {
                 type="email"
                 placeholder="you@example.com"
                 autoComplete="email"
-                hint="На него придёт письмо с подтверждением"
+                hint={t('email_hint')}
                 error={form.formState.errors.email?.message}
                 {...form.register('email')}
             />
 
             <div>
                 <UIInputPassword
-                    label="Пароль"
-                    placeholder="Минимум 8 символов"
+                    label={t('password_label')}
+                    placeholder={t('password_placeholder')}
                     autoComplete="new-password"
                     error={form.formState.errors.password?.message}
                     {...form.register('password')}
@@ -48,7 +50,7 @@ export default function RegisterForm() {
             </div>
 
             <UIButton type="submit" size="lg" fullWidth loading={isSubmitting}>
-                Создать аккаунт
+                {t('submit')}
             </UIButton>
         </form>
     );

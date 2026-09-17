@@ -5,7 +5,15 @@ export const MUTATIONS = {
   PHONE_LOGIN:     'phone-login',
   LOGOUT:          'logout',
   RESET_REQUEST:   'reset-request',
-  RESET_CONFIRM:   'reset-confirm',
+  RESET_CONFIRM:          'reset-confirm',
+  ADD_FAVORITE:           'add-favorite',
+  REMOVE_FAVORITE:        'remove-favorite',
+  BULK_REMOVE_FAVORITES:  'bulk-remove-favorites',
+  CREATE_SUBSCRIPTION:    'create-subscription',
+  UPDATE_SUBSCRIPTION:    'update-subscription',
+  DELETE_SUBSCRIPTION:    'delete-subscription',
+  PAUSE_SUBSCRIPTION:     'pause-subscription',
+  MARK_SEEN_SUBSCRIPTION: 'mark-seen-subscription',
 } as const;
 
 export type MutationType = typeof MUTATIONS[keyof typeof MUTATIONS];

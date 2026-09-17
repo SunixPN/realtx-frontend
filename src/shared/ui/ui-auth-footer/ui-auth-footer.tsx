@@ -2,9 +2,11 @@
 
 import { useRef, useState } from 'react';
 import { Transition } from 'react-transition-group';
+import { useTranslations } from 'next-intl';
 import UILegalModal, { type LegalType } from './ui-legal-modal';
 
 export function UIAuthFooter() {
+    const t = useTranslations('auth.footer');
     const [open, setOpen] = useState<LegalType | null>(null);
     const [current, setCurrent] = useState<LegalType | null>(null);
     const nodeRef = useRef<HTMLDivElement>(null);
@@ -19,21 +21,21 @@ export function UIAuthFooter() {
     return (
         <>
             <footer className="border-t border-border bg-surface-raised px-4 py-4 text-center text-xs text-text-faint">
-                Продолжая, вы соглашаетесь с{' '}
+                {t('prefix')}{' '}
                 <button
                     type="button"
                     className="cursor-pointer text-inherit underline transition-colors hover:text-text-muted"
                     onClick={() => openModal('terms')}
                 >
-                    условиями использования
+                    {t('terms')}
                 </button>{' '}
-                и{' '}
+                {t('and')}{' '}
                 <button
                     type="button"
                     className="cursor-pointer text-inherit underline transition-colors hover:text-text-muted"
                     onClick={() => openModal('privacy')}
                 >
-                    политикой конфиденциальности
+                    {t('privacy')}
                 </button>
             </footer>
 

@@ -1,14 +1,17 @@
 import { z } from 'zod';
-import { passwordSchema } from '@/shared/schemas/password-schema';
+import { createPasswordSchema } from '@/shared/schemas/password-schema';
 
-export const resetConfirmSchema = z
-    .object({
-        password:        passwordSchema,
-        passwordConfirm: z.string().min(1, 'Повторите пароль'),
-    })
-    .refine((v) => v.password === v.passwordConfirm, {
-        path:    ['passwordConfirm'],
-        message: 'Пароли не совпадают',
-    });
+type T = (key: string) => string;
 
-export type ResetConfirmValues = z.infer<typeof resetConfirmSchema>;
+export const createResetConfirmSchema = (t: T) =>
+    z
+        .object({
+            password:        createPasswordSchema(t),
+            passwordConfirm: z.string().min(1, t('password_confirm_required')),
+        })
+        .refine((v) => v.password === v.passwordConfirm, {
+            path:    ['passwordConfirm'],
+            message: t('passwords_not_match'),
+        });
+
+export type ResetConfirmValues = z.infer<ReturnType<typeof createResetConfirmSchema>>;

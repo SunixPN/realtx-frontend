@@ -12,11 +12,12 @@ export default function MapWidget() {
         <EstateSelectionProvider>
             <MainMapFeature
                 drawerOpen={drawer.isOpen}
-                mapFilter={() => (
+                mapFilter={({ total }) => (
                     <MainMapFiltersFeature
                         drawerOpen={drawer.isOpen}
                         onToggleDrawer={drawer.toggle}
                         onCloseDrawer={drawer.close}
+                        total={total}
                     />
                 )}
                 drawer={<EstateDrawerFeature />}

@@ -9,6 +9,9 @@ export const QUERIES = {
     HOUSE_ESTATES:           "house-estates",
     SUGGEST:                 "suggest",
     CURRENCY_RATES:          "currency-rates",
+    FAVORITES:               "favorites",
+    FAVORITE_IDS:            "favorite-ids",
+    SUBSCRIPTIONS:           "subscriptions",
 } as const;
 
 export type QueryType = typeof QUERIES[keyof typeof QUERIES];

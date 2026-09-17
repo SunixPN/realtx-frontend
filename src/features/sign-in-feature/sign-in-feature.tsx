@@ -1,6 +1,7 @@
 'use client';
 
 import {ReactNode} from 'react';
+import { useTranslations } from 'next-intl';
 import SignInHeader from "@/features/sign-in-feature/_ui/sign-in-header/sign-in-header";
 import SignInForm from "@/features/sign-in-feature/_ui/sign-in-form/sign-in-form";
 import { UIAuthFooter } from '@/shared/ui/ui-auth-footer';
@@ -14,6 +15,7 @@ export default function SignInFeature({
     googleOAuth,
     phoneOAuth,
 }: SignInFeatureProps) {
+    const t = useTranslations('auth');
 
     return (
         <div className="flex min-h-[calc(100vh-var(--header-height))] flex-col bg-surface-subtle">
@@ -24,7 +26,7 @@ export default function SignInFeature({
                         <SignInForm />
                         <div className="flex items-center gap-3">
                             <span className="h-px flex-1 bg-border" />
-                            <span className="text-xs text-text-faint">или через</span>
+                            <span className="text-xs text-text-faint">{t('or_via')}</span>
                             <span className="h-px flex-1 bg-border" />
                         </div>
 
@@ -35,8 +37,7 @@ export default function SignInFeature({
                     </div>
 
                     <p className="mt-6 text-center text-xs text-text-faint">
-                        RealtX — агрегатор объявлений с realt.by. Мы не участвуем в сделках,
-                        аккаунт нужен только для сохранения избранного и подписок.
+                        {t('footer_note')}
                     </p>
                 </div>
             </main>
@@ -45,5 +46,3 @@ export default function SignInFeature({
         </div>
     );
 }
-
-

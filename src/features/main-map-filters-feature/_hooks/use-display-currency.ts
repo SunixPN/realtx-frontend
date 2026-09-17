@@ -2,8 +2,7 @@
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useCallback, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { currencyRatesQuery, type CurrencyRatesType } from '@/shared/api/currency-rates-query'
+import { useCurrencyRates, type CurrencyRatesType } from '@/shared/api/currency-rates-query'
 
 export type DisplayCurrency = 'USD' | 'BYN' | 'EUR'
 
@@ -35,7 +34,7 @@ export function useDisplayCurrency() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const pathname = usePathname()
-    const { data: rates } = useQuery(currencyRatesQuery())
+    const { data: rates } = useCurrencyRates()
 
     const fromUrl = searchParams.get('currency')?.toUpperCase()
     const urlCurrency = fromUrl && VALID.has(fromUrl as DisplayCurrency) ? (fromUrl as DisplayCurrency) : null

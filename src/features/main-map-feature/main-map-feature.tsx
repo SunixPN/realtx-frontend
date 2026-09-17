@@ -2,15 +2,15 @@
 
 import { ReactNode, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { keepPreviousData } from '@tanstack/query-core'
 import { MapCanvas, useMap } from '@/shared/map'
 import {
-    mapPointsQuery,
-    districtProfitabilityQuery,
-    districtsGeojsonQuery,
+    useMapPoints,
+    useDistrictProfitability,
+    useDistrictsGeojson,
     parseFiltersFromSearchParams,
 } from '@/entities/estate'
+import { useFavoriteIds } from '@/entities/favorite'
+import { useAuth } from '@/entities/me/api/auth-query'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { useEstateSelection } from '@/features/estate-drawer-feature'
 import { useMapMarkers, type MarkerClickHandlers } from './_hooks/use-map-markers'
@@ -21,7 +21,7 @@ import { MapModeToggle } from './_ui/map-mode-toggle'
 import { DistrictRanking } from './_ui/district-ranking'
 
 type MainMapFeatureProps = {
-    mapFilter?: () => ReactNode
+    mapFilter?: (ctx: { total: number }) => ReactNode
     drawer?: ReactNode
     drawerOpen?: boolean
 }
@@ -35,24 +35,26 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
     const map = useMap()
 
     // Точки на карте — только в режиме объектов.
-    const { data: points = [], isFetching: fetchingPoints } = useQuery({
-        ...mapPointsQuery(filters, currency),
-        placeholderData: keepPreviousData,
+    const { data: points = [], isValidating: fetchingPoints } = useMapPoints(filters, currency, {
         enabled: mode === 'objects',
     })
 
+    console.log(points, "POINTS!")
+
     // Выгодность районов — только в режиме тепловой карты.
-    const { data: districts = [], isFetching: fetchingDistricts } = useQuery({
-        ...districtProfitabilityQuery(filters, currency),
-        placeholderData: keepPreviousData,
+    const { data: districts = [], isValidating: fetchingDistricts } = useDistrictProfitability(filters, currency, {
         enabled: mode === 'heat',
     })
 
     // GeoJSON полигонов — статичен, грузим один раз при переключении в heat.
-    const { data: geojson } = useQuery({
-        ...districtsGeojsonQuery(),
-        enabled: mode === 'heat',
-    })
+    const { data: geojson } = useDistrictsGeojson({ enabled: mode === 'heat' })
+
+    const { data: auth } = useAuth()
+    const { data: favoriteIdsData } = useFavoriteIds({ enabled: !!auth?.user })
+    const favoriteIds = useMemo(
+        () => new Set(favoriteIdsData?.ids ?? []),
+        [favoriteIdsData],
+    )
 
     const { openEstate, openHouse } = useEstateSelection()
     const handlers = useMemo<MarkerClickHandlers>(() => ({
@@ -61,7 +63,7 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
     }), [openEstate, openHouse])
 
     // В режиме heat передаём null в useMapMarkers — хук очистит маркеры и source.
-    useMapMarkers(mode === 'objects' ? map : null, points, handlers)
+    useMapMarkers(mode === 'objects' ? map : null, points, handlers, favoriteIds)
 
     useDistrictHeatLayers(map, mode, districts, geojson)
 
@@ -69,7 +71,7 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
 
     return (
         <div className="map-container relative w-full" style={{ height: 'calc(100vh - var(--header-height))' }}>
-            {mapFilter && mapFilter()}
+            {mapFilter && mapFilter({ total: points.length })}
             <div className="absolute top-20 left-4 z-30">
                 <MapModeToggle mode={mode} onChange={setMode} />
             </div>

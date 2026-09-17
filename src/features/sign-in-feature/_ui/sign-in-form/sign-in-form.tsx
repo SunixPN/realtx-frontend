@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import {UIInput} from "@/shared/ui/ui-input";
 import UIInputPassword from "@/shared/ui/ui-input-password/ui-input-password";
 import Link from "next/link";
@@ -6,6 +9,7 @@ import {UIButton} from "@/shared/ui/ui-button";
 import {useSignInForm} from "@/features/sign-in-feature/_hooks/use-sign-in-form";
 
 export default function SignInForm() {
+    const t = useTranslations('auth.sign_in');
     const { form, onSubmit, isSubmitting } = useSignInForm()
 
     return (
@@ -25,8 +29,8 @@ export default function SignInForm() {
 
             <div>
                 <UIInputPassword
-                    label="Пароль"
-                    placeholder="Минимум 8 символов"
+                    label={t('password_label')}
+                    placeholder={t('password_placeholder')}
                     autoComplete="current-password"
                     error={form.formState.errors.password?.message}
                     {...form.register('password')}
@@ -36,13 +40,13 @@ export default function SignInForm() {
                         href={ROUTES.RESET}
                         className="text-xs font-medium text-brand hover:underline"
                     >
-                        Забыли пароль?
+                        {t('forgot_password')}
                     </Link>
                 </div>
             </div>
 
             <UIButton type="submit" size="lg" fullWidth loading={isSubmitting}>
-                Войти
+                {t('submit')}
             </UIButton>
         </form>
     )

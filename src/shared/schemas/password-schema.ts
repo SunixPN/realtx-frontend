@@ -1,21 +1,25 @@
 import { z } from 'zod';
 
+type T = (key: string) => string;
+
 /**
  * Правила пароля синхронизированы с RegisterDto/ResetDto на бэке:
  * 8–72 символа, обязательно строчная/заглавная/цифра/спецсимвол.
  */
-export const passwordSchema = z
-    .string()
-    .min(1, 'Введите пароль')
-    .min(8, 'Минимум 8 символов')
-    .max(72, 'Максимум 72 символа')
-    .regex(/[a-z]/, 'Добавьте строчную букву')
-    .regex(/[A-Z]/, 'Добавьте заглавную букву')
-    .regex(/[0-9]/, 'Добавьте цифру')
-    .regex(/[^a-zA-Z0-9]/, 'Добавьте спецсимвол (!@#$% и т.д.)');
+export const createPasswordSchema = (t: T) =>
+    z
+        .string()
+        .min(1, t('password_required'))
+        .min(8, t('password_min'))
+        .max(72, t('password_max'))
+        .regex(/[a-z]/, t('password_lower'))
+        .regex(/[A-Z]/, t('password_upper'))
+        .regex(/[0-9]/, t('password_digit'))
+        .regex(/[^a-zA-Z0-9]/, t('password_special'));
 
-export const emailSchema = z
-    .string()
-    .min(1, 'Введите email')
-    .email('Некорректный email')
-    .max(255, 'Email слишком длинный');
+export const createEmailSchema = (t: T) =>
+    z
+        .string()
+        .min(1, t('email_required'))
+        .email(t('email_invalid'))
+        .max(255, t('email_too_long'));

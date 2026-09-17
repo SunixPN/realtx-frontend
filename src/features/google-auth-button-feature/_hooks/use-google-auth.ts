@@ -2,26 +2,21 @@
 
 import { useState } from 'react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { firebaseAuth } from '@/shared/firebase/firebase';
-import { googleLoginMutation } from '@/features/google-auth-button-feature/_api/google-login-mutation';
+import { useGoogleLoginMutation } from '@/features/google-auth-button-feature/_api/google-login-mutation';
 import { showToast } from '@/shared/helpers/show-toast';
 import { ROUTES } from '@/shared/const/routes';
 
 const POPUP_CLOSE_CODES = new Set(['auth/popup-closed-by-user', 'auth/cancelled-popup-request']);
 
 export const useGoogleAuth = () => {
+    const t = useTranslations('auth');
     const router = useRouter();
     const [isPopupPending, setIsPopupPending] = useState(false);
 
-    const { mutate, isPending: isMutationPending } = useMutation({
-        ...googleLoginMutation,
-        onSuccess: (data, variables, onMutateResult, context) => {
-            googleLoginMutation.onSuccess?.(data, variables, onMutateResult, context);
-            router.push(ROUTES.ROOT);
-        },
-    });
+    const { trigger, isMutating: isMutationPending } = useGoogleLoginMutation();
 
     const signInWithGoogle = async () => {
         setIsPopupPending(true);
@@ -43,11 +38,12 @@ export const useGoogleAuth = () => {
             const result = await signInWithPopup(firebaseAuth, provider);
             window.removeEventListener('focus', onFocus);
             const idToken = await result.user.getIdToken();
-            mutate({ idToken });
+            const auth = await trigger({ idToken });
+            if (auth) router.push(ROUTES.ROOT);
         } catch (error) {
             const code = (error as { code?: string })?.code;
             if (!POPUP_CLOSE_CODES.has(code ?? '')) {
-                showToast({ status: 'error', text: 'Не удалось войти через Google' });
+                showToast({ status: 'error', text: t('google_error') });
             }
         } finally {
             window.removeEventListener('focus', onFocus);

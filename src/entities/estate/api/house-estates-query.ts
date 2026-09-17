@@ -1,4 +1,6 @@
-import { queryOptions } from '@tanstack/react-query'
+'use client'
+
+import useSWR from 'swr'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { QUERIES } from '@/shared/const/queries'
@@ -12,31 +14,39 @@ export type HouseBbox = {
     maxLng: number
 }
 
-/**
- * bbox приходит от Mapbox-кластера — clusterProperties.minLng/maxLng/minLat/maxLat.
- * Ключ округляем до 5 знаков (~1 м), чтобы кэш совпадал между кликами по одному дому.
- * Фильтры пробрасываются ровно как в mapPointsQuery — иначе счётчик на метке
- * ("2 квартиры") не сходится с содержимым drawer'а (там всплывали все 6).
- */
-export const houseEstatesQuery = (
+// bbox округляем до 5 знаков (~1 м), чтобы кэш совпадал между кликами по одному дому.
+function bboxKeyParts(b: HouseBbox) {
+    return [
+        Number(b.minLat.toFixed(5)),
+        Number(b.maxLat.toFixed(5)),
+        Number(b.minLng.toFixed(5)),
+        Number(b.maxLng.toFixed(5)),
+    ] as const
+}
+
+export const houseEstatesKey = (
     bbox: HouseBbox,
     filters: MapFiltersType = {},
     displayCurrency: 'USD' | 'BYN' | 'EUR' = 'USD',
-) => {
-    const normFilters = normalizeFilters(filters)
-    const key = [
-        bbox.minLat.toFixed(5),
-        bbox.maxLat.toFixed(5),
-        bbox.minLng.toFixed(5),
-        bbox.maxLng.toFixed(5),
-    ]
-    return queryOptions({
-        queryKey: [QUERIES.HOUSE_ESTATES, displayCurrency, ...key, ...Object.values(normFilters)],
-        queryFn: () =>
-            api.get<HouseEstatesResponseType>(API_ROUTES.ESTATE.HOUSE, {
-                params: { ...bbox, ...normFilters, displayCurrency },
-            }),
-        select: (r) => r.data,
-        staleTime: 10 * 60 * 1000,
+) => [QUERIES.HOUSE_ESTATES, displayCurrency, bboxKeyParts(bbox), normalizeFilters(filters)] as const
+
+type Key = ReturnType<typeof houseEstatesKey>
+
+const fetcher = async ([, displayCurrency, bboxParts, normFilters]: Key): Promise<HouseEstatesResponseType> => {
+    const [minLat, maxLat, minLng, maxLng] = bboxParts
+    const r = await api.get<HouseEstatesResponseType>(API_ROUTES.ESTATE.HOUSE, {
+        params: { minLat, maxLat, minLng, maxLng, ...normFilters, displayCurrency },
     })
+    return r.data
+}
+
+export function useHouseEstates(
+    bbox: HouseBbox,
+    filters: MapFiltersType = {},
+    displayCurrency: 'USD' | 'BYN' | 'EUR' = 'USD',
+) {
+    return useSWR<HouseEstatesResponseType>(
+        houseEstatesKey(bbox, filters, displayCurrency),
+        fetcher as (k: Key) => Promise<HouseEstatesResponseType>,
+    )
 }

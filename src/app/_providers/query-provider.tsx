@@ -1,8 +1,7 @@
 "use client"
 
 import {ReactNode} from "react";
-import {QueryClientProvider} from "@tanstack/react-query";
-import {queryClient} from "@/shared/api/query";
+import {SWRConfig} from "swr";
 import '@/entities/me/api/auth-api-interceptors';
 
 type QueryProviderProps = {
@@ -11,8 +10,13 @@ type QueryProviderProps = {
 
 export default function QueryProvider({ children }: QueryProviderProps) {
     return (
-        <QueryClientProvider client={queryClient}>
+        <SWRConfig
+            value={{
+                revalidateOnFocus: false,
+                shouldRetryOnError: false,
+            }}
+        >
             {children}
-        </QueryClientProvider>
+        </SWRConfig>
     )
 }

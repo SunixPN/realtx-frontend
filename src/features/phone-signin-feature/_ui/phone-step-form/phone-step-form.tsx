@@ -1,6 +1,7 @@
 'use client';
 
 import { Controller } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 import type { RecaptchaVerifier } from 'firebase/auth';
 import { UIInput } from '@/shared/ui/ui-input';
 import { UIButton } from '@/shared/ui/ui-button';
@@ -16,6 +17,7 @@ type PhoneStepFormProps = {
 };
 
 export default function PhoneStepForm({ getVerifier, resetVerifier, onSuccess }: PhoneStepFormProps) {
+    const t = useTranslations('auth.phone');
     const { form, onSubmit, isSubmitting } = usePhoneStepForm({ getVerifier, resetVerifier, onSuccess });
 
     const countryCode = form.watch('countryCode') as CountryCode;
@@ -24,7 +26,7 @@ export default function PhoneStepForm({ getVerifier, resetVerifier, onSuccess }:
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
             <div className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-text-base">Номер телефона</span>
+                <span className="text-sm font-medium text-text-base">{t('phone_label')}</span>
                 <div className="flex items-start gap-2">
                     <Controller
                         control={form.control}
@@ -60,7 +62,7 @@ export default function PhoneStepForm({ getVerifier, resetVerifier, onSuccess }:
             </div>
 
             <UIButton type="submit" size="lg" fullWidth loading={isSubmitting}>
-                Отправить код
+                {t('send_code')}
             </UIButton>
         </form>
     );

@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import RegisterHeader from '@/features/register-feature/_ui/register-header/register-header';
 import RegisterForm from '@/features/register-feature/_ui/register-form/register-form';
 import { UIAuthFooter } from '@/shared/ui/ui-auth-footer';
@@ -11,6 +12,7 @@ type RegisterFeatureProps = {
 };
 
 export default function RegisterFeature({ googleOAuth, phoneOAuth }: RegisterFeatureProps) {
+    const t = useTranslations('auth');
     return (
         <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-surface-subtle">
             <main className="flex flex-1 items-center justify-center px-4 py-10">
@@ -21,7 +23,7 @@ export default function RegisterFeature({ googleOAuth, phoneOAuth }: RegisterFea
 
                         <div className="flex items-center gap-3">
                             <span className="h-px flex-1 bg-border" />
-                            <span className="text-xs text-text-faint">или через</span>
+                            <span className="text-xs text-text-faint">{t('or_via')}</span>
                             <span className="h-px flex-1 bg-border" />
                         </div>
 

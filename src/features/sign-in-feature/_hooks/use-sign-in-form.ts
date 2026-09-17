@@ -1,24 +1,22 @@
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { signInSchema, SignInValues } from '@/features/sign-in-feature/_schemas/sign-in-schema';
-import { signInMutation } from '@/features/sign-in-feature/_api/sign-in-mutation';
+import { useTranslations } from 'next-intl';
+import { createSignInSchema, SignInValues } from '@/features/sign-in-feature/_schemas/sign-in-schema';
+import { useSignInMutation } from '@/features/sign-in-feature/_api/sign-in-mutation';
 import { ROUTES } from '@/shared/const/routes';
 
 export const useSignInForm = () => {
   const router = useRouter();
-  const form = useForm<SignInValues>({ resolver: zodResolver(signInSchema) });
-  const { mutate: login, isPending: isSubmitting } = useMutation({
-      ...signInMutation,
-      onSuccess: (data, variables, onMutateResult, context) => {
-          signInMutation.onSuccess?.(data, variables, onMutateResult, context);
-          router.push(ROUTES.ROOT);
-      },
-  });
+  const tV = useTranslations('validation');
+  const schema = useMemo(() => createSignInSchema(tV), [tV]);
+  const form = useForm<SignInValues>({ resolver: zodResolver(schema) });
+  const { trigger, isMutating: isSubmitting } = useSignInMutation();
 
   const onSubmit = async (values: SignInValues) => {
-    login(values);
+    const result = await trigger(values);
+    if (result) router.push(ROUTES.ROOT);
   };
 
   return { form, onSubmit, isSubmitting };

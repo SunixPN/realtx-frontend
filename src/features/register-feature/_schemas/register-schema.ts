@@ -1,13 +1,16 @@
 import { z } from 'zod';
-import { emailSchema, passwordSchema } from '@/shared/schemas/password-schema';
+import { createEmailSchema, createPasswordSchema } from '@/shared/schemas/password-schema';
 
-export const registerSchema = z.object({
-    name: z
-        .string()
-        .max(100, 'Имя слишком длинное')
-        .optional(),
-    email: emailSchema,
-    password: passwordSchema,
-});
+type T = (key: string) => string;
 
-export type RegisterValues = z.infer<typeof registerSchema>;
+export const createRegisterSchema = (t: T) =>
+    z.object({
+        name: z
+            .string()
+            .max(100, t('name_too_long'))
+            .optional(),
+        email: createEmailSchema(t),
+        password: createPasswordSchema(t),
+    });
+
+export type RegisterValues = z.infer<ReturnType<typeof createRegisterSchema>>;

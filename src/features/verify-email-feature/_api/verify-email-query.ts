@@ -1,16 +1,30 @@
-import { queryOptions } from '@tanstack/react-query';
-import { api } from '@/shared/api/api';
-import { API_ROUTES } from '@/shared/const/api-routes';
-import { QUERIES } from '@/shared/const/queries';
+'use client'
 
-type VerifyEmailResponse = { message: string };
+import useSWR from 'swr'
+import { api } from '@/shared/api/api'
+import { API_ROUTES } from '@/shared/const/api-routes'
+import { QUERIES } from '@/shared/const/queries'
 
-export const verifyEmailQuery = (token: string) =>
-    queryOptions({
-        queryKey: [QUERIES.VERIFY_EMAIL, token],
-        queryFn:  async () => api.post<VerifyEmailResponse>(API_ROUTES.AUTH.VERIFY_EMAIL, { token }),
-        select:   (response) => response.data,
-        enabled:  !!token,
-        retry:    false,
-        staleTime: Infinity,
-    });
+type VerifyEmailResponse = { message: string }
+
+export const verifyEmailKey = (token: string) => [QUERIES.VERIFY_EMAIL, token] as const
+
+type Key = ReturnType<typeof verifyEmailKey>
+
+const fetcher = async ([, token]: Key): Promise<VerifyEmailResponse> => {
+    const r = await api.post<VerifyEmailResponse>(API_ROUTES.AUTH.VERIFY_EMAIL, { token })
+    return r.data
+}
+
+export function useVerifyEmail(token: string) {
+    return useSWR<VerifyEmailResponse>(
+        token ? verifyEmailKey(token) : null,
+        fetcher as (k: Key) => Promise<VerifyEmailResponse>,
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+            shouldRetryOnError: false,
+            dedupingInterval: Infinity,
+        },
+    )
+}

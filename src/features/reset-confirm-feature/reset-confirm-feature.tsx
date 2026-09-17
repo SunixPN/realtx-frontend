@@ -2,21 +2,23 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { UILinkChecker } from '@/shared/ui/ui-link-checker';
 import { UIExpiredLink } from '@/shared/ui/ui-expired-link';
 import { ROUTES } from '@/shared/const/routes';
-import { resetVerifyQuery } from '@/features/reset-confirm-feature/_api/reset-verify-query';
+import { useResetVerify } from '@/features/reset-confirm-feature/_api/reset-verify-query';
 import ResetConfirmForm from '@/features/reset-confirm-feature/_ui/reset-confirm-form/reset-confirm-form';
 import ResetSuccessView from '@/features/reset-confirm-feature/_ui/reset-success-view/reset-success-view';
 import { UIAuthFooter } from '@/shared/ui/ui-auth-footer';
 
 export default function ResetConfirmFeature() {
+    const t = useTranslations('auth.reset_confirm');
     const searchParams = useSearchParams();
     const token = searchParams.get('token') ?? '';
     const [isDone, setIsDone] = useState(false);
 
-    const { isLoading, isError } = useQuery(resetVerifyQuery(token));
+    const { isLoading, error } = useResetVerify(token);
+    const isError = !!error;
 
     const renderContent = () => {
         if (isDone) return <ResetSuccessView />;
@@ -24,9 +26,9 @@ export default function ResetConfirmFeature() {
         if (!token || isError) {
             return (
                 <UIExpiredLink
-                    title="Ссылка не работает"
-                    subtitle="Она либо уже использована, либо ей больше часа. Запросите новую — придёт за пару секунд."
-                    actionLabel="Запросить новую ссылку"
+                    title={t('expired_title')}
+                    subtitle={t('expired_subtitle')}
+                    actionLabel={t('expired_action')}
                     actionHref={ROUTES.RESET}
                 />
             );
@@ -35,11 +37,9 @@ export default function ResetConfirmFeature() {
         if (isLoading) {
             return (
                 <UILinkChecker
-                    title="Проверяем ссылку"
-                    subtitle="Секунду — убеждаемся, что ссылка действительна."
-                    note={
-                        <>Ссылка одноразовая — если открылась дважды или прошёл час с момента отправки, увидите ошибку.</>
-                    }
+                    title={t('checking_title')}
+                    subtitle={t('checking_subtitle')}
+                    note={<>{t('checking_note')}</>}
                 />
             );
         }

@@ -26,6 +26,21 @@ export const API_ROUTES = {
   CURRENCY: {
     RATES: '/currency/rates',
   },
+  FAVORITES: {
+    LIST:         '/favorites',
+    IDS:          '/favorites/ids',
+    ADD:          (id: number) => `/favorites/${id}`,
+    REMOVE:       (id: number) => `/favorites/${id}`,
+    BULK_REMOVE:  '/favorites/bulk',
+  },
+  SUBSCRIPTIONS: {
+    LIST:   '/search-subscriptions',
+    CREATE: '/search-subscriptions',
+    UPDATE: (id: string) => `/search-subscriptions/${id}`,
+    PAUSE:  (id: string) => `/search-subscriptions/${id}/pause`,
+    MARK_SEEN: (id: string) => `/search-subscriptions/${id}/mark-seen`,
+    REMOVE: (id: string) => `/search-subscriptions/${id}`,
+  },
 } as const;
 
 export type ApiRouteType = typeof API_ROUTES[keyof typeof API_ROUTES];

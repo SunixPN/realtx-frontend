@@ -3,18 +3,26 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 import { ROUTES } from '@/shared/const/routes';
 import { IconBell, IconGitCompare, IconHeart, IconLoader, IconMoon, IconSun } from '@/shared/ui/ui-icons';
 import { UserMenu } from '@/widgets/header/_ui/user-menu/user-menu';
-import {useQuery} from "@tanstack/react-query";
-import {authQuery} from "@/entities/me/api/auth-query";
+import { LocaleSwitcher } from '@/widgets/header/_ui/locale-switcher/locale-switcher';
+import { useAuth } from "@/entities/me/api/auth-query";
+import { useFavoriteIds } from '@/entities/favorite';
+import { useSubscriptions } from '@/entities/search-subscription';
 
 export function Header() {
+  const t = useTranslations('header');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
 
-  const { isLoading: isPending, data } = useQuery(authQuery)
+  const { isLoading: isPending, data } = useAuth()
+  const { data: favIds } = useFavoriteIds({ enabled: !!data?.user })
+  const favCount = favIds?.ids.length ?? 0
+  const { data: subs } = useSubscriptions({ enabled: !!data?.user })
+  const freshCount = subs?.reduce((n, s) => n + (s.paused ? 0 : s.fresh), 0) ?? 0
 
   useEffect(() => {
     setMounted(true);
@@ -35,29 +43,39 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center justify-between gap-4 border-b border-border bg-surface-raised px-4">
       <Link href={ROUTES.ROOT} className="flex items-center hover:opacity-80">
-        <Image src="/logo.png" alt="RealtX" width={108} height={32} priority />
+        <Image src="/logo.png" alt={t('logo_alt')} width={108} height={32} priority />
       </Link>
 
       <div className="flex items-center gap-1">
         {data?.user && (
             <>
-              <button
-                  type="button"
-                  aria-label="Избранное"
-                  className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
+              <Link
+                  href={ROUTES.FAVORITES}
+                  aria-label={favCount ? t('favorites_aria_count', { count: favCount }) : t('favorites_aria')}
+                  className="relative flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
               >
                 <IconHeart size={20} />
-              </button>
-              <button
-                  type="button"
-                  aria-label="Сохранённые поиски"
-                  className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
+                {favCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white leading-4">
+                    {favCount}
+                  </span>
+                )}
+              </Link>
+              <Link
+                  href={ROUTES.SUBSCRIPTIONS}
+                  aria-label={freshCount ? t('subscriptions_aria_count', { count: freshCount }) : t('subscriptions_aria')}
+                  className="relative flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
               >
                 <IconBell size={20} />
-              </button>
+                {freshCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white leading-4">
+                    {freshCount}
+                  </span>
+                )}
+              </Link>
               <button
                   type="button"
-                  aria-label="Сравнение"
+                  aria-label={t('compare_aria')}
                   className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
               >
                 <IconGitCompare size={20} />
@@ -68,24 +86,19 @@ export function Header() {
         <button
           type="button"
           onClick={toggleTheme}
-          aria-label="Переключить тему"
+          aria-label={t('theme_toggle_aria')}
           className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
         >
           {mounted && theme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
         </button>
 
-        <button
-          type="button"
-          className="flex h-9 cursor-pointer items-center rounded-md px-2.5 text-sm font-medium text-text-muted hover:bg-surface-subtle hover:text-text-base"
-        >
-          RU
-        </button>
+        <LocaleSwitcher />
 
         <span className="mx-1.5 h-6 w-px bg-border" />
 
         {isPending ? (
           <div
-            aria-label="Проверка авторизации"
+            aria-label={t('auth_checking_aria')}
             className="flex size-9 items-center justify-center rounded-xl text-text-muted"
           >
             <IconLoader size={18} />
@@ -100,7 +113,7 @@ export function Header() {
               'hover:bg-brand-hover hover:opacity-100',
             )}
           >
-            Войти
+            {t('sign_in')}
           </Link>
         )}
       </div>

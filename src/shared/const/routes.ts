@@ -7,6 +7,8 @@ export const ROUTES = {
     RESET_NEW: "/reset/new",
     VERIFY_EMAIL: "/verify-email",
     PROFILE: "/profile",
+    FAVORITES: "/favorites",
+    SUBSCRIPTIONS: "/subscriptions",
 } as const
 
 export type RoutesType = typeof ROUTES[keyof typeof ROUTES]

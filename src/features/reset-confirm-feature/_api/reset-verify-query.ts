@@ -1,16 +1,30 @@
-import { queryOptions } from '@tanstack/react-query';
-import { api } from '@/shared/api/api';
-import { API_ROUTES } from '@/shared/const/api-routes';
-import { QUERIES } from '@/shared/const/queries';
+'use client'
 
-type VerifyResponse = { valid: true };
+import useSWR from 'swr'
+import { api } from '@/shared/api/api'
+import { API_ROUTES } from '@/shared/const/api-routes'
+import { QUERIES } from '@/shared/const/queries'
 
-export const resetVerifyQuery = (token: string) =>
-    queryOptions({
-        queryKey: [QUERIES.RESET_VERIFY, token],
-        queryFn:  async () => api.post<VerifyResponse>(API_ROUTES.AUTH.PASSWORD_RESET.VERIFY, { token }),
-        select:   (response) => response.data,
-        enabled:  !!token,
-        retry:    false,
-        staleTime: Infinity,
-    });
+type VerifyResponse = { valid: true }
+
+export const resetVerifyKey = (token: string) => [QUERIES.RESET_VERIFY, token] as const
+
+type Key = ReturnType<typeof resetVerifyKey>
+
+const fetcher = async ([, token]: Key): Promise<VerifyResponse> => {
+    const r = await api.post<VerifyResponse>(API_ROUTES.AUTH.PASSWORD_RESET.VERIFY, { token })
+    return r.data
+}
+
+export function useResetVerify(token: string) {
+    return useSWR<VerifyResponse>(
+        token ? resetVerifyKey(token) : null,
+        fetcher as (k: Key) => Promise<VerifyResponse>,
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+            shouldRetryOnError: false,
+            dedupingInterval: Infinity,
+        },
+    )
+}

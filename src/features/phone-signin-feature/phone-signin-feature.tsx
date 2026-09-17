@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { ROUTES } from '@/shared/const/routes';
 import { useRecaptcha } from '@/features/phone-signin-feature/_hooks/use-recaptcha';
 import PhoneSignInHeader from '@/features/phone-signin-feature/_ui/phone-signin-header/phone-signin-header';
@@ -19,6 +20,7 @@ const maskPhone = (phone: string) => {
 };
 
 export default function PhoneSignInFeature() {
+    const t = useTranslations('auth.phone');
     const router = useRouter();
     const [phase, setPhase] = useState<Phase>('phone');
     const [phone, setPhone] = useState<string | null>(null);
@@ -33,8 +35,8 @@ export default function PhoneSignInFeature() {
                         {phase === 'phone' ? (
                             <>
                                 <PhoneSignInHeader
-                                    title="Вход по номеру телефона"
-                                    subtitle="Введите номер — пришлём одноразовый код в SMS. Пароль не понадобится."
+                                    title={t('step_phone_title')}
+                                    subtitle={t('step_phone_subtitle')}
                                     onBack={() => router.push(ROUTES.SIGN_IN)}
                                 />
                                 <PhoneStepForm
@@ -49,10 +51,10 @@ export default function PhoneSignInFeature() {
                         ) : (
                             <>
                                 <PhoneSignInHeader
-                                    title="Введите код из SMS"
+                                    title={t('step_code_title')}
                                     subtitle={
                                         <>
-                                            Отправили шестизначный код на номер{' '}
+                                            {t('step_code_subtitle_prefix')}{' '}
                                             <span className="font-medium text-text-base tabular-nums">
                                                 {phone ? maskPhone(phone) : ''}
                                             </span>.

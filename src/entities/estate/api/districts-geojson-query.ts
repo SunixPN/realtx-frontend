@@ -1,15 +1,19 @@
-import { queryOptions } from '@tanstack/react-query'
+'use client'
+
+import useSWR from 'swr'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
-import { QUERIES } from '@/shared/const/queries'
 import type { DistrictGeoJSONType } from './estate-types'
+import { districtsGeojsonKey } from './estate-query-keys'
 
-export const districtsGeojsonQuery = () =>
-    queryOptions({
-        queryKey: [QUERIES.DISTRICTS_GEOJSON],
-        queryFn: async () => {
-            const r = await api.get<DistrictGeoJSONType>(API_ROUTES.ESTATE.DISTRICTS_GEOJSON)
-            return r.data
-        },
-        staleTime: Infinity,
-    })
+export { districtsGeojsonKey }
+
+const fetcher = async (): Promise<DistrictGeoJSONType> => {
+    const r = await api.get<DistrictGeoJSONType>(API_ROUTES.ESTATE.DISTRICTS_GEOJSON)
+    return r.data
+}
+
+export function useDistrictsGeojson(options?: { enabled?: boolean }) {
+    const enabled = options?.enabled ?? true
+    return useSWR<DistrictGeoJSONType>(enabled ? districtsGeojsonKey() : null, fetcher)
+}

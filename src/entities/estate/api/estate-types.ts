@@ -35,6 +35,7 @@ export type PriceChange = {
 
 export type EstateType = {
     id: number
+    isFavorite: boolean
     sourceUuid: string
     sourceUrl: string | null
     headline: string | null
@@ -75,6 +76,7 @@ export type EstateType = {
 /** Ответ /estate/house — облегчённая карточка для списка «квартиры в этом доме». */
 export type EstateShortType = {
     id: number
+    isFavorite: boolean
     price: number | null
     pricePerM2: number | null
     priceCurrency: number | null

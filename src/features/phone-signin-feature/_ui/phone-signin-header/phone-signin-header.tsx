@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { IconArrowLeft, IconPhone } from '@/shared/ui/ui-icons';
 
 type PhoneSignInHeaderProps = {
@@ -7,6 +10,7 @@ type PhoneSignInHeaderProps = {
 };
 
 export default function PhoneSignInHeader({ title, subtitle, onBack }: PhoneSignInHeaderProps) {
+    const t = useTranslations('common');
     return (
         <div className="flex flex-col gap-3">
             <button
@@ -15,7 +19,7 @@ export default function PhoneSignInHeader({ title, subtitle, onBack }: PhoneSign
                 className="flex w-fit cursor-pointer items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text-base"
             >
                 <IconArrowLeft size={14} />
-                Назад
+                {t('back')}
             </button>
 
             <div className="flex flex-col items-center gap-3 pt-1 text-center">

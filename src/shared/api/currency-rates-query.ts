@@ -1,4 +1,6 @@
-import { queryOptions } from '@tanstack/react-query'
+'use client'
+
+import useSWR from 'swr'
 import { api } from './api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { QUERIES } from '@/shared/const/queries'
@@ -9,14 +11,18 @@ export type CurrencyRatesType = {
     eurToByn: number
 }
 
-// Курсы для конвертации priceMin/priceMax при смене displayCurrency.
-// Меняются раз в сутки — держим кеш агрессивно.
-export const currencyRatesQuery = () =>
-    queryOptions({
-        queryKey: [QUERIES.CURRENCY_RATES],
-        queryFn: async () => {
-            const r = await api.get<CurrencyRatesType>(API_ROUTES.CURRENCY.RATES)
-            return r.data
-        },
-        staleTime: 60 * 60 * 1000,
+export const currencyRatesKey = () => [QUERIES.CURRENCY_RATES] as const
+
+const fetcher = async (): Promise<CurrencyRatesType> => {
+    const r = await api.get<CurrencyRatesType>(API_ROUTES.CURRENCY.RATES)
+    return r.data
+}
+
+// Курсы меняются раз в сутки — держим кеш агрессивно.
+export function useCurrencyRates() {
+    return useSWR<CurrencyRatesType>(currencyRatesKey(), fetcher, {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+        dedupingInterval: 60 * 60 * 1000,
     })
+}

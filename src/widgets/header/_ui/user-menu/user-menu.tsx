@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/shared/helpers/cn';
 import { AuthUserType } from '@/entities/me/types/me-type';
@@ -24,6 +25,7 @@ function getInitials(user: AuthUserType): string {
 }
 
 export function UserMenu({ user }: UserMenuProps) {
+    const t = useTranslations('user_menu');
     const [open, setOpen] = useState(false);
     const [closing, setClosing] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -61,7 +63,7 @@ export function UserMenu({ user }: UserMenuProps) {
         <div ref={containerRef} className="relative">
             <button
                 type="button"
-                aria-label="Профиль"
+                aria-label={t('profile_aria')}
                 aria-expanded={open}
                 onClick={toggle}
                 className={cn(
@@ -89,7 +91,7 @@ export function UserMenu({ user }: UserMenuProps) {
                         </span>
                         <div className="min-w-0">
                             <div className="truncate text-sm font-medium text-text-base">
-                                {user.name ?? 'Без имени'}
+                                {user.name ?? t('no_name')}
                             </div>
                             {user.email && (
                                 <div className="truncate text-xs text-text-muted">
@@ -100,14 +102,14 @@ export function UserMenu({ user }: UserMenuProps) {
                     </div>
 
                     <div className="flex flex-col py-1">
-                        <MenuItem icon={<IconUser size={16} />} label="Профиль" />
-                        <MenuItem icon={<IconClock size={16} />} label="Просмотренные" />
+                        <MenuItem icon={<IconUser size={16} />} label={t('profile')} />
+                        <MenuItem icon={<IconClock size={16} />} label={t('viewed')} />
                     </div>
 
                     <div className="border-t border-border">
                         <MenuItem
                             icon={<IconLogOut size={16} />}
-                            label="Выйти"
+                            label={t('logout')}
                             tone="danger"
                             disabled={isPending}
                             onClick={() => { startClose(); logout(); }}

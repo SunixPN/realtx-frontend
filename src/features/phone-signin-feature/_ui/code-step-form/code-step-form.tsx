@@ -1,6 +1,7 @@
 'use client';
 
 import { Controller } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 import type { RecaptchaVerifier } from 'firebase/auth';
 import { UIButton } from '@/shared/ui/ui-button';
 import { useCodeStepForm } from '@/features/phone-signin-feature/_hooks/use-code-step-form';
@@ -13,6 +14,7 @@ type CodeStepFormProps = {
 };
 
 export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStepFormProps) {
+    const t = useTranslations('auth.phone');
     const cooldown = useResendCooldown(45);
     const { form, onSubmit, isSubmitting, isResending, resend } = useCodeStepForm({
         resetVerifier,
@@ -43,7 +45,7 @@ export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStep
             </div>
 
             <UIButton type="submit" size="lg" fullWidth loading={isSubmitting}>
-                Войти
+                {t('submit')}
             </UIButton>
 
             <div className="flex flex-col items-center gap-2">
@@ -54,11 +56,11 @@ export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStep
                         disabled={isResending || isSubmitting}
                         className="cursor-pointer text-sm font-medium text-brand hover:underline disabled:cursor-not-allowed disabled:opacity-60 disabled:no-underline"
                     >
-                        {isResending ? 'Отправляем...' : 'Отправить снова'}
+                        {isResending ? t('resend_pending') : t('resend')}
                     </button>
                 ) : (
                     <span className="text-sm text-text-faint tabular-nums">
-                        Отправить снова через {cooldown.secondsLeft} сек.
+                        {t('resend_countdown', { seconds: cooldown.secondsLeft })}
                     </span>
                 )}
                 <button
@@ -66,7 +68,7 @@ export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStep
                     onClick={onChangeNumber}
                     className="cursor-pointer text-sm font-medium text-text-muted hover:text-text-base"
                 >
-                    Указать другой номер
+                    {t('change_number')}
                 </button>
             </div>
         </form>

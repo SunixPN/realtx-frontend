@@ -1,8 +1,11 @@
 import { z } from 'zod';
-import { emailSchema } from '@/shared/schemas/password-schema';
+import { createEmailSchema } from '@/shared/schemas/password-schema';
 
-export const resetRequestSchema = z.object({
-    email: emailSchema,
-});
+type T = (key: string) => string;
 
-export type ResetRequestValues = z.infer<typeof resetRequestSchema>;
+export const createResetRequestSchema = (t: T) =>
+    z.object({
+        email: createEmailSchema(t),
+    });
+
+export type ResetRequestValues = z.infer<ReturnType<typeof createResetRequestSchema>>;

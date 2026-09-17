@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, type ChangeEvent, type ClipboardEvent, type KeyboardEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 
 type CodeBoxesInputProps = {
@@ -18,6 +19,7 @@ export default function CodeBoxesInput({
     hasError = false,
     disabled = false,
 }: CodeBoxesInputProps) {
+    const t = useTranslations('auth.phone');
     const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
     const digits = Array.from({ length }, (_, i) => value[i] ?? '');
@@ -95,7 +97,7 @@ export default function CodeBoxesInput({
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
-                    aria-label={`Цифра ${i + 1}`}
+                    aria-label={t('digit_aria', { index: i + 1 })}
                     className={cn(
                         'flex size-12 items-center justify-center rounded-md border bg-surface-page text-center text-2xl font-semibold tabular-nums text-text-base outline-none transition-colors',
                         hasError
