@@ -4,7 +4,9 @@
         "app_description": "Search for apartments, houses and commercial real estate in Belarus",
         "meta_title": "RealtX — real estate aggregator",
         "close": "Close",
-        "back": "Back"
+        "back": "Back",
+        "range_from": "from",
+        "range_to": "to"
     },
     "header": {
         "logo_alt": "RealtX",
@@ -298,7 +300,17 @@
         "owners_only": "Owners only",
         "owners_only_sub": "Without agency listings",
         "metro_walk_label": "Walk time to metro",
-        "reset_all": "Reset all"
+        "reset_all": "Reset all",
+        "search_placeholder": "Address or metro",
+        "search_clear_aria": "Clear",
+        "search_no_results": "Nothing found",
+        "search_start_typing": "Start typing",
+        "search_type_metro": "metro",
+        "search_type_address": "address",
+        "mode_objects": "Properties",
+        "mode_heat": "District profitability",
+        "district_ranking_title": "District ranking",
+        "per_m2": "/m²"
     },
     "legal": {
         "terms_intro": "RealtX is an aggregator of listings from realt.by. We are not a party to real estate purchase, sale, or rental deals and are not responsible for third-party listing content.",

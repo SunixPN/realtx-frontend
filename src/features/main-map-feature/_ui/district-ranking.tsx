@@ -2,26 +2,30 @@
 
 import { useState } from 'react'
 import { ChevronDown, TrendingUp } from 'lucide-react'
+import { useTranslations, useLocale } from 'next-intl'
 import { cn } from '@/shared/helpers/cn'
 import { scoreToColor } from '@/shared/map/heat-palette'
+import { useDistrictLabel } from '@/entities/estate'
 import type { DistrictProfitabilityType } from '@/entities/estate'
 
 type DistrictRankingProps = {
     districts: DistrictProfitabilityType[]
 }
 
-function formatPpm(price: number | null, currency: number): string {
-    if (price === null) return '—'
-    const sym = currency === 840 ? '$' : currency === 933 ? 'Br' : '€'
-    return `${price.toLocaleString('ru-RU')} ${sym}/м²`
-}
-
 export function DistrictRanking({ districts }: DistrictRankingProps) {
+    const t = useTranslations('filters')
+    const locale = useLocale()
+    const districtLabel = useDistrictLabel()
     const [collapsed, setCollapsed] = useState(false)
 
-    // Сортировка по score desc; NaN/пустые уходят вниз естественно, т.к. 0.
     const sorted = [...districts].sort((a, b) => b.score - a.score)
     const top = sorted[0]
+
+    const formatPpm = (price: number | null, currency: number): string => {
+        if (price === null) return '—'
+        const sym = currency === 840 ? '$' : currency === 933 ? 'Br' : '€'
+        return `${price.toLocaleString(locale)} ${sym}${t('per_m2')}`
+    }
 
     return (
         <div className="w-64 rounded-lg border border-border bg-surface-raised shadow-lg overflow-hidden">
@@ -31,7 +35,7 @@ export function DistrictRanking({ districts }: DistrictRankingProps) {
                 className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-surface-muted transition-colors cursor-pointer"
             >
                 <TrendingUp className="size-4 text-text-faint shrink-0" aria-hidden />
-                <span className="text-sm font-medium text-text-base">Рейтинг районов</span>
+                <span className="text-sm font-medium text-text-base">{t('district_ranking_title')}</span>
                 <ChevronDown
                     className={cn(
                         'size-4 text-text-faint ml-auto transition-transform',
@@ -41,7 +45,6 @@ export function DistrictRanking({ districts }: DistrictRankingProps) {
                 />
             </button>
 
-            {/* grid-rows 0fr↔1fr — единственный «чистый» способ анимировать height:auto */}
             <div
                 className={cn(
                     'grid transition-[grid-template-rows] duration-300 ease-out',
@@ -66,7 +69,7 @@ export function DistrictRanking({ districts }: DistrictRankingProps) {
                                     className="size-2.5 rounded-full shrink-0"
                                     style={{ background: scoreToColor(d.score) }}
                                 />
-                                <span className="flex-1 truncate text-text-base">{d.district}</span>
+                                <span className="flex-1 truncate text-text-base">{districtLabel(d.district)}</span>
                                 <span className="text-xs text-text-muted tabular-nums">
                                     {formatPpm(d.avgPricePerM2, d.currency)}
                                 </span>

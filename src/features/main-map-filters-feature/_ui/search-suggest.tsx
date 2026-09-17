@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useQuery } from '@tanstack/react-query'
 import { Search, Train, MapPin, X } from 'lucide-react'
-import { suggestQuery, type SuggestItemType } from '@/entities/estate'
+import { useTranslations } from 'next-intl'
+import { useSuggest, type SuggestItemType } from '@/entities/estate'
 import { usePopoverPosition } from '@/shared/helpers/use-popover-position'
 import { cn } from '@/shared/helpers/cn'
 
@@ -13,10 +13,6 @@ type SearchSuggestProps = {
     onChange: (next: string | undefined) => void
 }
 
-/**
- * Debounce локальный: сам инпут отражает `input` мгновенно, а `debounced`
- * (для запроса suggest'ов) отстаёт на 250мс — не палим бэк на каждый keystroke.
- */
 function useDebounced<T>(value: T, delay: number): T {
     const [d, setD] = useState(value)
     useEffect(() => {
@@ -27,34 +23,27 @@ function useDebounced<T>(value: T, delay: number): T {
 }
 
 export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
-    // input — то, что видит пользователь; commited (value) приезжает извне из URL.
-    // При наборе не пушим в URL на каждый символ — только при выборе или Enter,
-    // иначе router.replace() отменит фокус и подсказки схлопнутся.
+    const t = useTranslations('filters')
     const [input, setInput] = useState(value ?? '')
     const [open, setOpen] = useState(false)
     const wrapperRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
 
-    // Синхронизация: если value поменялось «снаружи» (напр. очистили все фильтры),
-    // подтягиваем в локальный input.
     useEffect(() => {
         setInput(value ?? '')
     }, [value])
 
     const debounced = useDebounced(input.trim(), 250)
-    const { data: suggestions = [], isFetching } = useQuery({
-        ...suggestQuery(debounced, 10),
-        enabled: open,
-    })
+    const { data: suggestions = [], isValidating: isFetching } = useSuggest(debounced, 10, { enabled: open })
 
     const pos = usePopoverPosition(wrapperRef, open)
 
     useEffect(() => {
         if (!open) return
         const handler = (e: MouseEvent) => {
-            const t = e.target as Node
-            const inWrapper = wrapperRef.current?.contains(t)
-            const inPopover = (t as HTMLElement)?.closest?.('[data-suggest-popover="true"]')
+            const tgt = e.target as Node
+            const inWrapper = wrapperRef.current?.contains(tgt)
+            const inPopover = (tgt as HTMLElement)?.closest?.('[data-suggest-popover="true"]')
             if (!inWrapper && !inPopover) setOpen(false)
         }
         document.addEventListener('mousedown', handler)
@@ -93,13 +82,13 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
                         if (e.key === 'Enter') commit(input.trim() || undefined)
                         if (e.key === 'Escape') setOpen(false)
                     }}
-                    placeholder="Адрес или метро"
+                    placeholder={t('search_placeholder')}
                     className="min-w-0 flex-1 bg-transparent text-sm text-text-base placeholder:text-text-muted outline-none"
                 />
                 {input && (
                     <button
                         type="button"
-                        aria-label="Очистить"
+                        aria-label={t('search_clear_aria')}
                         onClick={clear}
                         className="shrink-0 cursor-pointer rounded-full p-0.5 text-text-faint hover:bg-surface-subtle hover:text-text-base"
                     >
@@ -121,7 +110,7 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
                 >
                     {suggestions.length === 0 && !isFetching && (
                         <li className="px-3 py-2 text-sm text-text-faint">
-                            {debounced ? 'Ничего не найдено' : 'Начните вводить'}
+                            {debounced ? t('search_no_results') : t('search_start_typing')}
                         </li>
                     )}
                     {suggestions.map((s: SuggestItemType) => (
@@ -135,7 +124,7 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
                                 : <MapPin className="size-4 shrink-0 text-text-muted" />}
                             <span className="flex-1 truncate">{s.value}</span>
                             <span className="text-xs text-text-faint">
-                                {s.type === 'metro' ? 'метро' : 'адрес'}
+                                {s.type === 'metro' ? t('search_type_metro') : t('search_type_address')}
                             </span>
                         </li>
                     ))}

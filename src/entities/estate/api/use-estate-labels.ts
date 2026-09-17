@@ -51,6 +51,12 @@ export function useMinskDistrictOptions(): Array<{ value: string; label: string 
     }))
 }
 
+export function useDistrictLabel(): (districtName: string) => string {
+    const options = useMinskDistrictOptions()
+    const map = new Map(options.map((o) => [o.value, o.label]))
+    return (name) => map.get(name) ?? name
+}
+
 export function useFormatRooms(): (rooms: number | null) => string {
     const t = useTranslations('estate')
     return (rooms) => {

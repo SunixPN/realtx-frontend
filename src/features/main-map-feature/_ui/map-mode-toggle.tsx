@@ -1,13 +1,9 @@
 'use client'
 
 import { Layers } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/shared/helpers/cn'
 import type { MapMode } from '../_hooks/use-map-mode'
-
-const ITEMS = [
-    { key: 'objects' as const, label: 'Объекты' },
-    { key: 'heat' as const, label: 'Выгодность районов' },
-]
 
 type MapModeToggleProps = {
     mode: MapMode
@@ -15,6 +11,13 @@ type MapModeToggleProps = {
 }
 
 export function MapModeToggle({ mode, onChange }: MapModeToggleProps) {
+    const t = useTranslations('filters')
+
+    const ITEMS: { key: MapMode; label: string }[] = [
+        { key: 'objects', label: t('mode_objects') },
+        { key: 'heat',    label: t('mode_heat') },
+    ]
+
     return (
         <div className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-raised p-1 shadow-md">
             <Layers className="mx-1.5 size-4 text-text-faint shrink-0" aria-hidden />

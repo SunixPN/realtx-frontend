@@ -4,7 +4,9 @@
         "app_description": "Поиск квартир, домов и коммерческой недвижимости в Беларуси",
         "meta_title": "RealtX — агрегатор недвижимости",
         "close": "Закрыть",
-        "back": "Назад"
+        "back": "Назад",
+        "range_from": "от",
+        "range_to": "до"
     },
     "header": {
         "logo_alt": "RealtX",
@@ -298,7 +300,17 @@
         "owners_only": "Только собственники",
         "owners_only_sub": "Без агентских объявлений",
         "metro_walk_label": "Время до метро пешком",
-        "reset_all": "Сбросить всё"
+        "reset_all": "Сбросить всё",
+        "search_placeholder": "Адрес или метро",
+        "search_clear_aria": "Очистить",
+        "search_no_results": "Ничего не найдено",
+        "search_start_typing": "Начните вводить",
+        "search_type_metro": "метро",
+        "search_type_address": "адрес",
+        "mode_objects": "Объекты",
+        "mode_heat": "Выгодность районов",
+        "district_ranking_title": "Рейтинг районов",
+        "per_m2": "/м²"
     },
     "legal": {
         "terms_intro": "RealtX — агрегатор объявлений с сайта realt.by. Мы не являемся участником сделок купли-продажи или аренды недвижимости и не несём ответственности за содержание объявлений третьих лиц.",

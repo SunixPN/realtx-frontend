@@ -20,6 +20,7 @@ export {
     useRepairStateLabels,
     useMetroTimeOptions,
     useMinskDistrictOptions,
+    useDistrictLabel,
     useFormatRooms,
 } from './api/use-estate-labels'
 

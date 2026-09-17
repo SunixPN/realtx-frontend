@@ -1,4 +1,7 @@
+'use client'
+
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 
 export interface RangeFieldProps {
@@ -64,14 +67,15 @@ export function UIRangeField({
   error,
   fromValue,
   toValue,
-  fromPlaceholder = 'от',
-  toPlaceholder = 'до',
+  fromPlaceholder,
+  toPlaceholder,
   onFromChange,
   onToChange,
   disabled,
   className,
   debounceMs,
 }: RangeFieldProps) {
+  const t = useTranslations('common');
   const fromId = useId();
   const toId = useId();
   const hasError = !!error;
@@ -95,7 +99,7 @@ export function UIRangeField({
 
       <div className="flex items-center gap-2">
         <label htmlFor={fromId} className={inputCls}>
-          <span className="mr-2 text-text-faint text-sm">от</span>
+          <span className="mr-2 text-text-faint text-sm">{t('range_from')}</span>
           <input
             id={fromId}
             type="number"
@@ -109,7 +113,7 @@ export function UIRangeField({
         </label>
 
         <label htmlFor={toId} className={inputCls}>
-          <span className="mr-2 text-text-faint text-sm">до</span>
+          <span className="mr-2 text-text-faint text-sm">{t('range_to')}</span>
           <input
             id={toId}
             type="number"
