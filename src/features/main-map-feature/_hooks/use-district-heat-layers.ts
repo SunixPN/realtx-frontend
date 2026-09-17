@@ -6,6 +6,7 @@ import mapboxgl from 'mapbox-gl'
 import type { FeatureCollection } from 'geojson'
 import { scoreToColor, HEAT_COLOR_EXPRESSION } from '@/shared/map/heat-palette'
 import type { DistrictProfitabilityType, DistrictGeoJSONType } from '@/entities/estate'
+import { useDistrictLabel } from '@/entities/estate'
 import type { MapMode } from './use-map-mode'
 
 const SOURCE_ID      = 'district-heat'
@@ -22,7 +23,7 @@ function formatPpm(price: number | null, currency: number, locale: string, perM2
 }
 
 function createLabelEl(
-    name: string,
+    displayName: string,
     district: DistrictProfitabilityType | undefined,
     onClick: () => void,
     locale: string,
@@ -36,7 +37,7 @@ function createLabelEl(
     el.innerHTML =
         `<div class="district-heat-label__inner">` +
         `<span class="district-heat-label__dot" style="background:${color}"></span>` +
-        `<span class="district-heat-label__name">${name}</span>` +
+        `<span class="district-heat-label__name">${displayName}</span>` +
         (priceText
             ? `<span class="district-heat-label__sep">·</span>` +
               `<span class="district-heat-label__price">${priceText}</span>`
@@ -79,10 +80,13 @@ export function useDistrictHeatLayers(
 ) {
     const locale = useLocale()
     const tFilters = useTranslations('filters')
+    const districtLabel = useDistrictLabel()
     const perM2Ref = useRef(tFilters('per_m2'))
     perM2Ref.current = tFilters('per_m2')
     const localeRef = useRef(locale)
     localeRef.current = locale
+    const districtLabelRef = useRef(districtLabel)
+    districtLabelRef.current = districtLabel
     const labelsRef = useRef<mapboxgl.Marker[]>([])
     const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null)
 
@@ -152,7 +156,7 @@ export function useDistrictHeatLayers(
             const centroid: [number, number] = [f.properties.centroid.lng, f.properties.centroid.lat]
             const districtData = scoreMap.get(name)
 
-            const el = createLabelEl(name, districtData, () => {
+            const el = createLabelEl(districtLabelRef.current(name), districtData, () => {
                 setSelectedDistrict(name)
                 map.easeTo({ center: centroid, zoom: 12.5, duration: 700 })
             }, localeRef.current, perM2Ref.current)
