@@ -12,18 +12,24 @@ export type {
 
 export {
     PRICE_CURRENCY_LABELS,
-    WALL_MATERIAL_LABELS,
-    REPAIR_STATE_LABELS,
     MINSK_DISTRICTS,
-    METRO_TIME_OPTIONS,
 } from './api/estate-types'
 
-export { mapPointsQuery } from './api/map-points-query'
-export { districtProfitabilityQuery } from './api/district-profitability-query'
-export { districtsGeojsonQuery } from './api/districts-geojson-query'
-export { estateByIdQuery } from './api/estate-by-id-query'
-export { houseEstatesQuery, type HouseBbox } from './api/house-estates-query'
-export { suggestQuery, type SuggestItemType } from './api/suggest-query'
+export {
+    useWallMaterialLabels,
+    useRepairStateLabels,
+    useMetroTimeOptions,
+    useMinskDistrictOptions,
+    useFormatRooms,
+} from './api/use-estate-labels'
+
+export { mapPointsKey, districtProfitabilityKey, districtsGeojsonKey, estateByIdKey } from './api/estate-query-keys'
+export { useMapPoints } from './api/map-points-query'
+export { useDistrictProfitability } from './api/district-profitability-query'
+export { useDistrictsGeojson } from './api/districts-geojson-query'
+export { useEstateById } from './api/estate-by-id-query'
+export { useHouseEstates, houseEstatesKey, type HouseBbox } from './api/house-estates-query'
+export { useSuggest, suggestKey, type SuggestItemType } from './api/suggest-query'
 
 export { getMainPhoto, getThumbPhoto } from './model/photo-url'
 

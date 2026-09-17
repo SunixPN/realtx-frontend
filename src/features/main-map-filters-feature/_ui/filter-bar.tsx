@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { Bell, SlidersHorizontal } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { SearchSuggest } from './search-suggest'
 import { UIChip } from '@/shared/ui/ui-chip'
 import { UIRangeField } from '@/shared/ui/ui-range-field'
@@ -12,14 +13,14 @@ import { BynSign } from '@/shared/ui/byn-sign/byn-sign'
 import { cn } from '@/shared/helpers/cn'
 import {
     MINSK_DISTRICTS,
-    METRO_TIME_OPTIONS,
+    useMetroTimeOptions,
+    useMinskDistrictOptions,
     countActiveFilters,
     type MapFiltersType,
 } from '@/entities/estate'
 import type { DisplayCurrency } from '../_hooks/use-display-currency'
-import {useQuery} from "@tanstack/react-query";
-import {authQuery} from "@/entities/me/api/auth-query";
-import {IconLoader} from "@/shared/ui/ui-icons";
+import { useAuth } from "@/entities/me/api/auth-query";
+import { IconLoader } from "@/shared/ui/ui-icons";
 
 type FilterBarProps = {
     filters: MapFiltersType
@@ -30,6 +31,8 @@ type FilterBarProps = {
     total: number
     currency: DisplayCurrency
     onCurrencyChange: (c: DisplayCurrency) => void
+    saved: boolean
+    onSaveSearch: () => void
 }
 
 const CURRENCY_ORDER: DisplayCurrency[] = ['USD', 'BYN', 'EUR']
@@ -40,64 +43,51 @@ function currencySymbol(c: DisplayCurrency): ReactNode {
     return <BynSign />
 }
 
-function formatPriceLabel(filters: MapFiltersType, currency: DisplayCurrency): ReactNode | undefined {
-    const sym = currencySymbol(currency)
-    if (filters.priceMin && filters.priceMax) return <>{filters.priceMin.toLocaleString('ru-RU')} – {filters.priceMax.toLocaleString('ru-RU')} {sym}</>
-    if (filters.priceMin) return <>от {filters.priceMin.toLocaleString('ru-RU')} {sym}</>
-    if (filters.priceMax) return <>до {filters.priceMax.toLocaleString('ru-RU')} {sym}</>
-    return undefined
-}
-
-function formatRoomsLabel(filters: MapFiltersType): string | undefined {
-    if (!filters.rooms?.length) return undefined
-    return filters.rooms.map(r => r >= 5 ? '5+' : String(r)).join('–')
-}
-
-function formatAreaLabel(filters: MapFiltersType): string | undefined {
-    if (filters.areaMin && filters.areaMax) return `${filters.areaMin} – ${filters.areaMax} м²`
-    if (filters.areaMin) return `от ${filters.areaMin} м²`
-    if (filters.areaMax) return `до ${filters.areaMax} м²`
-    return undefined
-}
-
 const ROOM_OPTIONS = [1, 2, 3, 4, 5]
 
-function pluralObjects(n: number): string {
-    const last = n % 10
-    const two = n % 100
-    if (two >= 11 && two <= 14) return 'объектов'
-    if (last === 1) return 'объект'
-    if (last >= 2 && last <= 4) return 'объекта'
-    return 'объектов'
-}
+export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, drawerOpen, total, currency, onCurrencyChange, saved, onSaveSearch }: FilterBarProps) {
+    const t = useTranslations('filters')
+    const { data, isLoading } = useAuth()
+    const metroTimeOptions = useMetroTimeOptions()
+    const districtOptions = useMinskDistrictOptions()
 
-export function FilterBar({ filters, onChange, onClear, onOpenDrawer, drawerOpen, total, currency, onCurrencyChange }: FilterBarProps) {
-    const [saved, setSaved] = useState(false)
+    const formatPriceLabel = (): ReactNode | undefined => {
+        const sym = currencySymbol(currency)
+        if (filters.priceMin && filters.priceMax) return <>{filters.priceMin.toLocaleString('ru-RU')} – {filters.priceMax.toLocaleString('ru-RU')} {sym}</>
+        if (filters.priceMin) return <>{t('price_from', { min: filters.priceMin.toLocaleString('ru-RU'), currency: '' })} {sym}</>
+        if (filters.priceMax) return <>{t('price_to', { max: filters.priceMax.toLocaleString('ru-RU'), currency: '' })} {sym}</>
+        return undefined
+    }
 
-    const { data, isLoading } = useQuery(authQuery)
+    const formatRoomsLabel = (): string | undefined => {
+        if (!filters.rooms?.length) return undefined
+        return filters.rooms.map(r => r >= 5 ? '5+' : String(r)).join('–')
+    }
+
+    const formatAreaLabel = (): string | undefined => {
+        if (filters.areaMin && filters.areaMax) return t('area_range', { min: filters.areaMin, max: filters.areaMax })
+        if (filters.areaMin) return t('area_from', { min: filters.areaMin })
+        if (filters.areaMax) return t('area_to', { max: filters.areaMax })
+        return undefined
+    }
 
     const extraCount = countActiveFilters(filters) -
-        (formatPriceLabel(filters, currency) ? 1 : 0) -
-        (formatRoomsLabel(filters) ? 1 : 0) -
-        (formatAreaLabel(filters) ? 1 : 0) -
+        (formatPriceLabel() ? 1 : 0) -
+        (formatRoomsLabel() ? 1 : 0) -
+        (formatAreaLabel() ? 1 : 0) -
         (filters.districts?.length ? 1 : 0) -
         (filters.metroTimeMax ? 1 : 0)
 
     return (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface-page p-2 shadow-lg">
-            {/* Поиск по адресу/метро — подсказки из /estate/suggest */}
             <SearchSuggest
                 value={filters.q}
                 onChange={(next) => onChange(f => ({ ...f, q: next }))}
             />
 
-            {/* Цена. Кнопки $/[Br]/€ — НЕ фильтр, а валюта отображения;
-             * priceMin/priceMax отправляются на бэк уже в этой валюте, и бэк
-             * возвращает `price` в ней же. Смена валюты триггерит новый запрос
-             * через queryKey. */}
             <UIChip
-                label="Цена"
-                value={formatPriceLabel(filters, currency)}
+                label={t('price')}
+                value={formatPriceLabel()}
                 onClear={() => onChange(f => ({ ...f, priceMin: undefined, priceMax: undefined }))}
             >
                 <div className="flex flex-col gap-3 w-72">
@@ -128,10 +118,9 @@ export function FilterBar({ filters, onChange, onClear, onOpenDrawer, drawerOpen
                 </div>
             </UIChip>
 
-            {/* Комнаты */}
             <UIChip
-                label="Комнаты"
-                value={formatRoomsLabel(filters)}
+                label={t('rooms')}
+                value={formatRoomsLabel()}
                 onClear={() => onChange(f => ({ ...f, rooms: undefined }))}
             >
                 <div className="flex gap-2">
@@ -158,10 +147,9 @@ export function FilterBar({ filters, onChange, onClear, onOpenDrawer, drawerOpen
                 </div>
             </UIChip>
 
-            {/* Площадь */}
             <UIChip
-                label="Площадь"
-                value={formatAreaLabel(filters)}
+                label={t('area')}
+                value={formatAreaLabel()}
                 onClear={() => onChange(f => ({ ...f, areaMin: undefined, areaMax: undefined }))}
             >
                 <div className="w-64">
@@ -176,25 +164,24 @@ export function FilterBar({ filters, onChange, onClear, onOpenDrawer, drawerOpen
                 </div>
             </UIChip>
 
-            {/* Район */}
             <UIChip
-                label="Район"
+                label={t('district')}
                 count={filters.districts?.length}
                 onClear={() => onChange(f => ({ ...f, districts: undefined }))}
             >
                 <div className="w-80 grid grid-cols-2 gap-x-6 gap-y-3">
-                    {MINSK_DISTRICTS.map(d => (
+                    {districtOptions.map(({ value, label }) => (
                         <UICheckbox
-                            key={d}
-                            label={d}
-                            checked={filters.districts?.includes(d) ?? false}
+                            key={value}
+                            label={label}
+                            checked={filters.districts?.includes(value) ?? false}
                             onChange={e => onChange(f => {
                                 const cur = f.districts ?? []
                                 return {
                                     ...f,
                                     districts: e.target.checked
-                                        ? [...cur, d]
-                                        : cur.filter(x => x !== d),
+                                        ? [...cur, value]
+                                        : cur.filter(x => x !== value),
                                 }
                             })}
                         />
@@ -202,23 +189,21 @@ export function FilterBar({ filters, onChange, onClear, onOpenDrawer, drawerOpen
                 </div>
             </UIChip>
 
-            {/* Метро */}
             <UIChip
-                label="Метро"
-                value={filters.metroTimeMax ? `до ${filters.metroTimeMax} мин` : undefined}
+                label={t('metro')}
+                value={filters.metroTimeMax ? t('metro_chip_value', { min: filters.metroTimeMax }) : undefined}
                 onClear={() => onChange(f => ({ ...f, metroTimeMax: undefined }))}
             >
                 <div className="w-48">
                     <UISelect
-                        placeholder="Любое время"
-                        options={METRO_TIME_OPTIONS}
+                        placeholder={t('metro_any_time')}
+                        options={metroTimeOptions}
                         value={filters.metroTimeMax ? String(filters.metroTimeMax) : undefined}
                         onChange={v => onChange(f => ({ ...f, metroTimeMax: v ? Number(v) : undefined }))}
                     />
                 </div>
             </UIChip>
 
-            {/* Все фильтры */}
             <button
                 type="button"
                 onClick={onOpenDrawer}
@@ -231,7 +216,7 @@ export function FilterBar({ filters, onChange, onClear, onOpenDrawer, drawerOpen
                 )}
             >
                 <SlidersHorizontal className="size-4" aria-hidden />
-                Все фильтры
+                {t('all_filters')}
                 {extraCount > 0 && (
                     <span className="rounded-xs bg-brand px-1 text-xs font-semibold text-white tabular-nums">
                         {extraCount}
@@ -242,12 +227,12 @@ export function FilterBar({ filters, onChange, onClear, onOpenDrawer, drawerOpen
             <span className="mx-1 h-6 w-px bg-border" />
 
             <span className="px-1 text-sm font-medium text-text-base tabular-nums">
-                {total.toLocaleString('ru-RU')} {pluralObjects(total)}
+                {t('results_count', { count: total })}
             </span>
             {
                 isLoading ? (
                     <div
-                        aria-label="Проверка авторизации"
+                        aria-label={t('auth_checking_aria')}
                         className="flex size-9 items-center justify-center rounded-xl text-text-muted"
                     >
                         <IconLoader size={18} />
@@ -260,9 +245,9 @@ export function FilterBar({ filters, onChange, onClear, onOpenDrawer, drawerOpen
                                     size="sm"
                                     variant={saved ? 'secondary' : 'primary'}
                                     iconLeft={<Bell className="size-4" />}
-                                    onClick={() => setSaved(v => !v)}
+                                    onClick={onSaveSearch}
                                 >
-                                    {saved ? 'Поиск сохранён' : 'Сохранить поиск'}
+                                    {saved ? t('search_saved') : t('save_search')}
                                 </UIButton>
                             ) : <></>
                         }

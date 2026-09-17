@@ -1,4 +1,7 @@
+'use client'
+
 import { Minus, TrendingDown, TrendingUp } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import type { PriceChange } from '@/entities/estate'
 import type { DisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { BynSign } from '@/shared/ui/byn-sign/byn-sign'
@@ -37,17 +40,16 @@ type Props = {
 }
 
 export function PriceChangeBadge({ change, currency, variant = 'compact' }: Props) {
+    const t = useTranslations('estate')
     const delta = pickDelta(change, currency)
     const pct = pickPct(change, currency)
     if (delta === null && pct === null) return null
 
-    // Направление берём из процента (устойчивее к округлению), а при отсутствии — из дельты
     const dir = pct !== null ? pct : delta ?? 0
     const isZero = (delta === null || delta === 0) && (pct === null || pct === 0)
     const down = dir < 0
     const Icon = isZero ? Minus : down ? TrendingDown : TrendingUp
 
-    // Нулевая дельта в компакте — не рендерим (badge рядом с ценой не нужен)
     if (variant === 'compact') {
         if (isZero) return null
         return (
@@ -67,7 +69,6 @@ export function PriceChangeBadge({ change, currency, variant = 'compact' }: Prop
         )
     }
 
-    // full-вариант: серый нейтральный при нулевой дельте (например, цена вернулась к исходной)
     const tone = isZero
         ? {
               wrap: 'border-[var(--border-default)] bg-[var(--surface-muted)]',
@@ -92,7 +93,7 @@ export function PriceChangeBadge({ change, currency, variant = 'compact' }: Prop
             <div>
                 <div className={`text-base font-semibold tabular-nums ${tone.text}`}>
                     {isZero ? (
-                        'Без изменения'
+                        t('price_no_change')
                     ) : (
                         <>
                             {delta !== null && <DeltaValue v={delta} currency={currency} />}
@@ -101,8 +102,7 @@ export function PriceChangeBadge({ change, currency, variant = 'compact' }: Prop
                     )}
                 </div>
                 <div className="text-xs text-[var(--text-faint)]">
-                    Цена менялась {change.changes}{' '}
-                    {change.changes === 1 ? 'раз' : change.changes < 5 ? 'раза' : 'раз'} с момента публикации
+                    {t('price_changes_count', { count: change.changes })}
                 </div>
             </div>
         </div>

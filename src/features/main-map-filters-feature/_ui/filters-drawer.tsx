@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import { X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { UIRangeField } from '@/shared/ui/ui-range-field'
 import { UICheckbox } from '@/shared/ui/ui-checkbox'
 import { UISwitch } from '@/shared/ui/ui-switch'
@@ -11,27 +12,16 @@ import { UIButton } from '@/shared/ui/ui-button'
 import { BynSign } from '@/shared/ui/byn-sign/byn-sign'
 import { cn } from '@/shared/helpers/cn'
 import {
-    MINSK_DISTRICTS,
-    METRO_TIME_OPTIONS,
-    WALL_MATERIAL_LABELS,
-    REPAIR_STATE_LABELS,
+    useWallMaterialLabels,
+    useRepairStateLabels,
+    useMetroTimeOptions,
+    useMinskDistrictOptions,
     type MapFiltersType,
 } from '@/entities/estate'
 import type { DisplayCurrency } from '../_hooks/use-display-currency'
 
 const ROOM_OPTIONS = [1, 2, 3, 4, 5] as const
-const WALL_MATERIAL_OPTIONS = Object.entries(WALL_MATERIAL_LABELS).map(([v, l]) => ({ value: v, label: l }))
-const REPAIR_STATE_OPTIONS = Object.entries(REPAIR_STATE_LABELS).map(([v, l]) => ({ value: v, label: l }))
 const DURATION = 320
-
-function plural(n: number): string {
-    const last = n % 10
-    const two = n % 100
-    if (two >= 11 && two <= 14) return 'объектов'
-    if (last === 1) return 'объект'
-    if (last >= 2 && last <= 4) return 'объекта'
-    return 'объектов'
-}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
@@ -51,6 +41,8 @@ type FiltersDrawerProps = {
     total: number
     currency: DisplayCurrency
     onCurrencyChange: (c: DisplayCurrency) => void
+    applyLabel?: React.ReactNode
+    zIndexOffset?: number
 }
 
 const CURRENCY_ORDER: DisplayCurrency[] = ['USD', 'BYN', 'EUR']
@@ -61,11 +53,24 @@ function currencySymbol(c: DisplayCurrency) {
     return <BynSign />
 }
 
-export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, total, currency, onCurrencyChange }: FiltersDrawerProps) {
+export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, total, currency, onCurrencyChange, applyLabel, zIndexOffset = 0 }: FiltersDrawerProps) {
+    const t = useTranslations('filters')
+    const tCommon = useTranslations('common')
+    const wallLabels = useWallMaterialLabels()
+    const repairLabels = useRepairStateLabels()
+    const metroTimeOptions = useMetroTimeOptions()
+    const districtOptions = useMinskDistrictOptions()
+
+    const wallMaterialOptions = Object.entries(wallLabels).map(([v, l]) => ({ value: v, label: l }))
+    const repairStateOptions = Object.entries(repairLabels).map(([v, l]) => ({ value: v, label: l }))
+
+    const backdropZ = 40 + zIndexOffset
+    const panelZ = 50 + zIndexOffset
+    const nested = zIndexOffset > 0
+    const positionClass = nested ? 'fixed' : 'absolute'
     const backdropRef = useRef<HTMLDivElement>(null)
     const panelRef = useRef<HTMLElement>(null)
 
-    // ESC → закрыть
     useEffect(() => {
         if (!isOpen) return
         const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -73,15 +78,14 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
         return () => window.removeEventListener('keydown', handler)
     }, [isOpen, onClose])
 
-    // Блокируем скролл body пока открыт
     useEffect(() => {
+        if (nested) return
         document.body.style.overflow = isOpen ? 'hidden' : ''
         return () => { document.body.style.overflow = '' }
-    }, [isOpen])
+    }, [isOpen, nested])
 
     return (
         <>
-            {/* ── Backdrop ────────────────────────────────────────────── */}
             <CSSTransition
                 nodeRef={backdropRef}
                 in={isOpen}
@@ -92,11 +96,11 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                 <div
                     ref={backdropRef}
                     onClick={onClose}
-                    className="absolute inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+                    style={{ zIndex: backdropZ }}
+                    className={cn(positionClass, 'inset-0 bg-black/40 backdrop-blur-[2px]')}
                 />
             </CSSTransition>
 
-            {/* ── Panel ───────────────────────────────────────────────── */}
             <CSSTransition
                 nodeRef={panelRef}
                 in={isOpen}
@@ -106,19 +110,20 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
             >
                 <aside
                     ref={panelRef}
-                    aria-label="Все фильтры"
+                    aria-label={t('all_filters_aria')}
+                    style={{ zIndex: panelZ }}
                     className={cn(
-                        'absolute inset-y-0 right-0 z-50 flex w-[420px] flex-col',
+                        positionClass,
+                        'inset-y-0 right-0 flex w-[420px] flex-col',
                         'border-l border-border bg-surface-page',
                         'shadow-[0_12px_32px_-8px_rgb(15_23_42/0.16)]',
                     )}
                 >
-                    {/* Header */}
                     <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3.5">
-                        <h2 className="text-[0.9375rem] font-semibold text-text-base">Все фильтры</h2>
+                        <h2 className="text-[0.9375rem] font-semibold text-text-base">{t('all_filters')}</h2>
                         <button
                             type="button"
-                            aria-label="Закрыть"
+                            aria-label={tCommon('close')}
                             onClick={onClose}
                             className="flex size-9 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-subtle"
                         >
@@ -126,9 +131,8 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                         </button>
                     </div>
 
-                    {/* Scrollable body */}
                     <div className="flex-1 overflow-y-auto">
-                        <Section title="Цена">
+                        <Section title={t('section_price')}>
                             <div className="flex gap-2">
                                 {CURRENCY_ORDER.map(c => (
                                     <button
@@ -147,7 +151,7 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                                 ))}
                             </div>
                             <UIRangeField
-                                label={<>Цена, {currencySymbol(currency)}</>}
+                                label={<>{t('price_label_unit', { currency: '' })} {currencySymbol(currency)}</>}
                                 unit={currencySymbol(currency)}
                                 fromValue={filters.priceMin ?? ''}
                                 toValue={filters.priceMax ?? ''}
@@ -157,7 +161,7 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                             />
                         </Section>
 
-                        <Section title="Комнат">
+                        <Section title={t('section_rooms')}>
                             <div className="flex gap-2">
                                 {ROOM_OPTIONS.map(r => {
                                     const active = filters.rooms?.includes(r)
@@ -184,9 +188,9 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                             </div>
                         </Section>
 
-                        <Section title="Площадь и этаж">
+                        <Section title={t('section_area_storey')}>
                             <UIRangeField
-                                label="Общая площадь, м²"
+                                label={t('area_total_label')}
                                 fromValue={filters.areaMin ?? ''}
                                 toValue={filters.areaMax ?? ''}
                                 onFromChange={v => onChange(f => ({ ...f, areaMin: v ? Number(v) : undefined }))}
@@ -194,7 +198,7 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                                 debounceMs={400}
                             />
                             <UIRangeField
-                                label="Этаж"
+                                label={t('storey_label')}
                                 fromValue={filters.storeyMin ?? ''}
                                 toValue={filters.storeyMax ?? ''}
                                 onFromChange={v => onChange(f => ({ ...f, storeyMin: v ? Number(v) : undefined }))}
@@ -202,46 +206,46 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                                 debounceMs={400}
                             />
                             <UICheckbox
-                                label="Не первый и не последний"
+                                label={t('storey_not_first_last')}
                                 checked={filters.notFirstOrLast ?? false}
                                 onChange={e => onChange(f => ({ ...f, notFirstOrLast: e.target.checked || undefined }))}
                             />
                         </Section>
 
-                        <Section title="Дом">
+                        <Section title={t('section_building')}>
                             <UIRangeField
-                                label="Год постройки"
+                                label={t('year_label')}
                                 fromValue={filters.buildingYearMin ?? ''}
                                 toValue={filters.buildingYearMax ?? ''}
-                                fromPlaceholder="от"
-                                toPlaceholder="до"
+                                fromPlaceholder={t('year_from')}
+                                toPlaceholder={t('year_to')}
                                 onFromChange={v => onChange(f => ({ ...f, buildingYearMin: v ? Number(v) : undefined }))}
                                 onToChange={v => onChange(f => ({ ...f, buildingYearMax: v ? Number(v) : undefined }))}
                                 debounceMs={400}
                             />
                             <UISelect
-                                label="Тип дома"
-                                placeholder="Любой"
-                                options={WALL_MATERIAL_OPTIONS}
+                                label={t('wall_label')}
+                                placeholder={t('any')}
+                                options={wallMaterialOptions}
                                 value={filters.wallMaterial?.[0] ? String(filters.wallMaterial[0]) : undefined}
                                 onChange={v => onChange(f => ({ ...f, wallMaterial: v ? [Number(v)] : undefined }))}
                                 clearable
                             />
                             <UISelect
-                                label="Ремонт"
-                                placeholder="Любой"
-                                options={REPAIR_STATE_OPTIONS}
+                                label={t('repair_label')}
+                                placeholder={t('any')}
+                                options={repairStateOptions}
                                 value={filters.repairState?.[0] ? String(filters.repairState[0]) : undefined}
                                 onChange={v => onChange(f => ({ ...f, repairState: v ? [Number(v)] : undefined }))}
                                 clearable
                             />
                         </Section>
 
-                        <Section title="Продавец и метро">
+                        <Section title={t('section_seller_metro')}>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <div className="text-base text-text-base">Только собственники</div>
-                                    <div className="text-xs text-text-muted">Без агентских объявлений</div>
+                                    <div className="text-base text-text-base">{t('owners_only')}</div>
+                                    <div className="text-xs text-text-muted">{t('owners_only_sub')}</div>
                                 </div>
                                 <UISwitch
                                     checked={filters.ownerOnly ?? false}
@@ -249,29 +253,29 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                                 />
                             </div>
                             <UISelect
-                                label="Время до метро пешком"
-                                placeholder="Любое"
-                                options={METRO_TIME_OPTIONS}
+                                label={t('metro_walk_label')}
+                                placeholder={t('metro_any')}
+                                options={metroTimeOptions}
                                 value={filters.metroTimeMax ? String(filters.metroTimeMax) : undefined}
                                 onChange={v => onChange(f => ({ ...f, metroTimeMax: v ? Number(v) : undefined }))}
                                 clearable
                             />
                         </Section>
 
-                        <Section title="Район">
+                        <Section title={t('section_district')}>
                             <div className="grid grid-cols-2 gap-2">
-                                {MINSK_DISTRICTS.map(d => (
+                                {districtOptions.map(({ value, label }) => (
                                     <UICheckbox
-                                        key={d}
-                                        label={d}
-                                        checked={filters.districts?.includes(d) ?? false}
+                                        key={value}
+                                        label={label}
+                                        checked={filters.districts?.includes(value) ?? false}
                                         onChange={e => onChange(f => {
                                             const cur = f.districts ?? []
                                             return {
                                                 ...f,
                                                 districts: e.target.checked
-                                                    ? [...cur, d]
-                                                    : cur.filter(x => x !== d),
+                                                    ? [...cur, value]
+                                                    : cur.filter(x => x !== value),
                                             }
                                         })}
                                     />
@@ -280,17 +284,16 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                         </Section>
                     </div>
 
-                    {/* Sticky footer */}
                     <div className="flex shrink-0 items-center justify-between gap-3 border-t border-border bg-surface-page px-5 py-4">
                         <button
                             type="button"
                             onClick={onClear}
                             className="text-sm font-medium text-text-muted transition-colors hover:text-text-base"
                         >
-                            Сбросить всё
+                            {t('reset_all')}
                         </button>
                         <UIButton variant="primary" size="lg" onClick={onClose}>
-                            Показать {total.toLocaleString('ru-RU')} {plural(total)}
+                            {applyLabel ?? t('show_results', { count: total })}
                         </UIButton>
                     </div>
                 </aside>

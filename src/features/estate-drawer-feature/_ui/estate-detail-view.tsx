@@ -1,17 +1,19 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { ArrowLeft, ExternalLink, Heart, Maximize2, Train, X } from 'lucide-react'
-import { estateByIdQuery, REPAIR_STATE_LABELS, WALL_MATERIAL_LABELS } from '@/entities/estate'
+import { useTranslations } from 'next-intl'
+import { useEstateById, useWallMaterialLabels, useRepairStateLabels, useFormatRooms } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
+import { useToggleFavorite } from '@/features/favorite-toggle-feature'
 import { PhotoSlider } from './photo-slider'
 import { PriceDisplay, PricePerM2Display } from './price-display'
 import { PriceChangeBadge } from './price-change-badge'
 import { PriceHistorySection } from './price-history-section'
-import { formatArea, formatRooms, formatStorey } from './format'
-import {authQuery} from "@/entities/me/api/auth-query";
-import {IconLoader} from "@/shared/ui/ui-icons";
+import { formatArea, formatStorey } from './format'
+import { useAuth } from "@/entities/me/api/auth-query";
+import { IconLoader } from "@/shared/ui/ui-icons";
+import { cn } from '@/shared/helpers/cn';
 
 type Props = {
     id: number
@@ -30,10 +32,15 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
+    const t = useTranslations('estate')
     const { currency } = useDisplayCurrency()
-    const { data: estate, isPending, isError } = useQuery(estateByIdQuery(id, currency))
-
-    const { data, isLoading } = useQuery(authQuery)
+    const { data: estate, isLoading: isPending, error } = useEstateById(id, currency)
+    const isError = !!error
+    const { data, isLoading } = useAuth()
+    const { isFavorite, toggle, isPending: favPending } = useToggleFavorite(id, estate?.isFavorite ?? false)
+    const wallLabels = useWallMaterialLabels()
+    const repairLabels = useRepairStateLabels()
+    const formatRooms = useFormatRooms()
 
     return (
         <div className="flex h-full flex-col">
@@ -41,7 +48,7 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                 {showBack ? (
                     <button
                         type="button"
-                        aria-label="Назад"
+                        aria-label={t('back_aria')}
                         onClick={onBack}
                         className="flex size-9 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
                     >
@@ -51,11 +58,11 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                     <div className="size-9 shrink-0" />
                 )}
                 <span className="flex-1 truncate text-base font-medium text-[var(--text-base)]">
-                    {estate ? `${formatRooms(estate.rooms)} квартира` : 'Детали объекта'}
+                    {estate ? t('title_flat', { rooms: formatRooms(estate.rooms) }) : t('title_fallback')}
                 </span>
                 <button
                     type="button"
-                    aria-label="Закрыть"
+                    aria-label={t('close_aria')}
                     onClick={onClose}
                     className="flex size-9 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
                 >
@@ -66,7 +73,7 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
             <div className="flex-1 overflow-y-auto">
                 {isError && (
                     <div className="m-4 rounded-md bg-[var(--error-bg)] p-3 text-sm text-[var(--error)]">
-                        Не удалось загрузить объект.
+                        {t('error_load')}
                     </div>
                 )}
 
@@ -102,7 +109,7 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                             {
                                 isLoading ? (
                                     <div
-                                        aria-label="Проверка авторизации"
+                                        aria-label={t('auth_checking_aria')}
                                         className="flex size-9 items-center justify-center rounded-xl self-center text-text-muted"
                                     >
                                         <IconLoader size={18} />
@@ -112,9 +119,21 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                         {data?.user ? (
                                             <button
                                                 type="button"
-                                                className="flex h-11 items-center justify-center gap-2 rounded-md bg-[var(--brand)] px-4 text-sm font-medium text-[var(--text-on-brand)] hover:bg-[var(--brand-hover)]"
+                                                disabled={favPending}
+                                                onClick={toggle}
+                                                className={cn(
+                                                    'flex h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium transition-colors disabled:opacity-70 cursor-pointer',
+                                                    isFavorite
+                                                        ? 'border border-[var(--border-default)] text-[var(--text-base)] hover:bg-[var(--surface-muted)]'
+                                                        : 'bg-[var(--brand)] text-[var(--text-on-brand)] hover:bg-[var(--brand-hover)]',
+                                                )}
                                             >
-                                                <Heart className="size-5" /> В избранное
+                                                {favPending ? (
+                                                    <IconLoader size={18} className="animate-spin" />
+                                                ) : (
+                                                    <Heart className={cn('size-5 shrink-0', isFavorite && 'fill-current')} aria-hidden />
+                                                )}
+                                                {favPending ? t('fav_saving') : isFavorite ? t('fav_in') : t('fav_add')}
                                             </button>
                                         ) : <></>}
                                     </>
@@ -124,7 +143,7 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                 href={`/property/${estate.id}?currency=${currency}`}
                                 className="flex h-10 items-center justify-center gap-2 rounded-md border border-[var(--border-default)] px-4 text-sm font-medium text-[var(--text-base)] hover:bg-[var(--surface-muted)]"
                             >
-                                <Maximize2 className="size-4" /> Открыть полностью
+                                <Maximize2 className="size-4" /> {t('open_full')}
                             </Link>
                             {estate.sourceUrl && (
                                 <a
@@ -133,7 +152,7 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                     rel="noopener noreferrer"
                                     className="flex h-10 items-center justify-center gap-2 rounded-md border border-[var(--border-default)] px-4 text-sm font-medium text-[var(--text-base)] hover:bg-[var(--surface-muted)]"
                                 >
-                                    <ExternalLink className="size-4" /> На realt.by
+                                    <ExternalLink className="size-4" /> {t('source_link')}
                                 </a>
                             )}
                         </div>
@@ -160,28 +179,28 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                         />
 
                         <section>
-                            <h3 className="mb-1 text-base font-semibold text-[var(--text-base)]">Характеристики</h3>
+                            <h3 className="mb-1 text-base font-semibold text-[var(--text-base)]">{t('section_specs')}</h3>
                             <dl className="divide-y divide-[var(--border-default)]">
-                                <Row label="Комнат" value={String(estate.rooms ?? '—')} />
-                                <Row label="Общая площадь" value={formatArea(estate.areaTotal)} />
-                                <Row label="Жилая площадь" value={formatArea(estate.areaLiving)} />
-                                <Row label="Площадь кухни" value={formatArea(estate.areaKitchen)} />
-                                <Row label="Этаж" value={formatStorey(estate.storey, estate.storeys)} />
-                                <Row label="Год постройки" value={String(estate.buildingYear ?? '—')} />
+                                <Row label={t('spec_rooms')} value={String(estate.rooms ?? '—')} />
+                                <Row label={t('spec_area_total')} value={formatArea(estate.areaTotal)} />
+                                <Row label={t('spec_area_living')} value={formatArea(estate.areaLiving)} />
+                                <Row label={t('spec_area_kitchen')} value={formatArea(estate.areaKitchen)} />
+                                <Row label={t('spec_storey')} value={formatStorey(estate.storey, estate.storeys)} />
+                                <Row label={t('spec_year')} value={String(estate.buildingYear ?? '—')} />
                                 <Row
-                                    label="Тип дома"
-                                    value={estate.wallMaterial != null ? (WALL_MATERIAL_LABELS[estate.wallMaterial] ?? '—') : '—'}
+                                    label={t('spec_wall')}
+                                    value={estate.wallMaterial != null ? (wallLabels[estate.wallMaterial] ?? '—') : '—'}
                                 />
                                 <Row
-                                    label="Ремонт"
-                                    value={estate.repairState != null ? (REPAIR_STATE_LABELS[estate.repairState] ?? '—') : '—'}
+                                    label={t('spec_repair')}
+                                    value={estate.repairState != null ? (repairLabels[estate.repairState] ?? '—') : '—'}
                                 />
                             </dl>
                         </section>
 
                         {estate.description && (
                             <section>
-                                <h3 className="mb-2 text-base font-semibold text-[var(--text-base)]">Описание</h3>
+                                <h3 className="mb-2 text-base font-semibold text-[var(--text-base)]">{t('section_description')}</h3>
                                 <p className="text-sm leading-relaxed text-[var(--text-muted)] whitespace-pre-line">
                                     {estate.description}
                                 </p>
@@ -190,7 +209,7 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
 
                         <section className="rounded-lg bg-[var(--surface-muted)] p-4">
                             <div className="text-sm text-[var(--text-faint)]">
-                                {(estate.sellerType === 0 && estate.agencyName) ? 'Агентство' : 'Собственник / Компания'}
+                                {(estate.sellerType === 0 && estate.agencyName) ? t('seller_agency') : t('seller_owner')}
                             </div>
                             {estate.sellerType === 0 && estate.agencyName && (
                                 <div className="mt-0.5 text-base font-medium text-[var(--text-base)]">
@@ -198,7 +217,7 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                 </div>
                             )}
                             <p className="mt-2 text-xs text-[var(--text-faint)]">
-                                Контакты доступны в оригинальном объявлении на realt.by
+                                {t('seller_contacts_note')}
                             </p>
                         </section>
                     </div>
