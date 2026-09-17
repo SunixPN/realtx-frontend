@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, ImageOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { getMainPhoto, getThumbPhoto } from '@/entities/estate'
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 }
 
 export function PhotoSlider({ photos, loading }: Props) {
+    const t = useTranslations('estate')
     const [idx, setIdx] = useState(0)
     const thumbsRef = useRef<HTMLDivElement>(null)
     const count = photos.length
@@ -50,7 +52,7 @@ export function PhotoSlider({ photos, loading }: Props) {
             <div className="relative aspect-[4/3] bg-[var(--surface-muted)]">
                 <div className="flex size-full flex-col items-center justify-center gap-1.5 text-[var(--text-faint)]">
                     <ImageOff className="size-8" aria-hidden />
-                    <span className="text-sm">Фотографий нет</span>
+                    <span className="text-sm">{t('photo_no_photos')}</span>
                 </div>
             </div>
         )
@@ -78,7 +80,7 @@ export function PhotoSlider({ photos, loading }: Props) {
                     <>
                         <button
                             type="button"
-                            aria-label="Предыдущее фото"
+                            aria-label={t('photo_prev_aria')}
                             onClick={prev}
                             className="absolute left-2 top-1/2 -translate-y-1/2 flex size-8 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60"
                         >
@@ -86,7 +88,7 @@ export function PhotoSlider({ photos, loading }: Props) {
                         </button>
                         <button
                             type="button"
-                            aria-label="Следующее фото"
+                            aria-label={t('photo_next_aria')}
                             onClick={next}
                             className="absolute right-2 top-1/2 -translate-y-1/2 flex size-8 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60"
                         >
@@ -107,7 +109,7 @@ export function PhotoSlider({ photos, loading }: Props) {
                         <button
                             key={src + i}
                             type="button"
-                            aria-label={`Фото ${i + 1}`}
+                            aria-label={t('photo_thumb_aria', { n: i + 1 })}
                             onClick={() => setIdx(i)}
                             className="relative shrink-0 overflow-hidden rounded-sm transition"
                             style={{ width: 64, aspectRatio: '4/3' }}

@@ -19,7 +19,13 @@
         "strength_strong": "Strong",
         "error_title": "Something went wrong",
         "error_description": "Failed to load data. Please try again.",
-        "retry": "Retry"
+        "retry": "Retry",
+        "country_by": "Belarus",
+        "country_ru": "Russia",
+        "country_ua": "Ukraine",
+        "country_pl": "Poland",
+        "page_title_favorites": "Favorites — RealtX",
+        "page_title_subscriptions": "Search Subscriptions — RealtX"
     },
     "header": {
         "logo_alt": "RealtX",
@@ -275,6 +281,10 @@
         "chart_thousands_suffix": "k",
         "map_price_k": "{n}k",
         "chart_aria": "Price history",
+        "photo_no_photos": "No photos",
+        "photo_prev_aria": "Previous photo",
+        "photo_next_aria": "Next photo",
+        "photo_thumb_aria": "Photo {n}",
         "wall_panel": "Panel",
         "wall_brick": "Brick",
         "wall_monolith": "Monolithic",

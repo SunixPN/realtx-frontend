@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import type { PriceHistoryPoint } from '@/entities/estate'
 import type { DisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 
@@ -24,6 +27,7 @@ type Props = {
 }
 
 export function PriceHistoryChart({ history, currency }: Props) {
+    const t = useTranslations('estate')
     const rawPoints = history
         .map((h) => ({ date: h.date, v: pickValue(h, currency) }))
         .filter((p): p is { date: string; v: number } => p.v !== null)
@@ -59,7 +63,7 @@ export function PriceHistoryChart({ history, currency }: Props) {
             viewBox={`0 0 ${W} ${H}`}
             className="w-full"
             role="img"
-            aria-label="История цены"
+            aria-label={t('chart_aria')}
         >
             {/* горизонтальные сетки и подписи оси Y */}
             {[0, 0.5, 1].map((t) => {
@@ -105,7 +109,7 @@ export function PriceHistoryChart({ history, currency }: Props) {
             ))}
 
             {/* подписи дат оси X: первая, средняя, последняя */}
-            {[0, midIdx, coords.length - 1].map((i) => (
+            {[...new Set([0, midIdx, coords.length - 1])].map((i) => (
                 <text
                     key={i}
                     x={coords[i].x}

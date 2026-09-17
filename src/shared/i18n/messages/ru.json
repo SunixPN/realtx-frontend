@@ -19,7 +19,13 @@
         "strength_strong": "Надёжный",
         "error_title": "Что-то пошло не так",
         "error_description": "Не удалось загрузить данные. Попробуйте ещё раз",
-        "retry": "Повторить"
+        "retry": "Повторить",
+        "country_by": "Беларусь",
+        "country_ru": "Россия",
+        "country_ua": "Украина",
+        "country_pl": "Польша",
+        "page_title_favorites": "Избранное — RealtX",
+        "page_title_subscriptions": "Подписки на поиск — RealtX"
     },
     "header": {
         "logo_alt": "RealtX",
@@ -275,6 +281,10 @@
         "chart_thousands_suffix": "к",
         "map_price_k": "{n} тыс",
         "chart_aria": "История цены",
+        "photo_no_photos": "Фотографий нет",
+        "photo_prev_aria": "Предыдущее фото",
+        "photo_next_aria": "Следующее фото",
+        "photo_thumb_aria": "Фото {n}",
         "wall_panel": "Панельный",
         "wall_brick": "Кирпичный",
         "wall_monolith": "Монолитный",

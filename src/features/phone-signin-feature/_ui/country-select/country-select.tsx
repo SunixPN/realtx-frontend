@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { IconChevronDown, IconCheck } from '@/shared/ui/ui-icons';
 import { cn } from '@/shared/helpers/cn';
 import { COUNTRIES, getCountry, type CountryCode } from '@/shared/const/countries';
@@ -11,8 +12,10 @@ type CountrySelectProps = {
 };
 
 export default function CountrySelect({ value, onChange }: CountrySelectProps) {
+    const t = useTranslations('common');
     const containerRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
+    const countryName = (short: string) => t(`country_${short.toLowerCase()}` as Parameters<typeof t>[0]);
 
     const selected = getCountry(value);
     const Flag = selected.flag;
@@ -81,7 +84,7 @@ export default function CountrySelect({ value, onChange }: CountrySelectProps) {
                                 <CFlag />
                                 <span className="text-xs text-text-muted">{c.short}</span>
                                 <span className="tabular-nums text-text-base">{c.code}</span>
-                                <span className="flex-1 text-right text-xs text-text-faint">{c.name}</span>
+                                <span className="flex-1 text-right text-xs text-text-faint">{countryName(c.short)}</span>
                                 {isSelected && <IconCheck size={14} className="text-brand" />}
                             </li>
                         );

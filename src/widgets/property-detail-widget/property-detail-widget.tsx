@@ -426,7 +426,7 @@ function ContactModal({
                             ? 'bg-brand-bg text-brand'
                             : 'bg-[var(--success-bg,#f0fdf4)] text-[var(--success-700,#15803d)]',
                     )}>
-                        {sellerLabel === agencyLabel ? 'А' : 'С'}
+                        {sellerLabel[0]}
                     </div>
                     <div className="min-w-0">
                         <div className="text-xs text-text-faint">{sellerLabel}</div>
@@ -843,7 +843,7 @@ function SellerCard({ estate }: { estate: EstateType }) {
                             : 'bg-[var(--success-bg,#f0fdf4)] text-[var(--success-700,#15803d)]',
                     )}
                 >
-                    {isAgency ? 'А' : 'С'}
+                    {sellerLabel[0]}
                 </div>
                 <div className="min-w-0">
                     <div className="text-xs text-text-faint">{sellerLabel}</div>
