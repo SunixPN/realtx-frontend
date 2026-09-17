@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { createRegisterSchema, RegisterValues } from '@/features/register-feature/_schemas/register-schema';
 import { useRegisterMutation } from '@/features/register-feature/_api/register-mutation';
 import { ROUTES } from '@/shared/const/routes';
+import { beginTopLoader } from '@/shared/ui/top-loader/top-loader';
 
 export const useRegisterForm = () => {
     const router = useRouter();
@@ -17,7 +18,10 @@ export const useRegisterForm = () => {
     const onSubmit = async (values: RegisterValues) => {
         const name = values.name?.trim() || undefined;
         const result = await trigger({ ...values, name });
-        if (result) router.push(ROUTES.ROOT);
+        if (result) {
+            beginTopLoader();
+            router.push(ROUTES.ROOT);
+        }
     };
 
     return { form, onSubmit, isSubmitting };

@@ -1,7 +1,7 @@
 'use client'
 
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { useCallback, useTransition } from 'react'
+import { useSearchParams, usePathname } from 'next/navigation'
+import { useCallback } from 'react'
 import {
     parseFiltersFromSearchParams,
     serializeFiltersToSearchParams,
@@ -19,12 +19,21 @@ function preserve(source: URLSearchParams, target: URLSearchParams) {
     }
 }
 
+// SSR-фильтры нужны только на hard-reload — при первом рендере page.tsx
+// читает searchParams и делает prefetch. На клиенте же router.replace
+// вызывает RSC-roundtrip (сервер снова гонит prefetch, URL обновляется
+// только после ответа) — из-за этого фильтры «залипают».
+// Пишем URL через history.replaceState: Next.js App Router обновляет
+// useSearchParams без RSC-фетча, SWR-ключ меняется мгновенно.
+function writeUrl(pathname: string, sp: URLSearchParams) {
+    const qs = sp.toString()
+    const url = qs ? `${pathname}?${qs}` : pathname
+    window.history.replaceState(null, '', url)
+}
+
 export function useEstateFilters() {
     const searchParams = useSearchParams()
-    const router = useRouter()
     const pathname = usePathname()
-    // isPending = идёт SSR-навигация после router.replace (сервер догружает данные для новых фильтров)
-    const [isPending, startTransition] = useTransition()
 
     const filters = parseFiltersFromSearchParams(searchParams)
 
@@ -34,22 +43,16 @@ export function useEstateFilters() {
             const next = typeof updater === 'function' ? updater(current) : updater
             const sp = serializeFiltersToSearchParams(next)
             preserve(new URLSearchParams(searchParams.toString()), sp)
-            const qs = sp.toString()
-            startTransition(() => {
-                router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-            })
+            writeUrl(pathname, sp)
         },
-        [searchParams, router, pathname]
+        [searchParams, pathname]
     )
 
     const clearFilters = useCallback(() => {
         const sp = new URLSearchParams()
         preserve(new URLSearchParams(searchParams.toString()), sp)
-        const qs = sp.toString()
-        startTransition(() => {
-            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-        })
-    }, [searchParams, router, pathname])
+        writeUrl(pathname, sp)
+    }, [searchParams, pathname])
 
-    return { filters, setFilters, clearFilters, isPending }
+    return { filters, setFilters, clearFilters, isPending: false }
 }

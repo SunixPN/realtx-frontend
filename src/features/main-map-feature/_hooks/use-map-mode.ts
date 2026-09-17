@@ -1,33 +1,40 @@
 'use client'
 
-import { useCallback, useTransition } from 'react'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useCallback, useDeferredValue, useEffect, useState } from 'react'
+import { useSearchParams, usePathname } from 'next/navigation'
 
 export type MapMode = 'objects' | 'heat'
 
+// Разводим mode на два значения:
+//   mode          — используется табом, обновляется мгновенно (высокий приоритет).
+//   deferredMode  — используется тяжёлыми потребителями (SWR-фетч, маркеры/heat-layers).
+//                   React отложит их пересборку — таб не «залипает».
 export function useMapMode() {
     const searchParams = useSearchParams()
-    const router = useRouter()
     const pathname = usePathname()
-    const [isPending, startTransition] = useTransition()
+    const initial = (searchParams.get('mapMode') as MapMode | null) ?? 'objects'
 
-    const mode = (searchParams.get('mapMode') as MapMode | null) ?? 'objects'
+    const [mode, setModeState] = useState<MapMode>(initial)
+    const deferredMode = useDeferredValue(mode)
+
+    // Внешние правки URL (например, полный переход) — подхватываем.
+    useEffect(() => {
+        const urlMode = (searchParams.get('mapMode') as MapMode | null) ?? 'objects'
+        if (urlMode !== mode) setModeState(urlMode)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams])
 
     const setMode = useCallback(
-        (newMode: MapMode) => {
+        (next: MapMode) => {
+            setModeState(next)
             const sp = new URLSearchParams(searchParams.toString())
-            if (newMode === 'objects') {
-                sp.delete('mapMode')
-            } else {
-                sp.set('mapMode', newMode)
-            }
+            if (next === 'objects') sp.delete('mapMode')
+            else sp.set('mapMode', next)
             const qs = sp.toString()
-            startTransition(() => {
-                router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-            })
+            window.history.replaceState(null, '', qs ? `${pathname}?${qs}` : pathname)
         },
-        [searchParams, router, pathname],
+        [searchParams, pathname],
     )
 
-    return { mode, setMode, isPending }
+    return { mode, deferredMode, setMode }
 }

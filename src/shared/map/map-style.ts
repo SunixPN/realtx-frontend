@@ -1,6 +1,8 @@
 import type mapboxgl from "mapbox-gl"
 
-export const MAP_PALETTE = {
+export type MapPalette = typeof MAP_PALETTE_LIGHT
+
+export const MAP_PALETTE_LIGHT = {
     land:       "#DDE4EC",
     water:      "#A9C3D3",
     park:       "#C4D2B8",
@@ -19,7 +21,32 @@ export const MAP_PALETTE = {
     border:     "#64748B",
 }
 
-export function applyMapStyle(map: mapboxgl.Map) {
+// Тёмная палитра — нейтральный графит, синхронизирована с --surface-*.
+// Без сине-лавандового саташна, чтобы карта не «резала глаз».
+export const MAP_PALETTE_DARK: MapPalette = {
+    land:       "#363E4D",
+    water:      "#2F3D4A",
+    park:       "#39443C",
+    parkDark:   "#333D37",
+    building:   "#4B5464",
+    buildingOutline: "#59637A",
+    roadMinor:  "#4E586A",
+    roadMajor:  "#576078",
+    roadCasing: "#363E4D",
+    roadMotor:  "#66708A",
+    roadMotorCasing: "#363E4D",
+    labelText:  "#D8DFE9",
+    labelHalo:  "#2A3140",
+    labelWater: "#A5B1C1",
+    labelPlace: "#F1F4F8",
+    border:     "#66708A",
+}
+
+/** @deprecated Используй MAP_PALETTE_LIGHT / MAP_PALETTE_DARK или applyMapStyle(map, mode). */
+export const MAP_PALETTE = MAP_PALETTE_LIGHT
+
+export function applyMapStyle(map: mapboxgl.Map, mode: "light" | "dark" = "light") {
+    const MAP_PALETTE = mode === "dark" ? MAP_PALETTE_DARK : MAP_PALETTE_LIGHT
     const layers = map.getStyle().layers ?? []
 
     for (const layer of layers) {

@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "mapbox-gl/dist/mapbox-gl.css";
 
+/* Позволяет использовать `dark:` варианты Tailwind по классу html.dark
+ * (а не только по prefers-color-scheme, как дефолт Tailwind v4). */
+@custom-variant dark (&:where(html.dark, html.dark *));
+
 /* ─── Официальный шрифт-символ белорусского рубля (Нацбанк РБ) ────── */
 /* Символ BYN не имеет точки в Unicode; шрифт мапит его на U+E901 (PUA). */
 @font-face {
@@ -56,50 +60,90 @@
   --info-bg:    #eef2ff;
 }
 
-/* ─── Dark mode (system preference) ──────────────────────────────── */
-@media (prefers-color-scheme: light) {
-  :root:not(.light) {
-    --surface-page:    #0f0f0f;
-    --surface-raised:  #1a1a1a;
-    --surface-subtle:  #1f1f1f;
-    --surface-muted:   #2a2a2a;
-    --surface-overlay: rgba(0, 0, 0, 0.65);
+/* ─── Dark palette ────────────────────────────────────────────────
+ * Единая холодная сине-графитовая палитра, синхронизированная с картой.
+ * Применяется двумя путями:
+ *   1) html.dark                       — явный выбор пользователя.
+ *   2) prefers-color-scheme: dark на :root:not(.light):not(.dark) —
+ *      системная тема, если пользователь не выбирал явно.
+ * Токены дублируются в двух блоках намеренно: @media срабатывает только
+ * когда явного выбора нет, а html.dark должен работать всегда. */
+:root { color-scheme: light; }
 
-    --text-base:      #efefef;
-    --text-muted:     #a0a0a0;
-    --text-faint:     #666666;
-    --text-disabled:  #444444;
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.dark) {
+    color-scheme: dark;
 
-    --border-default: #2a2a2a;
-    --border-strong:  #3a3a3a;
+    --brand:        #6366f1;
+    --brand-hover:  #7c85f2;
+    --brand-bg:     rgba(99, 102, 241, 0.10);
+    --brand-fg:     #ffffff;
 
-    --success-bg: #052e16;
-    --warning-bg: #1c1407;
-    --error-bg:   #1c0707;
-    --info-bg:    #0d1b2b;
+    --surface-page:    #1e2025;
+    --surface-raised:  #292b31;
+    --surface-subtle:  #232529;
+    --surface-muted:   #33363d;
+    --surface-overlay: rgba(0, 0, 0, 0.55);
+
+    --text-base:      #e5e7eb;
+    --text-muted:     #a0a4ad;
+    --text-faint:     #72767f;
+    --text-disabled:  #3d4048;
+    --text-on-brand:  #ffffff;
+    --text-link:      #a5b4fc;
+
+    --border-default: #383b43;
+    --border-strong:  #454852;
+
+    --success:    #4ade80;
+    --success-bg: rgba(74, 222, 128, 0.10);
+    --warning:    #fbbf24;
+    --warning-bg: rgba(251, 191, 36, 0.10);
+    --error:      #f87171;
+    --error-bg:   rgba(248, 113, 113, 0.10);
+    --info:       #a5b4fc;
+    --info-bg:    rgba(165, 180, 252, 0.10);
   }
 }
 
-/* ─── Dark mode (ручной класс .dark на <html>) ────────────────────── */
 html.dark {
-  --surface-page:    #0f0f0f;
-  --surface-raised:  #1a1a1a;
-  --surface-subtle:  #1f1f1f;
-  --surface-muted:   #2a2a2a;
-  --surface-overlay: rgba(0, 0, 0, 0.65);
+  color-scheme: dark;
 
-  --text-base:      #efefef;
-  --text-muted:     #a0a0a0;
-  --text-faint:     #666666;
-  --text-disabled:  #444444;
+  --brand:        #6366f1;
+  --brand-hover:  #7c85f2;
+  --brand-bg:     rgba(99, 102, 241, 0.10);
+  --brand-fg:     #ffffff;
 
-  --border-default: #2a2a2a;
-  --border-strong:  #3a3a3a;
+  --surface-page:    #1e2025;
+  --surface-raised:  #292b31;
+  --surface-subtle:  #232529;
+  --surface-muted:   #33363d;
+  --surface-overlay: rgba(0, 0, 0, 0.55);
 
-  --success-bg: #052e16;
-  --warning-bg: #1c1407;
-  --error-bg:   #1c0707;
-  --info-bg:    #0d1b2b;
+  --text-base:      #e5e7eb;
+  --text-muted:     #a0a4ad;
+  --text-faint:     #72767f;
+  --text-disabled:  #3d4048;
+  --text-on-brand:  #ffffff;
+  --text-link:      #a5b4fc;
+
+  --border-default: #383b43;
+  --border-strong:  #454852;
+
+  --success:    #4ade80;
+  --success-bg: rgba(74, 222, 128, 0.10);
+  --warning:    #fbbf24;
+  --warning-bg: rgba(251, 191, 36, 0.10);
+  --error:      #f87171;
+  --error-bg:   rgba(248, 113, 113, 0.10);
+  --info:       #a5b4fc;
+  --info-bg:    rgba(165, 180, 252, 0.10);
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.45), 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 8px rgb(0 0 0 / 0.45), 0 2px 4px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 20px 40px rgb(0 0 0 / 0.55);
 }
 
 /* ─── Tailwind v4 design tokens ───────────────────────────────────── */
@@ -378,6 +422,15 @@ html.dark {
   border-top-color: #475569;
 }
 
+html.dark .map-pin--visited .map-pin__label {
+  background: #334155;
+  border-color: #1e293b;
+  color: #94a3b8;
+}
+html.dark .map-pin--visited .map-pin__tail {
+  border-top-color: #334155;
+}
+
 .map-pin--selected {
   z-index: 20;
 }
@@ -476,7 +529,7 @@ html.dark {
   align-items: center;
   gap: 4px;
   padding: 4px 8px 4px 6px;
-  background: #ffffff;
+  background: var(--surface-raised);
   color: var(--brand);
   border: 1.5px solid var(--brand);
   border-radius: 8px;

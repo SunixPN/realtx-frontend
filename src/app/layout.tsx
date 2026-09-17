@@ -8,6 +8,7 @@ import "./globals.css";
 import QueryProvider from "@/app/_providers/query-provider";
 import {ReactNode} from "react";
 import { TopLoader } from "@/shared/ui/top-loader/top-loader";
+import { ThemeInitScript, ThemeProvider } from "@/shared/theme";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -31,14 +32,19 @@ export default async function RootLayout({
 
     return (
         <html lang={locale} className={inter.variable} suppressHydrationWarning>
+            <head>
+                <ThemeInitScript />
+            </head>
             <QueryProvider>
                 <body className="min-h-screen bg-surface-page text-text-base antialiased">
-                    <NextIntlClientProvider locale={locale} messages={messages}>
-                        <TopLoader />
-                        <Header/>
-                        {children}
-                        <Toaster position="top-right" richColors closeButton />
-                    </NextIntlClientProvider>
+                    <ThemeProvider>
+                        <NextIntlClientProvider locale={locale} messages={messages}>
+                            <TopLoader />
+                            <Header/>
+                            {children}
+                            <Toaster position="top-right" richColors closeButton />
+                        </NextIntlClientProvider>
+                    </ThemeProvider>
                 </body>
             </QueryProvider>
         </html>

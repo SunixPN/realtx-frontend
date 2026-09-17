@@ -36,6 +36,7 @@ import {
 import { useAuth } from '@/entities/me/api/auth-query'
 import { useToggleFavorite } from '@/features/favorite-toggle-feature'
 import { IconLoader } from '@/shared/ui/ui-icons'
+import { showToast } from '@/shared/helpers/show-toast'
 import { useDisplayCurrency, type DisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { PhotoSlider } from '@/features/estate-drawer-feature/_ui/photo-slider'
 import { PriceDisplay, PricePerM2Display } from '@/features/estate-drawer-feature/_ui/price-display'
@@ -249,7 +250,7 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
                                 <IconAction label={t('action_compare')} icon={<GitCompare className="size-5" />} />
                             </>
                         )}
-                        <IconAction label={t('action_share')} icon={<Share2 className="size-5" />} />
+                        <ShareIconAction estate={estate} />
                     </>
                 )}
             </div>
@@ -278,15 +279,65 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
     )
 }
 
-function IconAction({ label, icon }: { label: string; icon: React.ReactNode }) {
+function IconAction({
+    label,
+    icon,
+    onClick,
+}: {
+    label: string
+    icon: React.ReactNode
+    onClick?: () => void
+}) {
     return (
         <button
             type="button"
+            onClick={onClick}
             className="flex cursor-pointer flex-col items-center gap-1 rounded-md border border-border bg-surface-page py-2.5 text-xs font-medium text-text-muted transition-colors hover:bg-surface-muted"
         >
             {icon}
             {label}
         </button>
+    )
+}
+
+function ShareIconAction({ estate }: { estate: EstateType }) {
+    const t = useTranslations('estate')
+    const formatRooms = useFormatRooms()
+
+    const handleShare = async () => {
+        const url = typeof window !== 'undefined' ? window.location.href : ''
+        const title = t('share_title', {
+            rooms: formatRooms(estate.rooms),
+            address: estate.address ?? t('default_town'),
+        })
+
+        // Web Share API — на мобильных вызывает нативный шит.
+        // На десктопе почти всегда отсутствует → падаем в copy-to-clipboard.
+        if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+            try {
+                await navigator.share({ title, url })
+                return
+            } catch (err) {
+                // AbortError = юзер сам закрыл шит, тост не показываем.
+                if ((err as { name?: string })?.name === 'AbortError') return
+                // fallthrough в copy
+            }
+        }
+
+        try {
+            await navigator.clipboard.writeText(url)
+            showToast({ status: 'success', text: t('share_toast_copied') })
+        } catch {
+            showToast({ status: 'error', text: t('share_toast_error') })
+        }
+    }
+
+    return (
+        <IconAction
+            label={t('action_share')}
+            icon={<Share2 className="size-5" />}
+            onClick={handleShare}
+        />
     )
 }
 
@@ -679,7 +730,7 @@ function PriceHistoryChart({ history, currency }: { history: PriceHistoryPoint[]
                 />
             ))}
 
-            {[0, midIdx, coords.length - 1].map((i) => (
+            {Array.from(new Set([0, midIdx, coords.length - 1])).map((i) => (
                 <text
                     key={i}
                     x={coords[i].x}

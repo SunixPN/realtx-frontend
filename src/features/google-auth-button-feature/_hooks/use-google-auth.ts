@@ -8,6 +8,7 @@ import { firebaseAuth } from '@/shared/firebase/firebase';
 import { useGoogleLoginMutation } from '@/features/google-auth-button-feature/_api/google-login-mutation';
 import { showToast } from '@/shared/helpers/show-toast';
 import { ROUTES } from '@/shared/const/routes';
+import { beginTopLoader } from '@/shared/ui/top-loader/top-loader';
 
 const POPUP_CLOSE_CODES = new Set(['auth/popup-closed-by-user', 'auth/cancelled-popup-request']);
 
@@ -39,7 +40,10 @@ export const useGoogleAuth = () => {
             window.removeEventListener('focus', onFocus);
             const idToken = await result.user.getIdToken();
             const auth = await trigger({ idToken });
-            if (auth) router.push(ROUTES.ROOT);
+            if (auth) {
+                beginTopLoader();
+                router.push(ROUTES.ROOT);
+            }
         } catch (error) {
             const code = (error as { code?: string })?.code;
             if (!POPUP_CLOSE_CODES.has(code ?? '')) {

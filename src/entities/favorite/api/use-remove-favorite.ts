@@ -6,7 +6,12 @@ import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { MUTATIONS } from '@/shared/const/mutations'
 import { QUERIES } from '@/shared/const/queries'
-import { isAnyFavoriteKey } from './favorite-keys'
+import {
+    favoriteIdsKey,
+    isAnyFavoriteKey,
+    isFavoritesKey,
+} from './favorite-keys'
+import type { FavoriteIdsType, FavoriteItemType } from './favorite-types'
 import type { EstateType, HouseEstatesResponseType } from '@/entities/estate'
 
 export function useRemoveFavorite() {
@@ -14,7 +19,20 @@ export function useRemoveFavorite() {
     return useSWRMutation<void, Error, string, number>(
         MUTATIONS.REMOVE_FAVORITE,
         async (_key, { arg: id }) => {
-            await api.delete(API_ROUTES.FAVORITES.REMOVE(id))
+            // Оптимистично вычищаем удаляемый id из ВСЕХ кэшей favorites-списков
+            // (все sort/currency-варианты). Без этого keepPreviousData при смене
+            // сортировки на миг показывает уже удалённый айтем.
+            mutate(
+                isFavoritesKey,
+                (old?: FavoriteItemType[]) => old?.filter(item => item.id !== id) ?? [],
+                { revalidate: false },
+            )
+            mutate(
+                favoriteIdsKey(),
+                (old?: FavoriteIdsType) =>
+                    old ? { ids: old.ids.filter(x => x !== id) } : { ids: [] },
+                { revalidate: false },
+            )
             mutate(
                 (k: unknown) => Array.isArray(k) && k[0] === QUERIES.ESTATE_BY_ID && k[1] === id,
                 (data: EstateType | undefined) => data ? { ...data, isFavorite: false } : data,
@@ -26,9 +44,13 @@ export function useRemoveFavorite() {
                     data ? { ...data, items: data.items.map(i => i.id === id ? { ...i, isFavorite: false } : i) } : data,
                 { revalidate: false },
             )
+            await api.delete(API_ROUTES.FAVORITES.REMOVE(id))
         },
         {
             onSuccess: () => {
+                mutate(isAnyFavoriteKey)
+            },
+            onError: () => {
                 mutate(isAnyFavoriteKey)
             },
         },

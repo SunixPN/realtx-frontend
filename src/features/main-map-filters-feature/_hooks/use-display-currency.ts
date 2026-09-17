@@ -1,6 +1,6 @@
 'use client'
 
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { useCurrencyRates, type CurrencyRatesType } from '@/shared/api/currency-rates-query'
 
@@ -32,7 +32,6 @@ function convert(value: number, from: DisplayCurrency, to: DisplayCurrency, rate
  */
 export function useDisplayCurrency() {
     const searchParams = useSearchParams()
-    const router = useRouter()
     const pathname = usePathname()
     const { data: rates } = useCurrencyRates()
 
@@ -58,9 +57,10 @@ export function useDisplayCurrency() {
             if (priceMax) sp.set('priceMax', String(convert(Number(priceMax), currency, next, rates)))
         }
 
+        // URL-обновление без RSC-roundtrip — см. use-estate-filters.
         const qs = sp.toString()
-        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-    }, [searchParams, router, pathname, currency, rates])
+        window.history.replaceState(null, '', qs ? `${pathname}?${qs}` : pathname)
+    }, [searchParams, pathname, currency, rates])
 
     return { currency, setCurrency }
 }

@@ -1,6 +1,8 @@
 'use client'
 
-import { useFavorites } from '@/entities/favorite'
+import { useLayoutEffect } from 'react'
+import { unstable_serialize, useSWRConfig } from 'swr'
+import { favoriteIdsKey, favoritesKey, useFavorites } from '@/entities/favorite'
 import {
     FavoritesHeader,
     FavoritesSortBar,
@@ -16,6 +18,28 @@ export function FavoritesWidget() {
     const { currency } = useDisplayCurrency()
     const { sort, setSort } = useFavoritesSort()
     const { selected, toggle, clear } = useFavoritesSelection()
+    const { fallback, mutate } = useSWRConfig()
+
+    // SWRConfig.fallback применяется только к ПУСТЫМ кэшам. Если юзер уже
+    // заходил на /favorites, а потом изменил избранное на карте/деталке,
+    // клиентский кэш может содержать устаревший список. Первый рендер тогда
+    // показывает stale-данные из кэша, пока фоновый revalidate не пришёл.
+    // На монтировании форсированно перезаписываем кэш свежими SSR-данными
+    // из fallback, чтобы такого «мигания» не было.
+    useLayoutEffect(() => {
+        const favKey = favoritesKey(sort, currency)
+        const idsKey = favoriteIdsKey()
+        const favSerialized = unstable_serialize(favKey)
+        const idsSerialized = unstable_serialize(idsKey)
+        if (fallback[favSerialized] !== undefined) {
+            mutate(favKey, fallback[favSerialized], { revalidate: false })
+        }
+        if (fallback[idsSerialized] !== undefined) {
+            mutate(idsKey, fallback[idsSerialized], { revalidate: false })
+        }
+        // Один раз на маунт — свежее SSR-состояние.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const { data: items = [], isLoading } = useFavorites(sort, currency)
 

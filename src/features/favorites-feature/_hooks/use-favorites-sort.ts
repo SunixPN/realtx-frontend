@@ -1,6 +1,6 @@
 'use client'
 
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { useCallback } from 'react'
 import type { FavoriteSort } from '@/entities/favorite'
 
@@ -9,7 +9,6 @@ const DEFAULT_SORT: FavoriteSort = 'recent'
 
 export function useFavoritesSort() {
     const searchParams = useSearchParams()
-    const router = useRouter()
     const pathname = usePathname()
 
     const raw = searchParams.get('sort') as FavoriteSort | null
@@ -17,13 +16,13 @@ export function useFavoritesSort() {
 
     const setSort = useCallback((next: FavoriteSort) => {
         const p = new URLSearchParams(searchParams.toString())
-        if (next === DEFAULT_SORT) {
-            p.delete('sort')
-        } else {
-            p.set('sort', next)
-        }
-        router.replace(`${pathname}?${p.toString()}`, { scroll: false })
-    }, [searchParams, router, pathname])
+        if (next === DEFAULT_SORT) p.delete('sort')
+        else p.set('sort', next)
+        // Инстант-переключение на клиенте: URL обновляем через history API,
+        // без RSC-фетча (SWR-ключ и loader реагируют мгновенно).
+        const qs = p.toString()
+        window.history.replaceState(null, '', qs ? `${pathname}?${qs}` : pathname)
+    }, [searchParams, pathname])
 
     return { sort, setSort }
 }

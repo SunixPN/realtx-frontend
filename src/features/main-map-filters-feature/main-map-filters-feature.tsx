@@ -1,8 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Loader2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { useEstateFilters } from './_hooks/use-estate-filters'
 import { useDisplayCurrency } from './_hooks/use-display-currency'
 import { FilterBar } from './_ui/filter-bar'
@@ -26,8 +24,7 @@ type SaveMode =
     | { kind: 'edit'; subscription: SearchSubscriptionType }
 
 export default function MainMapFiltersFeature({ drawerOpen, onToggleDrawer, onCloseDrawer, total }: Props) {
-    const tCommon = useTranslations('common')
-    const { filters, setFilters, clearFilters, isPending } = useEstateFilters()
+    const { filters, setFilters, clearFilters } = useEstateFilters()
     const { currency, setCurrency } = useDisplayCurrency()
 
     // Подписки нам нужны только чтобы понять: сохранён ли текущий поиск.
@@ -69,15 +66,6 @@ export default function MainMapFiltersFeature({ drawerOpen, onToggleDrawer, onCl
 
     return (
         <>
-            {isPending && (
-                <div
-                    className="absolute top-4 z-50 flex size-9 items-center justify-center rounded-full border border-border bg-surface-page shadow-lg transition-[right] duration-[320ms]"
-                    style={{ right: drawerOpen ? 'calc(420px + 1rem)' : '1rem' }}
-                >
-                    <Loader2 className="size-4 animate-spin text-brand" aria-label={tCommon('loading_aria')} />
-                </div>
-            )}
-
             <div className="absolute top-4 left-4 z-30 max-w-[calc(100%-2rem)]">
                 <FilterBar
                     filters={filters}

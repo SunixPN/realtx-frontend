@@ -7,6 +7,7 @@ import { cn } from '@/shared/helpers/cn';
 import { IconCheck } from '@/shared/ui/ui-icons';
 import { LOCALES, LOCALE_LABELS, LOCALE_SHORT, type Locale } from '@/shared/i18n/config';
 import { setLocale } from '@/shared/i18n/actions';
+import { beginTopLoader, endTopLoader } from '@/shared/ui/top-loader/top-loader';
 
 const CLOSE_MS = 120;
 
@@ -43,8 +44,16 @@ export function LocaleSwitcher() {
     function pick(locale: Locale) {
         startClose();
         if (locale === current) return;
-        startTransition(() => {
-            setLocale(locale);
+        // Смена локали через server action ре-рендерит layout — юзер видит
+        // «залипание» без индикации. Стартуем top-loader сразу, закрываем
+        // после завершения транзиции.
+        beginTopLoader();
+        startTransition(async () => {
+            try {
+                await setLocale(locale);
+            } finally {
+                endTopLoader();
+            }
         });
     }
 

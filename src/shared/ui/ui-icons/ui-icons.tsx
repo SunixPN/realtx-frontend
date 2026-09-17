@@ -100,6 +100,15 @@ export function IconSun({ size = 20, ...props }: IconProps) {
   );
 }
 
+export function IconMonitor({ size = 20, ...props }: IconProps) {
+  return (
+    <svg {...baseProps(size, props)}>
+      <rect x="2" y="3" width="20" height="14" rx="2" />
+      <path d="M8 21h8M12 17v4" />
+    </svg>
+  );
+}
+
 export function IconHeart({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>

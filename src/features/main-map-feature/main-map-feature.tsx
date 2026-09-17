@@ -30,24 +30,24 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
     const searchParams = useSearchParams()
     const filters = parseFiltersFromSearchParams(searchParams)
     const { currency } = useDisplayCurrency()
-    const { mode, setMode } = useMapMode()
+    const { mode, deferredMode, setMode } = useMapMode()
 
     const map = useMap()
 
-    // Точки на карте — только в режиме объектов.
+    // Точки на карте — только в режиме объектов. Ключ фильтруем по deferredMode,
+    // чтобы клик по табу мгновенно перерисовал сам таб, а SWR-фетч и пересборка
+    // маркеров ушли в низкоприоритетную транзицию.
     const { data: points = [], isValidating: fetchingPoints } = useMapPoints(filters, currency, {
-        enabled: mode === 'objects',
+        enabled: deferredMode === 'objects',
     })
-
-    console.log(points, "POINTS!")
 
     // Выгодность районов — только в режиме тепловой карты.
     const { data: districts = [], isValidating: fetchingDistricts } = useDistrictProfitability(filters, currency, {
-        enabled: mode === 'heat',
+        enabled: deferredMode === 'heat',
     })
 
     // GeoJSON полигонов — статичен, грузим один раз при переключении в heat.
-    const { data: geojson } = useDistrictsGeojson({ enabled: mode === 'heat' })
+    const { data: geojson } = useDistrictsGeojson({ enabled: deferredMode === 'heat' })
 
     const { data: auth } = useAuth()
     const { data: favoriteIdsData } = useFavoriteIds({ enabled: !!auth?.user })
@@ -63,9 +63,10 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
     }), [openEstate, openHouse])
 
     // В режиме heat передаём null в useMapMarkers — хук очистит маркеры и source.
-    useMapMarkers(mode === 'objects' ? map : null, points, handlers, favoriteIds)
+    // Читаем deferredMode: пересборка маркеров/heat-слоёв идёт в транзиции, таб не залипает.
+    useMapMarkers(deferredMode === 'objects' ? map : null, points, handlers, favoriteIds)
 
-    useDistrictHeatLayers(map, mode, districts, geojson)
+    useDistrictHeatLayers(map, deferredMode, districts, geojson)
 
     const isFetching = fetchingPoints || fetchingDistricts
 
@@ -75,7 +76,7 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
             <div className="absolute top-20 left-4 z-30">
                 <MapModeToggle mode={mode} onChange={setMode} />
             </div>
-            {mode === 'heat' && districts.length > 0 && (
+            {deferredMode === 'heat' && districts.length > 0 && (
                 <div className="absolute bottom-6 left-4 z-30">
                     <DistrictRanking districts={districts} />
                 </div>

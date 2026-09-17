@@ -2,11 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 import { ROUTES } from '@/shared/const/routes';
-import { IconBell, IconGitCompare, IconHeart, IconLoader, IconMoon, IconSun } from '@/shared/ui/ui-icons';
+import { IconBell, IconGitCompare, IconHeart, IconLoader, IconMonitor, IconMoon, IconSun } from '@/shared/ui/ui-icons';
+import { useTheme } from '@/shared/theme';
 import { UserMenu } from '@/widgets/header/_ui/user-menu/user-menu';
 import { LocaleSwitcher } from '@/widgets/header/_ui/locale-switcher/locale-switcher';
 import { useAuth } from "@/entities/me/api/auth-query";
@@ -15,8 +15,7 @@ import { useSubscriptions } from '@/entities/search-subscription';
 
 export function Header() {
   const t = useTranslations('header');
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [mounted, setMounted] = useState(false);
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
   const { isLoading: isPending, data } = useAuth()
   const { data: favIds } = useFavoriteIds({ enabled: !!data?.user })
@@ -24,26 +23,31 @@ export function Header() {
   const { data: subs } = useSubscriptions({ enabled: !!data?.user })
   const freshCount = subs?.reduce((n, s) => n + (s.paused ? 0 : s.fresh), 0) ?? 0
 
-  useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const initial =
-      stored ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    setTheme(initial);
-    document.documentElement.classList.toggle('dark', initial === 'dark');
-  }, []);
-
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    localStorage.setItem('theme', next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
+  const cycleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light');
   };
+
+  const ThemeIcon = theme === 'system' ? IconMonitor : resolvedTheme === 'dark' ? IconSun : IconMoon;
 
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center justify-between gap-4 border-b border-border bg-surface-raised px-4">
       <Link href={ROUTES.ROOT} className="flex items-center hover:opacity-80">
-        <Image src="/logo.png" alt={t('logo_alt')} width={108} height={32} priority />
+        <Image
+          src="/logo.png"
+          alt={t('logo_alt')}
+          width={108}
+          height={32}
+          priority
+          className="block dark:hidden"
+        />
+        <Image
+          src="/logo-dark.png"
+          alt={t('logo_alt')}
+          width={108}
+          height={32}
+          priority
+          className="hidden dark:block"
+        />
       </Link>
 
       <div className="flex items-center gap-1">
@@ -85,11 +89,12 @@ export function Header() {
         )}
         <button
           type="button"
-          onClick={toggleTheme}
+          onClick={cycleTheme}
           aria-label={t('theme_toggle_aria')}
+          title={theme}
           className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
         >
-          {mounted && theme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
+          <ThemeIcon size={20} />
         </button>
 
         <LocaleSwitcher />

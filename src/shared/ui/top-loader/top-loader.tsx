@@ -16,6 +16,14 @@ const doneHandlers = new Set<Handler>()
 function emitNavStart() { queueMicrotask(() => startHandlers.forEach(h => h())) }
 function emitNavDone()  { queueMicrotask(() => doneHandlers.forEach(h => h())) }
 
+// Публичное API — вызывать ПЕРЕД программной навигацией (router.push
+// после логина/регистрации). Next дёргает pushState на commit транзиции,
+// а к этому моменту RSC-fetch уже отработал — юзер успевает почувствовать
+// «залипание» без индикации. beginTopLoader стартует бар сразу,
+// NavWatcher закроет его при смене pathname.
+export function beginTopLoader() { emitNavStart() }
+export function endTopLoader()   { emitNavDone() }
+
 let navListenersInstalled = false
 
 function installNavListeners() {

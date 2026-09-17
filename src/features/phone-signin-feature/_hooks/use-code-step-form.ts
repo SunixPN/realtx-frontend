@@ -12,6 +12,7 @@ import { usePhoneLoginMutation } from '@/features/phone-signin-feature/_api/phon
 import { phoneConfirmationStore } from '@/entities/phone-auth/state/phone-confirmation-store';
 import { showToast } from '@/shared/helpers/show-toast';
 import { ROUTES } from '@/shared/const/routes';
+import { beginTopLoader } from '@/shared/ui/top-loader/top-loader';
 
 type UseCodeStepFormArgs = {
     resetVerifier: () => RecaptchaVerifier | null;
@@ -46,6 +47,7 @@ export const useCodeStepForm = ({ resetVerifier, onResendDone }: UseCodeStepForm
             const auth = await login({ idToken });
             if (auth) {
                 phoneConfirmationStore.clear();
+                beginTopLoader();
                 router.push(ROUTES.ROOT);
             }
         } catch {
