@@ -65,11 +65,11 @@ export function PriceHistoryChart({ history, currency }: Props) {
             aria-label={t('chart_aria')}
         >
             {/* горизонтальные сетки и подписи оси Y */}
-            {[0, 0.5, 1].map((t) => {
-                const y = PAD.t + chartH * t
-                const val = max - span * t
+            {[0, 0.5, 1].map((frac) => {
+                const y = PAD.t + chartH * frac
+                const val = max - span * frac
                 return (
-                    <g key={t}>
+                    <g key={frac}>
                         <line
                             x1={PAD.l}
                             x2={W - PAD.r}
