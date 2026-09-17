@@ -173,7 +173,7 @@ export function useDistrictHeatLayers(
             if (map.getLayer(FILL_LAYER)) map.removeLayer(FILL_LAYER)
             if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID)
         }
-    }, [map, mode, districts, geojson])
+    }, [map, mode, districts, geojson, locale])
 
     // Обновление подсветки выбранного района без пересоздания слоёв.
     useEffect(() => {

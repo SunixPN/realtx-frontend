@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import mapboxgl from 'mapbox-gl'
 import { PRICE_CURRENCY_LABELS, type EstateMapPointType, type HouseBbox } from '@/entities/estate'
 import { BYN_SIGN_HTML } from '@/shared/ui/byn-sign/byn-sign'
@@ -142,6 +142,7 @@ export function useMapMarkers(
     favoriteIds?: Set<number>,
 ) {
     const t = useTranslations('estate')
+    const locale = useLocale()
     const formatKRef = useRef((n: number) => t('map_price_k', { n }))
     formatKRef.current = (n: number) => t('map_price_k', { n })
     const markersRef = useRef<Record<string, mapboxgl.Marker>>({})
@@ -316,5 +317,5 @@ export function useMapMarkers(
         onScreenRef.current = {}
         markersRef.current = {}
         src.setData(toFeatureCollection(points))
-    }, [map, points, favoriteIds])
+    }, [map, points, favoriteIds, locale])
 }
