@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query'
-import { estateByIdQuery, type EstateType } from '@/entities/estate'
+import { SWRConfig, unstable_serialize } from 'swr'
+import { getTranslations } from 'next-intl/server'
+import { estateByIdKey, type EstateType } from '@/entities/estate'
 import { PropertyDetailWidget } from '@/widgets/property-detail-widget/property-detail-widget'
+import { API_ROUTES } from '@/shared/const/api-routes'
+import { serverFetch } from '@/shared/api/server-fetch'
 import type { DisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 
 type RouteParams = { id: string }
@@ -15,8 +18,10 @@ function resolveCurrency(raw: string | undefined): DisplayCurrency {
     return VALID_CURRENCIES.includes(up as DisplayCurrency) ? (up as DisplayCurrency) : 'USD'
 }
 
-// Заголовок вкладки/шеринга — данные уже в кэше QueryClient'а из prefetch'а
-// на странице, поэтому дублирующий getQueryData возьмёт из памяти.
+function fetchEstate(id: number, currency: DisplayCurrency) {
+    return serverFetch<EstateType>(API_ROUTES.ESTATE.BY_ID(id), { displayCurrency: currency })
+}
+
 export async function generateMetadata({
     params,
     searchParams,
@@ -24,26 +29,23 @@ export async function generateMetadata({
     params: Promise<RouteParams>
     searchParams: Promise<RouteSearch>
 }): Promise<Metadata> {
+    const t = await getTranslations('estate')
     const { id } = await params
     const { currency: cur } = await searchParams
     const numId = Number(id)
-    if (!Number.isFinite(numId)) return { title: 'Объект не найден — RealtX' }
+    if (!Number.isFinite(numId)) return { title: t('property_not_found_title') }
 
-    const currency = resolveCurrency(cur)
-    const qc = new QueryClient()
     try {
-        await qc.prefetchQuery(estateByIdQuery(numId, currency))
+        const currency = resolveCurrency(cur)
+        const estate = await fetchEstate(numId, currency)
+        const rooms = estate.rooms ? t('property_meta_rooms', { n: estate.rooms }) : t('property_meta_flat')
+        const addr = estate.address ?? t('default_town')
+        return {
+            title: `${rooms} · ${addr} — RealtX`,
+            description: estate.description ?? undefined,
+        }
     } catch {
-        return { title: 'Объект не найден — RealtX' }
-    }
-    const estate = qc.getQueryData<EstateType>(estateByIdQuery(numId, currency).queryKey)
-    if (!estate) return { title: 'Объект не найден — RealtX' }
-
-    const rooms = estate.rooms ? `${estate.rooms}-комн` : 'квартира'
-    const addr = estate.address ?? 'Минск'
-    return {
-        title: `${rooms} · ${addr} — RealtX`,
-        description: estate.description ?? undefined,
+        return { title: t('property_not_found_title') }
     }
 }
 
@@ -60,21 +62,23 @@ export default async function PropertyPage({
     if (!Number.isFinite(numId)) notFound()
 
     const currency = resolveCurrency(cur)
-    const queryClient = new QueryClient()
+
+    let estate: EstateType
     try {
-        await queryClient.prefetchQuery(estateByIdQuery(numId, currency))
+        estate = await fetchEstate(numId, currency)
     } catch {
         notFound()
     }
 
-    const estate = queryClient.getQueryData<EstateType>(estateByIdQuery(numId, currency).queryKey)
-    if (!estate) notFound()
+    const fallback = {
+        [unstable_serialize(estateByIdKey(numId, currency))]: estate!,
+    }
 
     return (
-        <HydrationBoundary state={dehydrate(queryClient)}>
+        <SWRConfig value={{ fallback }}>
             <div className="min-h-screen bg-surface-subtle">
                 <PropertyDetailWidget id={numId} />
             </div>
-        </HydrationBoundary>
+        </SWRConfig>
     )
 }

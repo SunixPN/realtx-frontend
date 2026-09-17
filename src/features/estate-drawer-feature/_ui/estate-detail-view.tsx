@@ -3,14 +3,14 @@
 import Link from 'next/link'
 import { ArrowLeft, ExternalLink, Heart, Maximize2, Train, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEstateById, useWallMaterialLabels, useRepairStateLabels, useFormatRooms } from '@/entities/estate'
+import { useEstateById, useWallMaterialLabels, useRepairStateLabels, useFormatRooms, useFormatArea } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { useToggleFavorite } from '@/features/favorite-toggle-feature'
 import { PhotoSlider } from './photo-slider'
 import { PriceDisplay, PricePerM2Display } from './price-display'
 import { PriceChangeBadge } from './price-change-badge'
 import { PriceHistorySection } from './price-history-section'
-import { formatArea, formatStorey } from './format'
+import { formatStorey } from './format'
 import { useAuth } from "@/entities/me/api/auth-query";
 import { IconLoader } from "@/shared/ui/ui-icons";
 import { cn } from '@/shared/helpers/cn';
@@ -41,6 +41,7 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
     const wallLabels = useWallMaterialLabels()
     const repairLabels = useRepairStateLabels()
     const formatRooms = useFormatRooms()
+    const formatArea = useFormatArea()
 
     return (
         <div className="flex h-full flex-col">

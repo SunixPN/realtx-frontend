@@ -12,9 +12,8 @@ function pickValue(p: PriceHistoryPoint, currency: DisplayCurrency): number | nu
     return currency === 'USD' ? p.usd : currency === 'BYN' ? p.byn : p.eur
 }
 
-function formatAxisValue(v: number, currency: DisplayCurrency): string {
-    if (currency === 'BYN') return `${Math.round(v / 1000)}к`
-    return `${Math.round(v / 1000)}к`
+function formatAxisValue(v: number, suffix: string): string {
+    return `${Math.round(v / 1000)}${suffix}`
 }
 
 function formatDate(iso: string): string {
@@ -86,7 +85,7 @@ export function PriceHistoryChart({ history, currency }: Props) {
                             fill="var(--text-faint, #9ca3af)"
                             fontSize={10}
                         >
-                            {formatAxisValue(val, currency)}
+                            {formatAxisValue(val, t('chart_thousands_suffix'))}
                         </text>
                     </g>
                 )

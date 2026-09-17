@@ -2,11 +2,11 @@
 
 import { ImageOff, Train } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { getThumbPhoto, type EstateShortType, useFormatRooms } from '@/entities/estate'
+import { getThumbPhoto, type EstateShortType, useFormatRooms, useFormatArea } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { FavoriteHeartButton } from '@/features/favorite-toggle-feature'
 import { PriceDisplay, PricePerM2Display } from './price-display'
-import { formatArea, formatStorey } from './format'
+import { formatStorey } from './format'
 
 type Props = {
     item: EstateShortType
@@ -17,6 +17,7 @@ export function EstateListCard({ item, onClick }: Props) {
     const t = useTranslations('estate')
     const { currency } = useDisplayCurrency()
     const formatRooms = useFormatRooms()
+    const formatArea = useFormatArea()
 
     return (
         <div

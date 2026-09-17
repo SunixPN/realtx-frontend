@@ -25,7 +25,8 @@
         "country_ua": "Ukraine",
         "country_pl": "Poland",
         "page_title_favorites": "Favorites — RealtX",
-        "page_title_subscriptions": "Search Subscriptions — RealtX"
+        "page_title_subscriptions": "Search Subscriptions — RealtX",
+        "page_title_register": "Register — RealtX"
     },
     "header": {
         "logo_alt": "RealtX",
@@ -306,7 +307,13 @@
         "district_leninsky": "Leninsky",
         "district_moskovsky": "Moskovsky",
         "district_oktyabrsky": "Oktyabrsky",
-        "district_frunzensky": "Frunzensky"
+        "district_frunzensky": "Frunzensky",
+        "default_town": "Minsk",
+        "property_not_found_title": "Property not found — RealtX",
+        "property_meta_rooms": "{n}-room",
+        "property_meta_flat": "apartment",
+        "area_unit": "m²",
+        "per_m2_suffix": "/ m²"
     },
     "filters": {
         "price": "Price",

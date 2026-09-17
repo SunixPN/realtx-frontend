@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import { BynSign } from '@/shared/ui/byn-sign/byn-sign'
 import { formatNumber } from './format'
 
@@ -38,10 +41,11 @@ export function PriceDisplay({ price, currency, className }: Props) {
 }
 
 export function PricePerM2Display({ price, currency, className }: Props) {
+    const t = useTranslations('estate')
     if (price == null) return <span className={className}>—</span>
     return (
         <span className={className}>
-            <PriceDisplay price={Math.round(price)} currency={currency} /> / м²
+            <PriceDisplay price={Math.round(price)} currency={currency} /> {t('per_m2_suffix')}
         </span>
     )
 }

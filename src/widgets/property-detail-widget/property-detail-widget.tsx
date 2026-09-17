@@ -29,6 +29,7 @@ import {
     useWallMaterialLabels,
     useRepairStateLabels,
     useFormatRooms,
+    useFormatArea,
     type EstateType,
     type PriceHistoryPoint,
 } from '@/entities/estate'
@@ -39,7 +40,7 @@ import { useDisplayCurrency, type DisplayCurrency } from '@/features/main-map-fi
 import { PhotoSlider } from '@/features/estate-drawer-feature/_ui/photo-slider'
 import { PriceDisplay, PricePerM2Display } from '@/features/estate-drawer-feature/_ui/price-display'
 import { PriceChangeBadge } from '@/features/estate-drawer-feature/_ui/price-change-badge'
-import { formatArea, formatStorey, formatNumber } from '@/features/estate-drawer-feature/_ui/format'
+import { formatStorey, formatNumber } from '@/features/estate-drawer-feature/_ui/format'
 import { cn } from '@/shared/helpers/cn'
 
 const PropertyMiniMap = dynamic(
@@ -123,7 +124,7 @@ function Breadcrumbs({ estate }: { estate: EstateType }) {
     const formatRooms = useFormatRooms()
 
     const parts = [
-        estate.townName ?? 'Минск',
+        estate.townName ?? t('default_town'),
         estate.districtName ? t('district_suffix', { name: estate.districtName }) : null,
         t('title_flat', { rooms: formatRooms(estate.rooms) }),
     ].filter(Boolean) as string[]
@@ -513,6 +514,7 @@ function ContactModal({
 function KeyFacts({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     const formatRooms = useFormatRooms()
+    const formatArea = useFormatArea()
 
     const items = [
         { label: t('spec_rooms'), value: String(estate.rooms ?? '—') },
@@ -712,6 +714,7 @@ function SpecsGrid({ estate }: { estate: EstateType }) {
     const locale = useLocale()
     const wallLabels = useWallMaterialLabels()
     const repairLabels = useRepairStateLabels()
+    const formatArea = useFormatArea()
 
     const formatDate = (iso: string | null) => {
         if (!iso) return '—'

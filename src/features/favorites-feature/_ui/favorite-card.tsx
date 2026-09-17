@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/shared/helpers/cn'
 import { useRemoveFavorite, type FavoriteItemType } from '@/entities/favorite'
-import { useFormatRooms } from '@/entities/estate'
-import { formatNumber, formatArea, formatStorey } from '../../estate-drawer-feature/_ui/format'
+import { useFormatRooms, useFormatArea } from '@/entities/estate'
+import { formatNumber, formatStorey } from '../../estate-drawer-feature/_ui/format'
 import { BynSign } from '@/shared/ui/byn-sign/byn-sign'
 
 type FavoriteCardProps = {
@@ -37,6 +37,7 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
     const t = useTranslations('favorites')
     const tEstate = useTranslations('estate')
     const formatRooms = useFormatRooms()
+    const formatArea = useFormatArea()
     const { trigger: remove, isMutating: isPending } = useRemoveFavorite()
     const photo = item.photos[0]
     const delta = item.priceDeltaUsd

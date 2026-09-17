@@ -25,7 +25,8 @@
         "country_ua": "Украина",
         "country_pl": "Польша",
         "page_title_favorites": "Избранное — RealtX",
-        "page_title_subscriptions": "Подписки на поиск — RealtX"
+        "page_title_subscriptions": "Подписки на поиск — RealtX",
+        "page_title_register": "Регистрация — RealtX"
     },
     "header": {
         "logo_alt": "RealtX",
@@ -306,7 +307,13 @@
         "district_leninsky": "Ленинский",
         "district_moskovsky": "Московский",
         "district_oktyabrsky": "Октябрьский",
-        "district_frunzensky": "Фрунзенский"
+        "district_frunzensky": "Фрунзенский",
+        "default_town": "Минск",
+        "property_not_found_title": "Объект не найден — RealtX",
+        "property_meta_rooms": "{n}-комн",
+        "property_meta_flat": "квартира",
+        "area_unit": "м²",
+        "per_m2_suffix": "/ м²"
     },
     "filters": {
         "price": "Цена",

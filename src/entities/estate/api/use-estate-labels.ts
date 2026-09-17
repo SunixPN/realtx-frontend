@@ -65,3 +65,12 @@ export function useFormatRooms(): (rooms: number | null) => string {
         return t('rooms_n', { count: rooms })
     }
 }
+
+export function useAreaUnit(): string {
+    return useTranslations('estate')('area_unit')
+}
+
+export function useFormatArea(): (v: number | null) => string {
+    const unit = useAreaUnit()
+    return (v) => (v == null ? '—' : `${v} ${unit}`)
+}

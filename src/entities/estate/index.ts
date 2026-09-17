@@ -22,6 +22,8 @@ export {
     useMinskDistrictOptions,
     useDistrictLabel,
     useFormatRooms,
+    useAreaUnit,
+    useFormatArea,
 } from './api/use-estate-labels'
 
 export { mapPointsKey, districtProfitabilityKey, districtsGeojsonKey, estateByIdKey } from './api/estate-query-keys'
