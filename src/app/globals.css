@@ -19,7 +19,13 @@
 
 /* ─── Layout ──────────────────────────────────────────────────────── */
 :root {
-  --header-height: 65px;
+  --header-height: 56px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --header-height: 65px;
+  }
 }
 
 /* ─── Light mode ──────────────────────────────────────────────────── */
@@ -148,6 +154,9 @@ html.dark {
 
 /* ─── Tailwind v4 design tokens ───────────────────────────────────── */
 @theme inline {
+  /* Breakpoints */
+  --breakpoint-xs: 360px;
+
   /* Fonts */
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "Fira Code", monospace;
@@ -287,6 +296,12 @@ html.dark {
 
   a:hover {
     opacity: 0.8;
+  }
+
+  /* На тач-устройствах hover «залипает» после тапа — гасим декоративные
+   * hover-эффекты, чтобы ссылки/кнопки не выглядели активированными. */
+  @media (hover: none) {
+    a:hover { opacity: 1; }
   }
 
   img, video {

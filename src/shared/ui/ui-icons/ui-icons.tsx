@@ -39,6 +39,14 @@ export function IconX({ size = 16, ...props }: IconProps) {
   );
 }
 
+export function IconMenu({ size = 20, ...props }: IconProps) {
+  return (
+    <svg {...baseProps(size, props)}>
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  );
+}
+
 export function IconInfo({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>

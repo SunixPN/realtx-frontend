@@ -4,6 +4,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/shared/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+    allowedDevOrigins: ["10.183.8.202"],
     webpack: (config) => {
         config.resolve.alias = {
             ...config.resolve.alias,

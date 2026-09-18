@@ -9,7 +9,7 @@ import { ROUTES } from '@/shared/const/routes';
 import { useResetVerify } from '@/features/reset-confirm-feature/_api/reset-verify-query';
 import ResetConfirmForm from '@/features/reset-confirm-feature/_ui/reset-confirm-form/reset-confirm-form';
 import ResetSuccessView from '@/features/reset-confirm-feature/_ui/reset-success-view/reset-success-view';
-import { UIAuthFooter } from '@/shared/ui/ui-auth-footer';
+import { UIAuthShell } from '@/shared/ui/ui-auth-shell';
 
 export default function ResetConfirmFeature() {
     const t = useTranslations('auth.reset_confirm');
@@ -47,17 +47,5 @@ export default function ResetConfirmFeature() {
         return <ResetConfirmForm token={token} onSuccess={() => setIsDone(true)} />;
     };
 
-    return (
-        <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-surface-subtle">
-            <main className="flex flex-1 items-center justify-center px-4 py-10">
-                <div className="w-full max-w-[440px]">
-                    <div className="flex flex-col gap-5 rounded-lg border border-border bg-surface-raised p-8">
-                        {renderContent()}
-                    </div>
-                </div>
-            </main>
-
-            <UIAuthFooter />
-        </div>
-    );
+    return <UIAuthShell>{renderContent()}</UIAuthShell>;
 }

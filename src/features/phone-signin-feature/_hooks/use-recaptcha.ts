@@ -15,7 +15,14 @@ export const useRecaptcha = () => {
         });
         verifierRef.current = verifier;
         return () => {
-            verifier.clear();
+            try {
+                verifier.clear();
+            }
+
+            catch (e) {
+                console.log(e)
+            }
+
             verifierRef.current = null;
         };
     }, []);

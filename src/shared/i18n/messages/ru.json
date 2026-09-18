@@ -38,7 +38,18 @@
         "theme_toggle_aria": "Переключить тему",
         "auth_checking_aria": "Проверка авторизации",
         "sign_in": "Войти",
-        "locale_switch_aria": "Выбрать язык"
+        "locale_switch_aria": "Выбрать язык",
+        "menu_open_aria": "Открыть меню",
+        "menu_close_aria": "Закрыть меню",
+        "menu_title": "Меню",
+        "menu_theme": "Тема",
+        "menu_theme_light": "Светлая",
+        "menu_theme_dark": "Тёмная",
+        "menu_theme_system": "Системная",
+        "menu_language": "Язык",
+        "menu_favorites": "Избранное",
+        "menu_subscriptions": "Подписки",
+        "menu_compare": "Сравнение"
     },
     "user_menu": {
         "profile_aria": "Профиль",

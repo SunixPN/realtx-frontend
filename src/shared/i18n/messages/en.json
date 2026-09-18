@@ -38,7 +38,18 @@
         "theme_toggle_aria": "Toggle theme",
         "auth_checking_aria": "Checking authentication",
         "sign_in": "Sign in",
-        "locale_switch_aria": "Change language"
+        "locale_switch_aria": "Change language",
+        "menu_open_aria": "Open menu",
+        "menu_close_aria": "Close menu",
+        "menu_title": "Menu",
+        "menu_theme": "Theme",
+        "menu_theme_light": "Light",
+        "menu_theme_dark": "Dark",
+        "menu_theme_system": "System",
+        "menu_language": "Language",
+        "menu_favorites": "Favorites",
+        "menu_subscriptions": "Subscriptions",
+        "menu_compare": "Compare"
     },
     "user_menu": {
         "profile_aria": "Profile",

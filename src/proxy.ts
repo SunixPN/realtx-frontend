@@ -1,6 +1,11 @@
 import { NextProxy, NextRequest, NextResponse } from "next/server";
 import { TOKENS } from "@/shared/const/tokens";
-import { PROTECTED_REDIRECT_ROUTE, PROTECTED_ROUTES } from "@/shared/const/routes-guard";
+import {
+    AUTH_REDIRECT_ROUTE,
+    AUTH_ROUTES,
+    PROTECTED_REDIRECT_ROUTE,
+    PROTECTED_ROUTES
+} from "@/shared/const/routes-guard";
 import { env } from "@/shared/config/env";
 import { API_ROUTES } from "@/shared/const/api-routes";
 
@@ -162,6 +167,13 @@ export const proxy: NextProxy = async (request) => {
         const response = NextResponse.redirect(url);
         clearAuthCookies(response);
         return response;
+    }
+
+    if (AUTH_ROUTES.includes(pathname) && (hasRefresh && hasAccess)) {
+        const url = request.nextUrl.clone();
+        url.pathname = AUTH_REDIRECT_ROUTE;
+
+        return NextResponse.redirect(url);
     }
 
     const response = NextResponse.next({ request });

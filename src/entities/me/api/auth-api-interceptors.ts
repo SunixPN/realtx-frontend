@@ -49,6 +49,8 @@ api.interceptors.response.use(
             !originalRequest ||
             originalRequest._retry ||
             originalRequest.url?.includes(API_ROUTES.AUTH.REFRESH)
+            || originalRequest.url?.includes(API_ROUTES.AUTH.LOGIN)
+            || originalRequest.url?.includes(API_ROUTES.AUTH.REGISTER)
         ) {
             throw buildApiError(error)
         }

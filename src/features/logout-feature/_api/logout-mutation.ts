@@ -20,7 +20,6 @@ export function useLogoutMutation() {
         },
         {
             onSuccess: async () => {
-                await clearTokensAction()
                 mutate(authKey, null, { revalidate: false })
                 showToast({ status: 'success', text: t('toast_success') })
             },

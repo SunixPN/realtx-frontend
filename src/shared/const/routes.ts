@@ -9,6 +9,7 @@ export const ROUTES = {
     PROFILE: "/profile",
     FAVORITES: "/favorites",
     SUBSCRIPTIONS: "/subscriptions",
+    PROPERTY: "/property",
 } as const
 
 export type RoutesType = typeof ROUTES[keyof typeof ROUTES]
