@@ -149,20 +149,32 @@ export const proxy: NextProxy = async (request) => {
     const refreshToken = request.cookies.get(TOKENS.REFRESH_TOKEN)?.value;
     const accessToken = request.cookies.get(TOKENS.ACCESS_TOKEN)?.value;
 
+    // RSC-prefetch запросы летят параллельно с user-navigation. Если бэк
+    // ротирует refresh_token, любой параллельный prefetch со старым токеном
+    // ловит 401 и рушит сессию. Prefetch не нуждается в свежих cookies —
+    // пропускаем refresh для них полностью.
+    const isRscPrefetch =
+        request.headers.get("next-router-prefetch") === "1" ||
+        request.headers.get("purpose") === "prefetch";
+
     let refreshed: NonNullable<RefreshResult> | null = null;
 
     // Проактивный refresh: access протух (или отсутствует), но refresh есть.
-    if (refreshToken && isExpired(accessToken)) {
+    if (refreshToken && isExpired(accessToken) && !isRscPrefetch) {
         const result = await refresh(refreshToken);
         if (result) {
             refreshed = result;
         } else {
-            // refresh не удался — refresh_token тоже мёртв, чистим и редиректим при необходимости.
-            const response = PROTECTED_ROUTES.includes(pathname)
-                ? NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url))
-                : NextResponse.next();
-            clearAuthCookies(response);
-            return response;
+            // Refresh не удался — может быть race с параллельной ротацией
+            // (текущий refresh_token уже использован соседним запросом). Не
+            // стираем куки здесь, иначе рушим валидную сессию. Пусть
+            // client-side interceptor или следующий user-navigation
+            // разберётся. На protected-route редиректим на sign-in только
+            // если нет никаких токенов — иначе просто пропускаем.
+            if (PROTECTED_ROUTES.includes(pathname) && !accessToken) {
+                return NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url));
+            }
+            return NextResponse.next();
         }
     }
 
