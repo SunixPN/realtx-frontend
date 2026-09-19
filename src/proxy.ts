@@ -158,9 +158,10 @@ export const proxy: NextProxy = async (request) => {
         }
     }
 
+    const hasRefresh = refreshed ? true : Boolean(refreshToken);
     const hasAccess = refreshed ? true : !!accessToken;
 
-    if (PROTECTED_ROUTES.includes(pathname) && !hasAccess) {
+    if (PROTECTED_ROUTES.includes(pathname) && !(hasAccess || hasRefresh)) {
         const url = request.nextUrl.clone();
         url.pathname = PROTECTED_REDIRECT_ROUTE;
         const response = NextResponse.redirect(url);
@@ -168,7 +169,7 @@ export const proxy: NextProxy = async (request) => {
         return response;
     }
 
-    if (AUTH_ROUTES.includes(pathname) && hasAccess) {
+    if (AUTH_ROUTES.includes(pathname) && (hasAccess && hasRefresh)) {
         const url = request.nextUrl.clone();
         url.pathname = AUTH_REDIRECT_ROUTE;
 
