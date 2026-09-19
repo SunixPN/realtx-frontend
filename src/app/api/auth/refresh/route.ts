@@ -34,11 +34,13 @@ export async function POST() {
     })
 
     // Дополнительно выставляем access_token явно (httpOnly через Next.js)
+    const domain = env.COOKIE_DOMAIN || undefined
     response.cookies.set(TOKENS.ACCESS_TOKEN, data.accessToken, {
         httpOnly: true,
         path: '/',
         sameSite: 'lax',
         maxAge: 15 * 60,
+        ...(domain ? { domain } : {}),
     })
 
     return response

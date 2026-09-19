@@ -122,11 +122,13 @@ function applyRefreshedCookies(
     }
     // Страховка: если бэк не кладёт access_token в куку — ставим сами.
     if (!hasAccessInSetCookie) {
+        const domain = env.COOKIE_DOMAIN || undefined;
         response.cookies.set(TOKENS.ACCESS_TOKEN, accessToken, {
             httpOnly: true,
             path: "/",
             sameSite: "lax",
             maxAge: 15 * 60,
+            ...(domain ? { domain } : {}),
         });
         request.cookies.set(TOKENS.ACCESS_TOKEN, accessToken);
     }
@@ -170,7 +172,7 @@ export const proxy: NextProxy = async (request) => {
         return response;
     }
 
-    if (AUTH_ROUTES.includes(pathname) && (hasAccess && hasRefresh)) {
+    if (AUTH_ROUTES.includes(pathname) && (hasAccess || hasRefresh)) {
         const url = request.nextUrl.clone();
         url.pathname = AUTH_REDIRECT_ROUTE;
 
