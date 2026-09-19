@@ -180,8 +180,14 @@ export const proxy: NextProxy = async (request) => {
     if (AUTH_ROUTES.includes(pathname) && (hasAccess || hasRefresh)) {
         const url = request.nextUrl.clone();
         url.pathname = AUTH_REDIRECT_ROUTE;
-
-        return NextResponse.redirect(url);
+        const response = NextResponse.redirect(url);
+        // Бэк ротирует refresh_token при рефреше — если не пробросить новый
+        // Set-Cookie на редирект, браузер оставит инвалидный старый, и на
+        // следующем запросе proxy получит 401 и стирает сессию.
+        if (refreshed) {
+            applyRefreshedCookies(response, request, refreshed.accessToken, refreshed.setCookies);
+        }
+        return response;
     }
 
     const response = NextResponse.next({ request });

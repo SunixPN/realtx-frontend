@@ -78,6 +78,15 @@ function NavWatcher() {
     const firstRun = useRef(true)
     useEffect(() => {
         if (firstRun.current) { firstRun.current = false; return }
+        // При быстрых последовательных навигациях (клик A → клик B до завершения)
+        // Next.js всё равно закоммитит промежуточные состояния — usePathname
+        // моргнёт на A, потом станет B. Мы не хотим закрывать бар на промежуточном
+        // коммите, поэтому эмитим done только когда React догнал реальный URL.
+        if (typeof window !== 'undefined') {
+            const winSearch = window.location.search.replace(/^\?/, '')
+            const reactSearch = params.toString()
+            if (window.location.pathname !== pathname || winSearch !== reactSearch) return
+        }
         emitNavDone()
     }, [pathname, params])
     return null
@@ -130,17 +139,21 @@ export function TopLoader() {
 
     const start = useCallback(() => {
         if (!mountedRef.current) return
-        stopInterval()
         stopSafetyTimeout()
-        phaseRef.current = 'loading'
-        setPct(0)
-        setPhase('loading')
-        intervalRef.current = setInterval(() => {
-            setPct(p => {
-                const step = (FILL_TARGET - p) * 0.12
-                return Math.min(p + Math.max(step, 0.4), FILL_TARGET)
-            })
-        }, TICK_MS)
+        // Если бар уже растёт — не сбрасываем прогресс на 0, только продлеваем
+        // safety-таймер. Иначе при быстрых кликах бар моргает.
+        if (phaseRef.current !== 'loading') {
+            stopInterval()
+            phaseRef.current = 'loading'
+            setPct(0)
+            setPhase('loading')
+            intervalRef.current = setInterval(() => {
+                setPct(p => {
+                    const step = (FILL_TARGET - p) * 0.12
+                    return Math.min(p + Math.max(step, 0.4), FILL_TARGET)
+                })
+            }, TICK_MS)
+        }
         safetyTimeoutRef.current = setTimeout(() => done(), SAFETY_TIMEOUT_MS)
     }, [done])
 
