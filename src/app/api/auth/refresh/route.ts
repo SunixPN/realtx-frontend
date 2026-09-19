@@ -38,6 +38,7 @@ export async function POST() {
         httpOnly: true,
         path: '/',
         sameSite: 'lax',
+        maxAge: 15 * 60,
     })
 
     return response

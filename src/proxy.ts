@@ -126,6 +126,7 @@ function applyRefreshedCookies(
             httpOnly: true,
             path: "/",
             sameSite: "lax",
+            maxAge: 15 * 60,
         });
         request.cookies.set(TOKENS.ACCESS_TOKEN, accessToken);
     }
