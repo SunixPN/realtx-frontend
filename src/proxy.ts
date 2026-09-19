@@ -135,8 +135,13 @@ function applyRefreshedCookies(
 }
 
 function clearAuthCookies(response: NextResponse) {
-    response.cookies.delete(TOKENS.REFRESH_TOKEN);
-    response.cookies.delete(TOKENS.ACCESS_TOKEN);
+    const domain = env.COOKIE_DOMAIN || undefined;
+    response.cookies.delete({ name: TOKENS.REFRESH_TOKEN, path: "/" });
+    response.cookies.delete({ name: TOKENS.ACCESS_TOKEN, path: "/" });
+    if (domain) {
+        response.cookies.delete({ name: TOKENS.REFRESH_TOKEN, path: "/", domain });
+        response.cookies.delete({ name: TOKENS.ACCESS_TOKEN, path: "/", domain });
+    }
 }
 
 export const proxy: NextProxy = async (request) => {

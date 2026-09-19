@@ -54,15 +54,20 @@ function installNavListeners() {
         } catch { /* ignore */ }
     }, true)
 
-    // ── Fallback: программная навигация (router.push/replace) и history-API
-    //    Next всё равно в итоге дёрнет history.pushState — если клик по <a>
-    //    не был отловлен (например, программный вызов), покажем бар хотя бы тут.
+    // ── Fallback: программная навигация (router.push/replace) и history-API.
+    //    Сравниваем URL до/после — pushState может вызываться Next-ом без
+    //    реальной смены URL (server redirect обратно на текущий route),
+    //    в таком случае бар показывать не нужно.
     const origPush = window.history.pushState.bind(window.history)
     window.history.pushState = (...args: Parameters<typeof window.history.pushState>) => {
+        const before = window.location.href
         origPush(...args)
-        emitNavStart()
+        if (window.location.href !== before) emitNavStart()
     }
-    window.addEventListener('popstate', emitNavStart)
+    // popstate НЕ обрабатываем: back/forward обычно бьёт по кешу и завершается
+    // мгновенно, а если Next догружает RSC — click/pushState уже эмитнут start.
+    // Явный popstate-эмит давал зависший бар на server-redirect'ах, возвращающих
+    // на тот же route (proxy.ts guard).
 }
 
 // ── Watcher: fires emitNavDone when Next.js commits the new route ───────────
@@ -84,11 +89,17 @@ type Phase = 'idle' | 'loading' | 'done'
 
 const TICK_MS = 80
 const FILL_TARGET = 84  // bar stops here until navigation completes
+// Короткий safety-нет на случай сетевых залипаний. Основная детекция
+// завершения — NavWatcher (смена pathname/search). start эмитим только
+// когда URL реально меняется (см. installNavListeners), поэтому длинный
+// timeout больше не нужен.
+const SAFETY_TIMEOUT_MS = 1500
 
 export function TopLoader() {
     const [phase, setPhase] = useState<Phase>('idle')
     const [pct, setPct] = useState(0)
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+    const safetyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const mountedRef = useRef(true)
     const phaseRef = useRef<Phase>('idle')
 
@@ -96,24 +107,15 @@ export function TopLoader() {
         if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null }
     }
 
-    const start = useCallback(() => {
-        if (!mountedRef.current) return
-        stopInterval()
-        phaseRef.current = 'loading'
-        setPct(0)
-        setPhase('loading')
-        intervalRef.current = setInterval(() => {
-            setPct(p => {
-                const step = (FILL_TARGET - p) * 0.12
-                return Math.min(p + Math.max(step, 0.4), FILL_TARGET)
-            })
-        }, TICK_MS)
-    }, [])
+    const stopSafetyTimeout = () => {
+        if (safetyTimeoutRef.current) { clearTimeout(safetyTimeoutRef.current); safetyTimeoutRef.current = null }
+    }
 
     const done = useCallback(() => {
         if (!mountedRef.current) return
         if (phaseRef.current !== 'loading') return  // ignore spurious done
         stopInterval()
+        stopSafetyTimeout()
         phaseRef.current = 'done'
         setPct(100)
         setPhase('done')
@@ -126,6 +128,22 @@ export function TopLoader() {
         }, 450)
     }, [])
 
+    const start = useCallback(() => {
+        if (!mountedRef.current) return
+        stopInterval()
+        stopSafetyTimeout()
+        phaseRef.current = 'loading'
+        setPct(0)
+        setPhase('loading')
+        intervalRef.current = setInterval(() => {
+            setPct(p => {
+                const step = (FILL_TARGET - p) * 0.12
+                return Math.min(p + Math.max(step, 0.4), FILL_TARGET)
+            })
+        }, TICK_MS)
+        safetyTimeoutRef.current = setTimeout(() => done(), SAFETY_TIMEOUT_MS)
+    }, [done])
+
     useEffect(() => {
         mountedRef.current = true
         installNavListeners()
@@ -136,6 +154,7 @@ export function TopLoader() {
             startHandlers.delete(start)
             doneHandlers.delete(done)
             stopInterval()
+            stopSafetyTimeout()
         }
     }, [start, done])
 
