@@ -76,24 +76,18 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
         const v = dx / Math.max(1, dt);
         setDragging(false);
         const panelWidth = panelRef.current?.offsetWidth ?? 320;
-        if (dx > panelWidth * 0.3 || (v > 0.5 && dx > 40)) {
+        if (dx > panelWidth * 0.3 || (v > 0.5 && dx > 30) || v > 0.9) {
             // Smooth exit: animate inline transform out to full width in
             // parallel with the CSSTransition exit so the panel never snaps
             // back to translateX(0) for a frame before unmounting.
+            // A very fast flick (v > 0.9) always dismisses even on tiny dx —
+            // otherwise the panel visually slid far right during the flick
+            // but snapped back on release, and the user tapped the still-
+            // visible backdrop to actually close it.
             dismissingRef.current = true;
             setDragX(panelWidth);
             onClose();
-            // Swallow the compat click Android/iOS dispatch right after
-            // pointerup — the CSSTransition backdrop fades out over DURATION
-            // but stays fully clickable, so the ghost click would land on it
-            // (onClose = no-op) and the user's next real tap feels dead.
-            const swallow = (ev: MouseEvent) => {
-                ev.stopPropagation();
-                ev.preventDefault();
-            };
-            window.addEventListener('click', swallow, { capture: true, once: true });
             window.setTimeout(() => {
-                window.removeEventListener('click', swallow, true);
                 dismissingRef.current = false;
                 setDragX(0);
                 setDragging(false);

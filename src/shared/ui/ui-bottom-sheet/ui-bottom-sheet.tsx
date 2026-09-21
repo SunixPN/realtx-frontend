@@ -202,17 +202,7 @@ export function UIBottomSheet({
         const panelHeight = panelHeightRef.current || window.innerHeight;
         setDragY(panelHeight);
         onClose();
-        // Swallow the compat click Android/iOS dispatch right after pointerup.
-        // Without this, it lands on the still-fading backdrop (whose
-        // pointer-events are gated by `visible`, which lags one render behind
-        // `dismissing`) and the user has to tap twice for anything to react.
-        const swallow = (ev: MouseEvent) => {
-            ev.stopPropagation();
-            ev.preventDefault();
-        };
-        window.addEventListener('click', swallow, { capture: true, once: true });
         window.setTimeout(() => {
-            window.removeEventListener('click', swallow, true);
             dismissingRef.current = false;
             setDismissing(false);
             setDragY(0);
@@ -239,12 +229,14 @@ export function UIBottomSheet({
         const visibleHeight = (currentFrac / maxFrac) * panelHeight;
 
         if (velocity > 0.6 && dy > 30) {
-            if (autoHeight || snapIdx === 0) {
-                dismissWithSwipe();
-                return;
-            }
-            commitSnap(snapIdx - 1);
-            setDragY(0);
+            // Fast downward flick always dismisses — including from an
+            // expanded snap. Otherwise a flick from snapIdx>0 only collapsed
+            // to the previous snap while dragY was already animating far
+            // off-screen, so the sheet visually "left" but stayed open and
+            // the user had to tap the backdrop to actually close it. Slow
+            // drags that want an intermediate snap fall through to the
+            // position-based branch below.
+            dismissWithSwipe();
             return;
         }
         if (!autoHeight && velocity < -0.6 && dy < -30) {
@@ -319,7 +311,7 @@ export function UIBottomSheet({
                 className={cn(
                     'fixed inset-0 z-[80] bg-black/40 backdrop-blur-[2px]',
                     'transition-opacity duration-300 ease-out',
-                    visible && !dismissing ? 'opacity-100' : 'pointer-events-none opacity-0',
+                    visible ? 'opacity-100' : 'pointer-events-none opacity-0',
                 )}
             />
             <div
