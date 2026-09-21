@@ -99,6 +99,8 @@ export function UIBottomSheet({
     const startTime = useRef(0);
     const panelRef = useRef<HTMLDivElement>(null);
     const panelHeightRef = useRef(0);
+    const dismissingRef = useRef(false);
+    const [dismissing, setDismissing] = useState(false);
 
     useLayoutEffect(() => setMounted(true), []);
 
@@ -119,6 +121,8 @@ export function UIBottomSheet({
         if (open) {
             setRendered(true);
             setSnapIdx(initialSnapIndex ?? snapPoints.length - 1);
+            dismissingRef.current = false;
+            setDismissing(false);
             setDragY(0);
             let raf2 = 0;
             const raf1 = requestAnimationFrame(() => {
@@ -186,27 +190,50 @@ export function UIBottomSheet({
         setDragY(dy);
     }, []);
 
+    const dismissWithSwipe = useCallback(() => {
+        // Smooth swipe-exit: keep dragging offset animating to the panel
+        // bottom in parallel with `visible=false`. Prevents the panel from
+        // snapping back to base transform for a frame, and gives us a window
+        // to hard-suppress hit-tests so Android's synthetic click doesn't
+        // land on a detached element (which caused the "first tap dead"
+        // symptom after swipe-close).
+        dismissingRef.current = true;
+        setDismissing(true);
+        const panelHeight = panelHeightRef.current || window.innerHeight;
+        setDragY(panelHeight);
+        onClose();
+        window.setTimeout(() => {
+            dismissingRef.current = false;
+            setDismissing(false);
+            setDragY(0);
+        }, DURATION_MS + 20);
+    }, [onClose]);
+
     const onPointerUp = useCallback((e: ReactPointerEvent) => {
         if (startY.current === null) return;
         const dy = e.clientY - startY.current;
         const dt = Date.now() - startTime.current;
         const velocity = dy / Math.max(1, dt);
         startY.current = null;
-        setDragging(false);
+        // Release pointer capture BEFORE any state change so the synthetic
+        // click that follows on Android doesn't get dispatched to an element
+        // that's about to translate off-screen.
         try {
             (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
         } catch {}
+        setDragging(false);
 
         const panelHeight = panelHeightRef.current || window.innerHeight;
-        // In non-auto mode, the sheet's own height already accounts for the
-        // largest snap; a snap step is `snap[i]/maxSnap * panelHeight`.
         const maxFrac = autoHeight ? autoMaxDvh / 100 : snapPoints[snapPoints.length - 1] ?? 1;
         const currentFrac = autoHeight ? autoMaxDvh / 100 : snapPoints[snapIdx] ?? maxFrac;
         const visibleHeight = (currentFrac / maxFrac) * panelHeight;
 
         if (velocity > 0.6 && dy > 30) {
-            if (autoHeight || snapIdx === 0) onClose();
-            else commitSnap(snapIdx - 1);
+            if (autoHeight || snapIdx === 0) {
+                dismissWithSwipe();
+                return;
+            }
+            commitSnap(snapIdx - 1);
             setDragY(0);
             return;
         }
@@ -216,13 +243,16 @@ export function UIBottomSheet({
             return;
         }
         if (dy > visibleHeight * 0.32) {
-            if (autoHeight || snapIdx === 0) onClose();
-            else commitSnap(snapIdx - 1);
+            if (autoHeight || snapIdx === 0) {
+                dismissWithSwipe();
+                return;
+            }
+            commitSnap(snapIdx - 1);
         } else if (!autoHeight && dy < -visibleHeight * 0.2 && snapIdx < snapPoints.length - 1) {
             commitSnap(snapIdx + 1);
         }
         setDragY(0);
-    }, [autoHeight, autoMaxDvh, snapIdx, snapPoints, commitSnap, onClose]);
+    }, [autoHeight, autoMaxDvh, snapIdx, snapPoints, commitSnap, dismissWithSwipe]);
 
     const dragHandlers: DragHandlers = useMemo(() => ({
         onPointerDown,
@@ -289,12 +319,13 @@ export function UIBottomSheet({
                 aria-label={ariaLabel}
                 style={{
                     ...heightStyle,
-                    transform: visible ? shownTransform : hiddenTransform,
+                    transform: visible || dismissing ? shownTransform : hiddenTransform,
                     transition: dragging
                         ? 'none'
                         : `transform ${DURATION_MS}ms cubic-bezier(.32,.72,0,1)`,
                     willChange: 'transform',
                     paddingBottom: 'env(safe-area-inset-bottom)',
+                    pointerEvents: visible && !dismissing ? undefined : 'none',
                 }}
                 className={cn(
                     'fixed inset-x-0 bottom-0 z-[90] flex flex-col overflow-hidden',

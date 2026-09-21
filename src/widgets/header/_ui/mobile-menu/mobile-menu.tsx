@@ -58,41 +58,23 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
     const [dragging, setDragging] = useState(false);
     const capturedRef = useRef(false);
     const dismissingRef = useRef(false);
-    const onPointerDown = (e: React.PointerEvent) => {
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-        const target = e.target as HTMLElement | null;
-        if (target && target.closest('button, a, input, textarea, select, [role="button"]')) {
-            return;
-        }
-        dragStart.current = { x: e.clientX, y: e.clientY, t: Date.now() };
-        capturedRef.current = false;
-    };
-    const onPointerMove = (e: React.PointerEvent) => {
-        const s = dragStart.current;
-        if (!s) return;
-        const dx = e.clientX - s.x;
-        const dy = e.clientY - s.y;
-        if (!capturedRef.current) {
-            if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy)) return;
-            capturedRef.current = true;
-            setDragging(true);
-            try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch {}
-        }
-        setDragX(Math.max(0, dx));
-    };
-    const onPointerUp = (e: React.PointerEvent) => {
+    const activePointerId = useRef<number | null>(null);
+    const cleanupPointerListeners = useRef<(() => void) | null>(null);
+    const finishDrag = (clientX: number) => {
         const s = dragStart.current;
         dragStart.current = null;
+        cleanupPointerListeners.current?.();
+        cleanupPointerListeners.current = null;
+        activePointerId.current = null;
         if (!capturedRef.current || !s) {
             capturedRef.current = false;
             return;
         }
         capturedRef.current = false;
-        const dx = e.clientX - s.x;
+        const dx = clientX - s.x;
         const dt = Date.now() - s.t;
         const v = dx / Math.max(1, dt);
         setDragging(false);
-        try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
         const panelWidth = panelRef.current?.offsetWidth ?? 320;
         if (dx > panelWidth * 0.3 || (v > 0.5 && dx > 40)) {
             // Smooth exit: animate inline transform out to full width in
@@ -110,14 +92,62 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
         }
         setDragX(0);
     };
+    const onPointerDown = (e: React.PointerEvent) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        const target = e.target as HTMLElement | null;
+        if (target && target.closest('button, a, input, textarea, select, [role="button"]')) {
+            return;
+        }
+        dragStart.current = { x: e.clientX, y: e.clientY, t: Date.now() };
+        capturedRef.current = false;
+        activePointerId.current = e.pointerId;
+        // Bind window-level listeners so Android's inner scroll container
+        // (which claims native pan-y) can't swallow subsequent pointermove
+        // events. React's delegated handlers on <aside> are unreliable here.
+        const onWinMove = (ev: PointerEvent) => {
+            if (activePointerId.current !== null && ev.pointerId !== activePointerId.current) return;
+            const s = dragStart.current;
+            if (!s) return;
+            const dx = ev.clientX - s.x;
+            const dy = ev.clientY - s.y;
+            if (!capturedRef.current) {
+                if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy)) return;
+                capturedRef.current = true;
+                setDragging(true);
+            }
+            if (capturedRef.current) {
+                ev.preventDefault();
+                setDragX(Math.max(0, dx));
+            }
+        };
+        const onWinUp = (ev: PointerEvent) => {
+            if (activePointerId.current !== null && ev.pointerId !== activePointerId.current) return;
+            finishDrag(ev.clientX);
+        };
+        window.addEventListener('pointermove', onWinMove, { passive: false });
+        window.addEventListener('pointerup', onWinUp);
+        window.addEventListener('pointercancel', onWinUp);
+        cleanupPointerListeners.current = () => {
+            window.removeEventListener('pointermove', onWinMove);
+            window.removeEventListener('pointerup', onWinUp);
+            window.removeEventListener('pointercancel', onWinUp);
+        };
+    };
     useEffect(() => {
         if (!isOpen && !dismissingRef.current) {
             setDragX(0);
             setDragging(false);
             capturedRef.current = false;
             dragStart.current = null;
+            cleanupPointerListeners.current?.();
+            cleanupPointerListeners.current = null;
+            activePointerId.current = null;
         }
     }, [isOpen]);
+    useEffect(() => () => {
+        cleanupPointerListeners.current?.();
+        cleanupPointerListeners.current = null;
+    }, []);
     useEffect(() => {
         if (!isOpen) return;
         const handler = (e: KeyboardEvent) => {
@@ -180,9 +210,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                     ref={panelRef}
                     aria-label={t('menu_title')}
                     onPointerDown={onPointerDown}
-                    onPointerMove={onPointerMove}
-                    onPointerUp={onPointerUp}
-                    onPointerCancel={onPointerUp}
                     style={{
                         paddingTop: 'env(safe-area-inset-top)',
                         paddingBottom: 'env(safe-area-inset-bottom)',
@@ -211,7 +238,7 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                             <IconX size={20} />
                         </button>
                     </div>
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
                         {user && (
                             <div className="flex items-center gap-3 border-b border-border p-4">
                                 <span className="flex size-11 items-center justify-center rounded-xl bg-brand/10 text-base font-semibold text-brand">

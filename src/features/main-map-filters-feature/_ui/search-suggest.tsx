@@ -64,7 +64,7 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
         <div ref={wrapperRef} className="relative">
             <div
                 className={cn(
-                    'flex h-11 w-full items-center gap-2 rounded-sm border bg-surface-page px-3 transition-colors lg:h-9 lg:w-96',
+                    'flex h-9 w-full items-center gap-2 rounded-sm border bg-surface-page px-3 transition-colors lg:w-96',
                     open ? 'border-brand ring-2 ring-brand/20' : 'border-border-strong hover:border-text-faint',
                 )}
             >

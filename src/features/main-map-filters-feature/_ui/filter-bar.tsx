@@ -240,7 +240,7 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                         type="button"
                         onClick={() => setSearchOpen(true)}
                         aria-label={t('search_open_aria')}
-                        className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-sm border border-border-strong bg-surface-page text-text-muted active:bg-surface-muted"
+                        className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-sm border border-border-strong bg-surface-page text-text-muted active:bg-surface-muted"
                     >
                         <Search className="size-4" aria-hidden />
                     </button>
@@ -250,9 +250,9 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                         type="button"
                         onClick={() => setSearchOpen(false)}
                         aria-label={t('search_close_aria')}
-                        className="flex size-10 shrink-0 items-center justify-center rounded-md text-text-muted active:bg-surface-muted"
+                        className="flex size-9 shrink-0 items-center justify-center rounded-md text-text-muted active:bg-surface-muted"
                     >
-                        <X className="size-5" />
+                        <X className="size-4" />
                     </button>
                 ) : (
                     <>

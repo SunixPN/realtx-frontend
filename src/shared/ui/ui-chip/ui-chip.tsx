@@ -10,8 +10,28 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 import { usePopoverPosition } from '@/shared/helpers/use-popover-position';
 import { useIsMobile } from '@/shared/hooks/use-is-mobile';
-import { UIBottomSheet } from '@/shared/ui/ui-bottom-sheet';
+import { UIBottomSheet, useBottomSheetDrag } from '@/shared/ui/ui-bottom-sheet';
 import { IconChevronDown, IconX } from '@/shared/ui/ui-icons';
+function ChipSheetHeader({ title, closeLabel, onClose }: { title: string; closeLabel: string; onClose: () => void }) {
+  const drag = useBottomSheetDrag();
+  return (
+    <div
+      {...(drag?.handlers ?? {})}
+      style={drag?.style}
+      className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3"
+    >
+      <h3 className="text-[15px] font-semibold text-text-base">{title}</h3>
+      <button
+        type="button"
+        aria-label={closeLabel}
+        onClick={onClose}
+        className="flex size-9 items-center justify-center rounded-md text-text-muted transition-colors active:bg-surface-muted"
+      >
+        <IconX size={18} />
+      </button>
+    </div>
+  );
+}
 export interface ChipProps {
   label:      string;
   value?:     ReactNode;
@@ -124,17 +144,7 @@ export function UIChip({
           autoHeight
           ariaLabel={label}
         >
-          <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
-            <h3 className="text-[15px] font-semibold text-text-base">{label}</h3>
-            <button
-              type="button"
-              aria-label={tCommon('close')}
-              onClick={() => setOpen(false)}
-              className="flex size-9 items-center justify-center rounded-md text-text-muted transition-colors active:bg-surface-muted"
-            >
-              <IconX size={18} />
-            </button>
-          </div>
+          <ChipSheetHeader title={label} closeLabel={tCommon('close')} onClose={() => setOpen(false)} />
           <div className="max-h-[70dvh] overflow-y-auto overscroll-contain px-4 py-4">
             {children}
           </div>
