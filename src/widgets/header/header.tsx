@@ -9,16 +9,12 @@ import { useTheme } from '@/shared/theme';
 import { UserMenu } from '@/widgets/header/_ui/user-menu/user-menu';
 import { LocaleSwitcher } from '@/widgets/header/_ui/locale-switcher/locale-switcher';
 import { useAuth } from "@/entities/me/api/auth-query";
-import { useFavoriteIds } from '@/entities/favorite';
-import { useSubscriptions } from '@/entities/search-subscription';
 export function Header() {
   const t = useTranslations('header');
   const { theme, resolvedTheme, setTheme } = useTheme();
   const { isLoading: isPending, data } = useAuth()
-  const { data: favIds } = useFavoriteIds({ enabled: !!data?.user })
-  const favCount = favIds?.ids.length ?? 0
-  const { data: subs } = useSubscriptions({ enabled: !!data?.user })
-  const freshCount = subs?.reduce((n, s) => n + (s.paused ? 0 : s.fresh), 0) ?? 0
+  const favCount = data?.user?.favoritesCount ?? 0
+  const freshCount = data?.user?.subscriptionsFreshCount ?? 0
   const cycleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light');
   };

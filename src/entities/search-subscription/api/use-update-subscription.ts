@@ -4,6 +4,7 @@ import { useSWRConfig } from 'swr'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { MUTATIONS } from '@/shared/const/mutations'
+import { authKey } from '@/entities/me/api/auth-query'
 import { subscriptionsKey } from './subscription-keys'
 import { toBackendFilters } from '../_helpers/filters-bridge'
 import type { SearchSubscriptionType, UpdateSubscriptionDtoType } from './subscription-types'
@@ -29,6 +30,7 @@ export function useUpdateSubscription() {
                         current ? current.map(s => s.id === updated.id ? updated : s) : current,
                     { revalidate: true },
                 )
+                mutate(authKey)
             },
         },
     )

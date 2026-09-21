@@ -1,20 +1,23 @@
 import { AxiosError, type InternalAxiosRequestConfig } from 'axios'
-import { mutate as swrMutate } from 'swr'
 import { api, ApiError } from '@/shared/api/api'
 import { TOKENS } from '@/shared/const/tokens'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { refreshRequest } from './refresh-request'
 import { saveAccessTokenAction } from '@/shared/actions/save-access-token-action'
 import { clearTokensAction } from '@/shared/actions/clear-tokens-action'
-import { authKey } from './auth-query'
 import readCookieAction from "@/shared/actions/read-cookie-action";
+import signInRedirectAction from "@/shared/actions/sign-in-redirect-action";
+
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean }
+
 let isRefreshing = false
 let pendingQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = []
+
 function processPending(token: string | null, err?: unknown) {
     pendingQueue.forEach(p => (token ? p.resolve(token) : p.reject(err)))
     pendingQueue = []
 }
+
 function buildApiError(error: AxiosError): ApiError | Error {
     const msg = (error.response?.data as { error?: { message?: string[] } })?.error?.message
     if (msg) return new ApiError(msg.join(','), error.response?.status ?? 500)
@@ -33,7 +36,9 @@ api.interceptors.response.use(
     response => response,
     async (error: unknown) => {
         if (!(error instanceof AxiosError)) throw new Error(String(error))
+
         const originalRequest = error.config as RetryConfig | undefined
+
         if (
             typeof window === 'undefined' ||
             error.response?.status !== 401 ||
@@ -43,8 +48,10 @@ api.interceptors.response.use(
             || originalRequest.url?.includes(API_ROUTES.AUTH.LOGIN)
             || originalRequest.url?.includes(API_ROUTES.AUTH.REGISTER)
         ) {
+            console.log("THROW ????")
             throw buildApiError(error)
         }
+
         if (isRefreshing) {
             return new Promise<string>((resolve, reject) => {
                 pendingQueue.push({ resolve, reject })
@@ -53,17 +60,22 @@ api.interceptors.response.use(
                 return api(originalRequest)
             })
         }
+
         originalRequest._retry = true
         isRefreshing = true
+
         try {
             const { data } = await refreshRequest()
             const newToken = data.accessToken
+
             await saveAccessTokenAction(newToken)
+
             processPending(newToken)
             originalRequest.headers.set('Authorization', `Bearer ${newToken}`)
             return api(originalRequest)
         } catch (refreshError) {
-            console.log(refreshError, "ERRO")
+            await clearTokensAction()
+            await signInRedirectAction(window.location.pathname)
         } finally {
             isRefreshing = false
         }

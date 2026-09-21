@@ -5,6 +5,7 @@ import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { MUTATIONS } from '@/shared/const/mutations'
 import { QUERIES } from '@/shared/const/queries'
+import { authKey } from '@/entities/me/api/auth-query'
 import { favoriteIdsKey, isAnyFavoriteKey, isFavoritesKey } from './favorite-keys'
 import type { FavoriteIdsType } from './favorite-types'
 import type { EstateType, HouseEstatesResponseType } from '@/entities/estate'
@@ -38,9 +39,11 @@ export function useAddFavorite() {
             onSuccess: () => {
                 mutate(isFavoritesKey)
                 mutate(isAnyFavoriteKey)
+                mutate(authKey)
             },
             onError: () => {
                 mutate(isAnyFavoriteKey)
+                mutate(authKey)
             },
         },
     )

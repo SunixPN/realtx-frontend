@@ -4,6 +4,7 @@ import { useSWRConfig } from 'swr'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { MUTATIONS } from '@/shared/const/mutations'
+import { authKey } from '@/entities/me/api/auth-query'
 import { subscriptionsKey } from './subscription-keys'
 import type { SearchSubscriptionType } from './subscription-types'
 export function useMarkSeenSubscription() {
@@ -30,9 +31,11 @@ export function useMarkSeenSubscription() {
                         current ? current.map(s => s.id === updated.id ? updated : s) : current,
                     { revalidate: false },
                 )
+                mutate(authKey)
             },
             onError: () => {
                 mutate(subscriptionsKey())
+                mutate(authKey)
             },
         },
     )

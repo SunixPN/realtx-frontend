@@ -4,6 +4,7 @@ import { useSWRConfig } from 'swr'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { MUTATIONS } from '@/shared/const/mutations'
+import { authKey } from '@/entities/me/api/auth-query'
 import {
     favoriteIdsKey,
     isFavoritesKey,
@@ -31,9 +32,11 @@ export function useBulkRemoveFavorites() {
         {
             onSuccess: () => {
                 mutate(isAnyFavoriteKey)
+                mutate(authKey)
             },
             onError: () => {
                 mutate(isAnyFavoriteKey)
+                mutate(authKey)
             },
         },
     )

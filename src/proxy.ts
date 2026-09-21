@@ -8,168 +8,114 @@ import {
 } from "@/shared/const/routes-guard";
 import { env } from "@/shared/config/env";
 import { API_ROUTES } from "@/shared/const/api-routes";
-const EXP_SKEW_SEC = 30;
-type RefreshResult = {
-    accessToken: string;
-    setCookies: string[];
-} | null;
 
-const inflight = new Map<string, Promise<RefreshResult>>();
-function decodeJwtExp(token: string): number | null {
-    const parts = token.split(".");
-    if (parts.length < 2) return null;
+const EXP_SKEW_SEC = 30;
+const B64URL_RE = /^[A-Za-z0-9_-]+$/;
+
+function decodeBase64UrlJson(part: string): Record<string, unknown> | null {
+    if (!B64URL_RE.test(part)) return null;
     try {
-        const payload = JSON.parse(
-            Buffer.from(parts[1].replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8"),
-        ) as { exp?: number };
-        return typeof payload.exp === "number" ? payload.exp : null;
+        const b64 = part.replace(/-/g, "+").replace(/_/g, "/");
+        const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
+        const bin = atob(padded);
+        const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+        const json = JSON.parse(new TextDecoder().decode(bytes));
+        if (typeof json !== "object" || json === null || Array.isArray(json)) return null;
+        return json as Record<string, unknown>;
     } catch {
         return null;
     }
 }
-function isExpired(token: string | undefined): boolean {
+
+interface ParsedJwt {
+    header: Record<string, unknown>;
+    payload: Record<string, unknown>;
+}
+
+function parseJwt(token: string): ParsedJwt | null {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const [h, p, s] = parts;
+    if (!h || !p || !s) return null;          // пустые сегменты
+    if (!B64URL_RE.test(s)) return null;      // подпись тоже base64url
+
+    const header = decodeBase64UrlJson(h);
+    const payload = decodeBase64UrlJson(p);
+    if (!header || !payload) return null;
+
+    // Минимальные требования к заголовку
+    if (typeof header.alg !== "string" || header.alg === "" ) return null;
+    if (header.alg.toLowerCase() === "none") return null; // "alg: none" — красный флаг
+
+    return { header, payload };
+}
+
+function isInvalidOrExpired(token: string | undefined): boolean {
     if (!token) return true;
-    const exp = decodeJwtExp(token);
-    if (exp === null) return true;
+
+    const jwt = parseJwt(token.trim());
+    if (!jwt) return true;
+
+    const { exp } = jwt.payload;
+    if (typeof exp !== "number" || !Number.isFinite(exp)) return true;
+
     return Date.now() / 1000 >= exp - EXP_SKEW_SEC;
 }
-async function refresh(refreshToken: string): Promise<RefreshResult> {
-    const existing = inflight.get(refreshToken);
-    if (existing) return existing;
-    const promise = (async (): Promise<RefreshResult> => {
+
+function authRoutesProtection( request: NextRequest, hasAccess: boolean) {
+    const { pathname } = request.nextUrl
+    if (AUTH_ROUTES.includes(pathname) && hasAccess) {
+        const url = request.nextUrl.clone();
+        url.pathname = AUTH_REDIRECT_ROUTE;
+        return NextResponse.redirect(url);
+    }
+
+    return NextResponse.next()
+}
+
+export const proxy: NextProxy = async (request) => {
+    const { pathname } = request.nextUrl;
+
+    const accessToken = request.cookies.get(TOKENS.ACCESS_TOKEN)?.value;
+    const hasAccess = Boolean(request.cookies.get(TOKENS.ACCESS_TOKEN))
+
+    if (hasAccess && isInvalidOrExpired(accessToken)) {
         try {
             const base = env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
             const res = await fetch(`${base}${API_ROUTES.AUTH.REFRESH}`, {
                 method: "POST",
-                headers: { Cookie: `${TOKENS.REFRESH_TOKEN}=${refreshToken}` },
-                cache: "no-store",
+                credentials: "include",
             });
-            if (!res.ok) return null;
-            const data = (await res.json()) as { accessToken: string };
-            return {
-                accessToken: data.accessToken,
-                setCookies: res.headers.getSetCookie(),
-            };
-        } catch {
-            return null;
-        }
-    })();
-    inflight.set(refreshToken, promise);
-    promise.finally(() => inflight.delete(refreshToken));
-    return promise;
-}
-type ParsedCookie = {
-    name: string;
-    value: string;
-    options: {
-        path?: string;
-        domain?: string;
-        maxAge?: number;
-        expires?: Date;
-        httpOnly?: boolean;
-        secure?: boolean;
-        sameSite?: "lax" | "strict" | "none";
-    };
-};
-function parseSetCookie(header: string): ParsedCookie | null {
-    const [nameValue, ...attrs] = header.split(";").map((p) => p.trim());
-    const eq = nameValue.indexOf("=");
-    if (eq === -1) return null;
-    const name = nameValue.slice(0, eq);
-    const value = decodeURIComponent(nameValue.slice(eq + 1));
-    const options: ParsedCookie["options"] = {};
-    for (const attr of attrs) {
-        const idx = attr.indexOf("=");
-        const k = (idx === -1 ? attr : attr.slice(0, idx)).toLowerCase();
-        const v = idx === -1 ? "" : attr.slice(idx + 1);
-        if (k === "path") options.path = v;
-        else if (k === "domain") options.domain = v;
-        else if (k === "max-age") options.maxAge = Number(v);
-        else if (k === "expires") options.expires = new Date(v);
-        else if (k === "httponly") options.httpOnly = true;
-        else if (k === "secure") options.secure = true;
-        else if (k === "samesite") options.sameSite = v.toLowerCase() as "lax" | "strict" | "none";
-    }
-    return { name, value, options };
-}
-function applyRefreshedCookies(
-    response: NextResponse,
-    request: NextRequest,
-    accessToken: string,
-    setCookies: string[],
-) {
-    let hasAccessInSetCookie = false;
-    for (const raw of setCookies) {
-        const parsed = parseSetCookie(raw);
-        if (!parsed) continue;
-        if (parsed.name === TOKENS.ACCESS_TOKEN) hasAccessInSetCookie = true;
-        response.cookies.set(parsed.name, parsed.value, parsed.options);
-        request.cookies.set(parsed.name, parsed.value);
-    }
-    if (!hasAccessInSetCookie) {
-        const domain = env.COOKIE_DOMAIN || undefined;
-        response.cookies.set(TOKENS.ACCESS_TOKEN, accessToken, {
-            httpOnly: true,
-            path: "/",
-            sameSite: "lax",
-            maxAge: 15 * 60,
-            ...(domain ? { domain } : {}),
-        });
-        request.cookies.set(TOKENS.ACCESS_TOKEN, accessToken);
-    }
-}
-function clearAuthCookies(response: NextResponse) {
-    const domain = env.COOKIE_DOMAIN || undefined;
-    response.cookies.delete({ name: TOKENS.REFRESH_TOKEN, path: "/" });
-    response.cookies.delete({ name: TOKENS.ACCESS_TOKEN, path: "/" });
-    if (domain) {
-        response.cookies.delete({ name: TOKENS.REFRESH_TOKEN, path: "/", domain });
-        response.cookies.delete({ name: TOKENS.ACCESS_TOKEN, path: "/", domain });
-    }
-}
-export const proxy: NextProxy = async (request) => {
-    const { pathname } = request.nextUrl;
-    const refreshToken = request.cookies.get(TOKENS.REFRESH_TOKEN)?.value;
-    const accessToken = request.cookies.get(TOKENS.ACCESS_TOKEN)?.value;
-    const isRscPrefetch =
-        request.headers.get("next-router-prefetch") === "1" ||
-        request.headers.get("purpose") === "prefetch";
-    let refreshed: NonNullable<RefreshResult> | null = null;
-    if (refreshToken && isExpired(accessToken) && !isRscPrefetch) {
-        const result = await refresh(refreshToken);
-        if (result) {
-            refreshed = result;
-        } else {
-            if (PROTECTED_ROUTES.includes(pathname) && !accessToken) {
-                return NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url));
+
+            if (!res.ok) {
+                const response = NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url))
+                response.cookies.delete(TOKENS.ACCESS_TOKEN)
+                return response
             }
-            return NextResponse.next();
+
+            const data = (await res.json()) as { accessToken: string };
+            const response = authRoutesProtection(request, true)
+            response.cookies.set(TOKENS.ACCESS_TOKEN, data.accessToken)
+
+            return response
+
+        } catch {
+            const response = NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url))
+            response.cookies.delete(TOKENS.ACCESS_TOKEN)
+            return response
         }
     }
-    const hasRefresh = refreshed ? true : Boolean(refreshToken);
-    const hasAccess = refreshed ? true : !!accessToken;
-    if (PROTECTED_ROUTES.includes(pathname) && !(hasAccess || hasRefresh)) {
+
+    if (PROTECTED_ROUTES.includes(pathname) && !hasAccess) {
         const url = request.nextUrl.clone();
         url.pathname = PROTECTED_REDIRECT_ROUTE;
-        const response = NextResponse.redirect(url);
-        clearAuthCookies(response);
-        return response;
+        return NextResponse.redirect(url);
     }
-    if (AUTH_ROUTES.includes(pathname) && (hasAccess || hasRefresh)) {
-        const url = request.nextUrl.clone();
-        url.pathname = AUTH_REDIRECT_ROUTE;
-        const response = NextResponse.redirect(url);
-        if (refreshed) {
-            applyRefreshedCookies(response, request, refreshed.accessToken, refreshed.setCookies);
-        }
-        return response;
-    }
-    const response = NextResponse.next({ request });
-    if (refreshed) {
-        applyRefreshedCookies(response, request, refreshed.accessToken, refreshed.setCookies);
-    }
-    return response;
+
+    return authRoutesProtection(request, hasAccess)
 };
+
 export const config = {
     matcher: ["/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)"],
 };

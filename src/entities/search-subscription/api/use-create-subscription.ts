@@ -4,6 +4,7 @@ import { useSWRConfig } from 'swr'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { MUTATIONS } from '@/shared/const/mutations'
+import { authKey } from '@/entities/me/api/auth-query'
 import { subscriptionsKey } from './subscription-keys'
 import { toBackendFilters } from '../_helpers/filters-bridge'
 import type { CreateSubscriptionDtoType, SearchSubscriptionType } from './subscription-types'
@@ -24,6 +25,7 @@ export function useCreateSubscription() {
                         current ? [created, ...current] : [created],
                     { revalidate: true },
                 )
+                mutate(authKey)
             },
         },
     )

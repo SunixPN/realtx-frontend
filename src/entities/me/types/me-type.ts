@@ -27,4 +27,6 @@ export type AuthUserType = {
     createdAt: string;
     updatedAt: string;
     lastLoginAt: string | null;
+    favoritesCount: number;
+    subscriptionsFreshCount: number;
 }

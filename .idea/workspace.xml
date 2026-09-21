@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="11a43f35-ec77-4978-a0c6-3ea470ddf8ba" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/claudeCodeTabState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/claudeCodeTabState.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/favorites/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/favorites/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/subscriptions/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/subscriptions/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/favorite/api/use-favorites.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/favorite/api/use-favorites.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/search-subscription/api/use-subscriptions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/search-subscription/api/use-subscriptions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/favorites-feature/_ui/favorites-grid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/favorites-feature/_ui/favorites-grid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/widgets/favorites-widget/favorites-widget.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/favorites-widget/favorites-widget.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/widgets/subscriptions-widget/subscriptions-widget.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/subscriptions-widget/subscriptions-widget.tsx" afterDir="false" />
-    </list>
+    <list default="true" id="11a43f35-ec77-4978-a0c6-3ea470ddf8ba" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -93,7 +83,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1789933356500</updated>
-      <workItem from="1789933358167" duration="18430000" />
+      <workItem from="1789933358167" duration="18903000" />
     </task>
     <servers />
   </component>

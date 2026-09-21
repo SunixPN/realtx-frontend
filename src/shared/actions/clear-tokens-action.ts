@@ -23,5 +23,4 @@ export async function clearTokensAction() {
     const store = await cookies()
     const domain = env.COOKIE_DOMAIN || undefined
     expire(store, TOKENS.ACCESS_TOKEN, domain)
-    expire(store, TOKENS.REFRESH_TOKEN, domain)
 }
