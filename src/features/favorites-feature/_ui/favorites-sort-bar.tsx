@@ -1,15 +1,12 @@
 'use client'
-
 import { ArrowDownAZ, Clock, TrendingDown } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/shared/helpers/cn'
 import type { FavoriteSort } from '@/entities/favorite'
-
 type FavoritesSortBarProps = {
     value: FavoriteSort
     onChange: (sort: FavoriteSort) => void
 }
-
 export function FavoritesSortBar({ value, onChange }: FavoritesSortBarProps) {
     const t = useTranslations('favorites')
     const OPTIONS: { key: FavoriteSort; label: string; icon: React.ReactNode }[] = [

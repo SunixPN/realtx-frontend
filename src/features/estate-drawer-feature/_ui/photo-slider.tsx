@@ -1,25 +1,18 @@
 'use client'
-
 import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, ImageOff } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { getMainPhoto, getThumbPhoto } from '@/entities/estate'
-
 type Props = {
     photos: string[]
     loading?: boolean
 }
-
 export function PhotoSlider({ photos, loading }: Props) {
     const t = useTranslations('estate')
     const [idx, setIdx] = useState(0)
     const thumbsRef = useRef<HTMLDivElement>(null)
     const count = photos.length
-
-    // Сбрасываем индекс при смене объекта
     useEffect(() => { setIdx(0) }, [photos])
-
-    // Скроллим превью к активному
     useEffect(() => {
         const container = thumbsRef.current
         if (!container) return
@@ -27,8 +20,6 @@ export function PhotoSlider({ photos, loading }: Props) {
         if (!thumb) return
         thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
     }, [idx])
-
-    // Прелоадим соседние кадры в браузерный кэш — без прогрева переключение подлагивает
     useEffect(() => {
         if (count < 2) return
         const neighbors = [(idx + 1) % count, (idx - 1 + count) % count]
@@ -37,16 +28,13 @@ export function PhotoSlider({ photos, loading }: Props) {
             img.src = getMainPhoto(photos[i])
         }
     }, [idx, photos, count])
-
     const prev = () => setIdx((i) => (i - 1 + count) % count)
     const next = () => setIdx((i) => (i + 1) % count)
-
     if (loading) {
         return (
             <div className="relative aspect-[4/3] animate-pulse bg-[var(--surface-muted)]" />
         )
     }
-
     if (count === 0) {
         return (
             <div className="relative aspect-[4/3] bg-[var(--surface-muted)]">
@@ -57,25 +45,22 @@ export function PhotoSlider({ photos, loading }: Props) {
             </div>
         )
     }
-
     return (
         <div>
-            {/* Главное фото */}
+            {}
             <div className="relative aspect-[4/3] overflow-hidden bg-[var(--surface-muted)]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {}
                 <img
                     src={getMainPhoto(photos[idx])}
                     alt=""
                     decoding="async"
                     className="size-full object-cover"
                 />
-
-                {/* Счётчик */}
+                {}
                 <div className="absolute bottom-2 right-2 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white tabular-nums">
                     {idx + 1} / {count}
                 </div>
-
-                {/* Стрелки — только если фото больше одного */}
+                {}
                 {count > 1 && (
                     <>
                         <button
@@ -97,8 +82,7 @@ export function PhotoSlider({ photos, loading }: Props) {
                     </>
                 )}
             </div>
-
-            {/* Превью — горизонтальный скролл */}
+            {}
             {count > 1 && (
                 <div
                     ref={thumbsRef}
@@ -114,7 +98,7 @@ export function PhotoSlider({ photos, loading }: Props) {
                             className="relative shrink-0 overflow-hidden rounded-sm transition"
                             style={{ width: 64, aspectRatio: '4/3' }}
                         >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            {}
                             <img
                                 src={getThumbPhoto(src)}
                                 alt=""
@@ -122,7 +106,7 @@ export function PhotoSlider({ photos, loading }: Props) {
                                 decoding="async"
                                 className="size-full object-cover"
                             />
-                            {/* Активный — бренд-рамка */}
+                            {}
                             <span
                                 className="absolute inset-0 rounded-sm border-2 transition"
                                 style={{

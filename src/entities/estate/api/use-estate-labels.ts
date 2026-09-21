@@ -1,13 +1,10 @@
 'use client'
-
 import { useTranslations } from 'next-intl'
 import { MINSK_DISTRICTS } from './estate-types'
-
 const MINSK_DISTRICT_KEYS = [
     'central', 'sovetsky', 'pervomaysky', 'partizansky',
     'zavodskoy', 'leninsky', 'moskovsky', 'oktyabrsky', 'frunzensky',
 ] as const
-
 export function useWallMaterialLabels(): Record<number, string> {
     const t = useTranslations('estate')
     return {
@@ -19,7 +16,6 @@ export function useWallMaterialLabels(): Record<number, string> {
         6: t('wall_aerated'),
     }
 }
-
 export function useRepairStateLabels(): Record<number, string> {
     const t = useTranslations('estate')
     return {
@@ -31,7 +27,6 @@ export function useRepairStateLabels(): Record<number, string> {
         6: t('repair_designer'),
     }
 }
-
 export function useMetroTimeOptions(): Array<{ value: string; label: string }> {
     const t = useTranslations('estate')
     return [
@@ -42,7 +37,6 @@ export function useMetroTimeOptions(): Array<{ value: string; label: string }> {
         { value: '30', label: t('metro_up_to', { n: 30 }) },
     ]
 }
-
 export function useMinskDistrictOptions(): Array<{ value: string; label: string }> {
     const t = useTranslations('estate')
     return MINSK_DISTRICTS.map((value, i) => ({
@@ -50,13 +44,11 @@ export function useMinskDistrictOptions(): Array<{ value: string; label: string 
         label: t(`district_${MINSK_DISTRICT_KEYS[i]}`),
     }))
 }
-
 export function useDistrictLabel(): (districtName: string) => string {
     const options = useMinskDistrictOptions()
     const map = new Map(options.map((o) => [o.value, o.label]))
     return (name) => map.get(name) ?? name
 }
-
 export function useFormatRooms(): (rooms: number | null) => string {
     const t = useTranslations('estate')
     return (rooms) => {
@@ -65,11 +57,9 @@ export function useFormatRooms(): (rooms: number | null) => string {
         return t('rooms_n', { count: rooms })
     }
 }
-
 export function useAreaUnit(): string {
     return useTranslations('estate')('area_unit')
 }
-
 export function useFormatArea(): (v: number | null) => string {
     const unit = useAreaUnit()
     return (v) => (v == null ? '—' : `${v} ${unit}`)

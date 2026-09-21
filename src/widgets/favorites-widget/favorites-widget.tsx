@@ -1,5 +1,4 @@
 'use client'
-
 import { useLayoutEffect } from 'react'
 import { unstable_serialize, useSWRConfig } from 'swr'
 import { favoriteIdsKey, favoritesKey, useFavorites } from '@/entities/favorite'
@@ -13,19 +12,11 @@ import {
     useFavoritesSelection,
 } from '@/features/favorites-feature'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
-
 export function FavoritesWidget() {
     const { currency } = useDisplayCurrency()
     const { sort, setSort } = useFavoritesSort()
     const { selected, toggle, clear } = useFavoritesSelection()
     const { fallback, mutate } = useSWRConfig()
-
-    // SWRConfig.fallback применяется только к ПУСТЫМ кэшам. Если юзер уже
-    // заходил на /favorites, а потом изменил избранное на карте/деталке,
-    // клиентский кэш может содержать устаревший список. Первый рендер тогда
-    // показывает stale-данные из кэша, пока фоновый revalidate не пришёл.
-    // На монтировании форсированно перезаписываем кэш свежими SSR-данными
-    // из fallback, чтобы такого «мигания» не было.
     useLayoutEffect(() => {
         const favKey = favoritesKey(sort, currency)
         const idsKey = favoriteIdsKey()
@@ -37,24 +28,17 @@ export function FavoritesWidget() {
         if (fallback[idsSerialized] !== undefined) {
             mutate(idsKey, fallback[idsSerialized], { revalidate: false })
         }
-        // Один раз на маунт — свежее SSR-состояние.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
     const { data: items = [], isLoading } = useFavorites(sort, currency)
-
-
     return (
         <div className="mx-auto flex w-full max-w-[1520px] flex-col gap-6 px-6 py-6">
             <header className="flex items-end justify-between gap-6 border-b border-border pb-5">
                 <FavoritesHeader items={items} />
                 <FavoritesSortBar value={sort} onChange={setSort} />
             </header>
-
             {selected.size > 0 && !isLoading && (
                 <SelectionBar selected={selected} onClear={clear} />
             )}
-
             {items.length === 0 ? (
                 <FavoritesEmpty />
             ) : (

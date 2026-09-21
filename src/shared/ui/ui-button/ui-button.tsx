@@ -1,8 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
-
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize    = 'sm' | 'md' | 'lg';
-
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?:  ButtonVariant;
     size?:     ButtonSize;
@@ -11,13 +9,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     iconRight?: ReactNode;
     fullWidth?: boolean;
 }
-
 const base =
     'inline-flex items-center justify-center gap-2 font-medium rounded-sm ' +
     'transition-all duration-150 cursor-pointer select-none ' +
     'disabled:opacity-50 disabled:pointer-events-none ' +
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
-
 const variants: Record<ButtonVariant, string> = {
     primary:
         'bg-brand text-white hover:bg-brand-hover active:scale-[0.98]',
@@ -30,13 +26,11 @@ const variants: Record<ButtonVariant, string> = {
     danger:
         'bg-error text-white hover:opacity-90 active:scale-[0.98]',
 };
-
 const sizes: Record<ButtonSize, string> = {
     sm: 'h-8  px-3 text-sm   gap-1.5',
     md: 'h-10 px-4 text-sm',
     lg: 'h-12 px-6 text-base gap-2.5',
 };
-
 export const UIButton = forwardRef<HTMLButtonElement, ButtonProps>(
     (
         {
@@ -54,7 +48,6 @@ export const UIButton = forwardRef<HTMLButtonElement, ButtonProps>(
         ref,
     ) => {
         const isDisabled = disabled || loading;
-
         return (
             <button
                 ref={ref}
@@ -75,9 +68,7 @@ export const UIButton = forwardRef<HTMLButtonElement, ButtonProps>(
                 ) : (
                     iconLeft && <span className="shrink-0">{iconLeft}</span>
                 )}
-
                 {children && <span>{children}</span>}
-
                 {!loading && iconRight && (
                     <span className="shrink-0">{iconRight}</span>
                 )}
@@ -85,9 +76,7 @@ export const UIButton = forwardRef<HTMLButtonElement, ButtonProps>(
         );
     },
 );
-
 UIButton.displayName = 'Button';
-
 function Spinner({ size }: { size: ButtonSize }) {
     const sz = size === 'sm' ? 14 : size === 'lg' ? 20 : 16;
     return (

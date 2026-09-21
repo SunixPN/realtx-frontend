@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -10,19 +9,15 @@ import { useResetVerify } from '@/features/reset-confirm-feature/_api/reset-veri
 import ResetConfirmForm from '@/features/reset-confirm-feature/_ui/reset-confirm-form/reset-confirm-form';
 import ResetSuccessView from '@/features/reset-confirm-feature/_ui/reset-success-view/reset-success-view';
 import { UIAuthShell } from '@/shared/ui/ui-auth-shell';
-
 export default function ResetConfirmFeature() {
     const t = useTranslations('auth.reset_confirm');
     const searchParams = useSearchParams();
     const token = searchParams.get('token') ?? '';
     const [isDone, setIsDone] = useState(false);
-
     const { isLoading, error } = useResetVerify(token);
     const isError = !!error;
-
     const renderContent = () => {
         if (isDone) return <ResetSuccessView />;
-
         if (!token || isError) {
             return (
                 <UIExpiredLink
@@ -33,7 +28,6 @@ export default function ResetConfirmFeature() {
                 />
             );
         }
-
         if (isLoading) {
             return (
                 <UILinkChecker
@@ -43,9 +37,7 @@ export default function ResetConfirmFeature() {
                 />
             );
         }
-
         return <ResetConfirmForm token={token} onSuccess={() => setIsDone(true)} />;
     };
-
     return <UIAuthShell>{renderContent()}</UIAuthShell>;
 }

@@ -2,37 +2,27 @@ export type EstateMapPointType = {
     id: number
     lat: number
     lng: number
-    /** Цена в выбранной валюте отображения (см. displayCurrency в запросе). */
     price: number | null
-    /** Совпадает с displayCurrency; оставлено для унифицированного рендера. */
     priceCurrency: number | null
-    /** Оригинальная цена и её валюта из источника — для «оригинал: X BYN» в карточке. */
     originalPrice: number | null
     originalCurrency: number | null
     rooms: number | null
 }
-
 export type PriceHistoryPoint = {
     date: string
     usd: number | null
     byn: number | null
     eur: number | null
 }
-
 export type PriceChange = {
     deltaUsd: number | null
     deltaByn: number | null
     deltaEur: number | null
-    /** % изменения в каждой валюте (один знак после запятой). Считаются
-     * независимо, потому что курс между валютами двигается — та же +153 Br
-     * в USD может выйти в 0.0%, а в BYN — в 0.1%. */
     deltaPctUsd: number | null
     deltaPctByn: number | null
     deltaPctEur: number | null
-    /** Сколько раз цена менялась с момента публикации */
     changes: number
 }
-
 export type EstateType = {
     id: number
     isFavorite: boolean
@@ -72,8 +62,6 @@ export type EstateType = {
     createdAt: string
     updatedAt: string
 }
-
-/** Ответ /estate/house — облегчённая карточка для списка «квартиры в этом доме». */
 export type EstateShortType = {
     id: number
     isFavorite: boolean
@@ -92,11 +80,9 @@ export type EstateShortType = {
     photo: string | null
     sellerType: number | null
 }
-
 export type HouseEstatesResponseType = {
     items: EstateShortType[]
 }
-
 export type DistrictProfitabilityType = {
     district: string
     score: number
@@ -105,13 +91,11 @@ export type DistrictProfitabilityType = {
     matchCount: number
     mode: 'filters' | 'price'
 }
-
 export type DistrictFeatureProperties = {
     name: string
     fallback?: boolean
     centroid: { lng: number; lat: number }
 }
-
 export type DistrictGeoJSONType = {
     type: 'FeatureCollection'
     features: Array<{
@@ -123,7 +107,6 @@ export type DistrictGeoJSONType = {
         }
     }>
 }
-
 export type EstateSearchResponseType = {
     total: number
     page: number
@@ -131,13 +114,11 @@ export type EstateSearchResponseType = {
     estates: EstateType[]
 }
 
-// Числовые коды из realt.by — уточнить у парсера при необходимости
 export const PRICE_CURRENCY_LABELS: Record<number, string> = {
     840: '$',
     933: 'Br',
     978: '€',
 }
-
 export const WALL_MATERIAL_LABELS: Record<number, string> = {
     1: 'Панельный',
     2: 'Кирпичный',
@@ -146,7 +127,6 @@ export const WALL_MATERIAL_LABELS: Record<number, string> = {
     5: 'Деревянный',
     6: 'Газосиликатный',
 }
-
 export const REPAIR_STATE_LABELS: Record<number, string> = {
     1: 'Без ремонта',
     2: 'Требует ремонта',
@@ -155,7 +135,6 @@ export const REPAIR_STATE_LABELS: Record<number, string> = {
     5: 'Евроремонт',
     6: 'Дизайнерский',
 }
-
 export const MINSK_DISTRICTS = [
     'Центральный',
     'Советский',
@@ -167,7 +146,6 @@ export const MINSK_DISTRICTS = [
     'Октябрьский',
     'Фрунзенский',
 ] as const
-
 export const METRO_TIME_OPTIONS = [
     { value: '5',  label: 'до 5 мин' },
     { value: '10', label: 'до 10 мин' },

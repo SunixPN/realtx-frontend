@@ -1,15 +1,11 @@
 'use client'
-
 import type { ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
-
 export const DRAWER_WIDTH_PX = 480
-
 type Props = {
     open: boolean
     children: ReactNode
 }
-
 export function DrawerShell({ open, children }: Props) {
     const t = useTranslations('estate')
     return (

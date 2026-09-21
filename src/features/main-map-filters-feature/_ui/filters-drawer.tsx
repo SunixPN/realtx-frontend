@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useRef } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import { X } from 'lucide-react'
@@ -19,10 +18,8 @@ import {
     type MapFiltersType,
 } from '@/entities/estate'
 import type { DisplayCurrency } from '../_hooks/use-display-currency'
-
 const ROOM_OPTIONS = [1, 2, 3, 4, 5] as const
 const DURATION = 320
-
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-4 border-b border-border px-5 py-5">
@@ -31,7 +28,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
         </section>
     )
 }
-
 type FiltersDrawerProps = {
     isOpen: boolean
     filters: MapFiltersType
@@ -44,15 +40,12 @@ type FiltersDrawerProps = {
     applyLabel?: React.ReactNode
     zIndexOffset?: number
 }
-
 const CURRENCY_ORDER: DisplayCurrency[] = ['USD', 'BYN', 'EUR']
-
 function currencySymbol(c: DisplayCurrency) {
     if (c === 'USD') return '$'
     if (c === 'EUR') return '€'
     return <BynSign />
 }
-
 export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, total, currency, onCurrencyChange, applyLabel, zIndexOffset = 0 }: FiltersDrawerProps) {
     const t = useTranslations('filters')
     const tCommon = useTranslations('common')
@@ -60,30 +53,25 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
     const repairLabels = useRepairStateLabels()
     const metroTimeOptions = useMetroTimeOptions()
     const districtOptions = useMinskDistrictOptions()
-
     const wallMaterialOptions = Object.entries(wallLabels).map(([v, l]) => ({ value: v, label: l }))
     const repairStateOptions = Object.entries(repairLabels).map(([v, l]) => ({ value: v, label: l }))
-
     const backdropZ = 40 + zIndexOffset
     const panelZ = 50 + zIndexOffset
     const nested = zIndexOffset > 0
     const positionClass = nested ? 'fixed' : 'absolute'
     const backdropRef = useRef<HTMLDivElement>(null)
     const panelRef = useRef<HTMLElement>(null)
-
     useEffect(() => {
         if (!isOpen) return
         const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
         window.addEventListener('keydown', handler)
         return () => window.removeEventListener('keydown', handler)
     }, [isOpen, onClose])
-
     useEffect(() => {
         if (nested) return
         document.body.style.overflow = isOpen ? 'hidden' : ''
         return () => { document.body.style.overflow = '' }
     }, [isOpen, nested])
-
     return (
         <>
             <CSSTransition
@@ -100,7 +88,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                     className={cn(positionClass, 'inset-0 bg-black/40 backdrop-blur-[2px]')}
                 />
             </CSSTransition>
-
             <CSSTransition
                 nodeRef={panelRef}
                 in={isOpen}
@@ -130,7 +117,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                             <X className="size-5" />
                         </button>
                     </div>
-
                     <div className="flex-1 overflow-y-auto">
                         <Section title={t('section_price')}>
                             <div className="flex gap-2">
@@ -160,7 +146,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                                 debounceMs={400}
                             />
                         </Section>
-
                         <Section title={t('section_rooms')}>
                             <div className="flex gap-2">
                                 {ROOM_OPTIONS.map(r => {
@@ -187,7 +172,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                                 })}
                             </div>
                         </Section>
-
                         <Section title={t('section_area_storey')}>
                             <UIRangeField
                                 label={t('area_total_label')}
@@ -211,7 +195,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                                 onChange={e => onChange(f => ({ ...f, notFirstOrLast: e.target.checked || undefined }))}
                             />
                         </Section>
-
                         <Section title={t('section_building')}>
                             <UIRangeField
                                 label={t('year_label')}
@@ -240,7 +223,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                                 clearable
                             />
                         </Section>
-
                         <Section title={t('section_seller_metro')}>
                             <div className="flex items-center justify-between">
                                 <div>
@@ -261,7 +243,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                                 clearable
                             />
                         </Section>
-
                         <Section title={t('section_district')}>
                             <div className="grid grid-cols-2 gap-2">
                                 {districtOptions.map(({ value, label }) => (
@@ -283,7 +264,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                             </div>
                         </Section>
                     </div>
-
                     <div className="flex shrink-0 items-center justify-between gap-3 border-t border-border bg-surface-page px-5 py-4">
                         <button
                             type="button"

@@ -1,15 +1,11 @@
 'use client'
-
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { createElement } from 'react'
 import type { HouseBbox } from '@/entities/estate'
 
-// Стэк view'ов в drawer: last-in — то, что видно. push от карты, pop из
-// «назад» в деталке. Ограничиваем максимум 2 уровня (house → estate).
 export type DrawerView =
     | { kind: 'estate'; id: number; center: [number, number] }
     | { kind: 'house'; bbox: HouseBbox; center: [number, number] }
-
 type Ctx = {
     stack: DrawerView[]
     top: DrawerView | null
@@ -19,32 +15,23 @@ type Ctx = {
     back: () => void
     close: () => void
 }
-
 const EstateSelectionContext = createContext<Ctx | null>(null)
-
 export function EstateSelectionProvider({ children }: { children: ReactNode }) {
     const [stack, setStack] = useState<DrawerView[]>([])
-
     const openEstate = useCallback((id: number, center: [number, number]) => {
         setStack((s) => {
-            // Если открываем ту же деталку — не плодим дубли.
             const t = s[s.length - 1]
             if (t?.kind === 'estate' && t.id === id) return s
             return [...s, { kind: 'estate', id, center }]
         })
     }, [])
-
     const openHouse = useCallback((bbox: HouseBbox, center: [number, number]) => {
-        // House всегда открывается как корневой view: закрываем предыдущее.
         setStack([{ kind: 'house', bbox, center }])
     }, [])
-
     const back = useCallback(() => {
         setStack((s) => (s.length > 1 ? s.slice(0, -1) : []))
     }, [])
-
     const close = useCallback(() => setStack([]), [])
-
     const value = useMemo<Ctx>(() => ({
         stack,
         top: stack[stack.length - 1] ?? null,
@@ -54,10 +41,8 @@ export function EstateSelectionProvider({ children }: { children: ReactNode }) {
         back,
         close,
     }), [stack, openEstate, openHouse, back, close])
-
     return createElement(EstateSelectionContext.Provider, { value }, children)
 }
-
 export function useEstateSelection() {
     const ctx = useContext(EstateSelectionContext)
     if (!ctx) throw new Error('useEstateSelection must be used inside EstateSelectionProvider')

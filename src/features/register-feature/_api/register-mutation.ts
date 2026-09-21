@@ -1,5 +1,4 @@
 'use client'
-
 import useSWRMutation from 'swr/mutation'
 import { useSWRConfig } from 'swr'
 import { useTranslations } from 'next-intl'
@@ -10,13 +9,11 @@ import { AuthResponseType } from '@/entities/me/types/me-type'
 import { showToast } from '@/shared/helpers/show-toast'
 import { authKey } from '@/entities/me/api/auth-query'
 import { saveAccessTokenAction } from '@/shared/actions/save-access-token-action'
-
 type Body = {
     name?: string
     email: string
     password: string
 }
-
 export function useRegisterMutation() {
     const { mutate } = useSWRConfig()
     const t = useTranslations('auth.register')

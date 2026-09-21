@@ -1,20 +1,16 @@
 'use client'
-
 import { Heart } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { FavoriteItemType } from '@/entities/favorite'
-
 type FavoritesHeaderProps = {
     items: FavoriteItemType[]
 }
-
 export function FavoritesHeader({ items }: FavoritesHeaderProps) {
     const t = useTranslations('favorites')
     const count = items.length
     const drops = items.filter(i => i.priceDeltaUsd !== null && i.priceDeltaUsd < 0).length
     const rises = items.filter(i => i.priceDeltaUsd !== null && i.priceDeltaUsd > 0).length
     const removed = items.filter(i => !i.isActive).length
-
     return (
         <div>
             <div className="text-sm text-text-muted">{t('subtitle')}</div>

@@ -1,11 +1,9 @@
 'use client';
-
 import { useEffect, useRef, useTransition } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { CSSTransition } from 'react-transition-group';
 import { useLocale, useTranslations } from 'next-intl';
-
 import { cn } from '@/shared/helpers/cn';
 import { ROUTES } from '@/shared/const/routes';
 import {
@@ -27,9 +25,7 @@ import { setLocale } from '@/shared/i18n/actions';
 import { beginTopLoader, endTopLoader } from '@/shared/ui/top-loader/top-loader';
 import type { AuthUserType } from '@/entities/me/types/me-type';
 import { useLogout } from '@/features/logout-feature/_hooks/use-logout';
-
 const DURATION = 320;
-
 type MobileMenuProps = {
     isOpen: boolean;
     onClose: () => void;
@@ -37,7 +33,6 @@ type MobileMenuProps = {
     favCount: number;
     freshCount: number;
 };
-
 function getInitials(user: AuthUserType): string {
     const source = user.name ?? user.email ?? '?';
     return (
@@ -49,7 +44,6 @@ function getInitials(user: AuthUserType): string {
             .join('') || '?'
     );
 }
-
 export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: MobileMenuProps) {
     const t = useTranslations('header');
     const tUserMenu = useTranslations('user_menu');
@@ -57,10 +51,8 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
     const currentLocale = useLocale() as Locale;
     const [isPending, startTransition] = useTransition();
     const { logout, isPending: isLoggingOut } = useLogout();
-
     const backdropRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLElement>(null);
-
     useEffect(() => {
         if (!isOpen) return;
         const handler = (e: KeyboardEvent) => {
@@ -69,7 +61,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
     }, [isOpen, onClose]);
-
     useEffect(() => {
         if (typeof document === 'undefined') return;
         document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -77,7 +68,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
             document.body.style.overflow = '';
         };
     }, [isOpen]);
-
     function pickLocale(locale: Locale) {
         if (locale === currentLocale) {
             onClose();
@@ -93,15 +83,12 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
             }
         });
     }
-
     const THEMES: { key: Theme; label: string; icon: React.ReactNode }[] = [
         { key: 'light', label: t('menu_theme_light'), icon: <IconMoon size={18} /> },
         { key: 'dark', label: t('menu_theme_dark'), icon: <IconSun size={18} /> },
         { key: 'system', label: t('menu_theme_system'), icon: <IconMonitor size={18} /> },
     ];
-
     if (typeof document === 'undefined') return null;
-
     const content = (
         <>
             <CSSTransition
@@ -117,7 +104,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                     className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
                 />
             </CSSTransition>
-
             <CSSTransition
                 nodeRef={panelRef}
                 in={isOpen}
@@ -145,7 +131,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                             <IconX size={20} />
                         </button>
                     </div>
-
                     <div className="flex-1 overflow-y-auto">
                         {user && (
                             <div className="flex items-center gap-3 border-b border-border p-4">
@@ -164,7 +149,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                                 </div>
                             </div>
                         )}
-
                         {user && (
                             <nav className="flex flex-col border-b border-border py-2">
                                 <MenuLink
@@ -199,7 +183,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                                 />
                             </nav>
                         )}
-
                         <section className="border-b border-border px-4 py-4">
                             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-text-faint">
                                 {t('menu_theme')}
@@ -228,7 +211,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                                 })}
                             </div>
                         </section>
-
                         <section className="border-b border-border px-4 py-4">
                             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-text-faint">
                                 {t('menu_language')}
@@ -257,7 +239,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                                 })}
                             </div>
                         </section>
-
                         {!user && (
                             <div className="p-4">
                                 <Link
@@ -269,7 +250,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                                 </Link>
                             </div>
                         )}
-
                         {user && (
                             <div className="p-4">
                                 <button
@@ -295,10 +275,8 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
             </CSSTransition>
         </>
     );
-
     return createPortal(content, document.body);
 }
-
 type MenuLinkProps = {
     href: string;
     icon: React.ReactNode;
@@ -306,7 +284,6 @@ type MenuLinkProps = {
     badge?: number;
     onClose: () => void;
 };
-
 function MenuLink({ href, icon, label, badge, onClose }: MenuLinkProps) {
     return (
         <Link
@@ -324,13 +301,11 @@ function MenuLink({ href, icon, label, badge, onClose }: MenuLinkProps) {
         </Link>
     );
 }
-
 type MenuButtonProps = {
     icon: React.ReactNode;
     label: string;
     onClick: () => void;
 };
-
 function MenuButton({ icon, label, onClick }: MenuButtonProps) {
     return (
         <button

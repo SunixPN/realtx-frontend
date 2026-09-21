@@ -1,10 +1,8 @@
 'use client'
-
 import { Heart } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { ROUTES } from '@/shared/const/routes'
-
 export function FavoritesEmpty() {
     const t = useTranslations('favorites')
     return (

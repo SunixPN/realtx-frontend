@@ -3,7 +3,6 @@ import { UIChip } from '@/shared/ui/ui-chip';
 import { UICheckbox } from '@/shared/ui/ui-checkbox';
 import { UIRangeField } from '@/shared/ui/ui-range-field';
 import { UIButton } from '@/shared/ui/ui-button';
-
 const meta = {
   title: 'UI/Chip',
   component: UIChip,
@@ -23,10 +22,8 @@ const meta = {
     ),
   ],
 } satisfies Meta<typeof UIChip>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 export const Empty: Story = {
   args: {
     label: 'Комнаты',
@@ -40,7 +37,6 @@ export const Empty: Story = {
     ),
   },
 };
-
 export const Filled: Story = {
   args: {
     label: 'Комнаты',
@@ -57,7 +53,6 @@ export const Filled: Story = {
     ),
   },
 };
-
 export const PriceRange: Story = {
   args: {
     label: 'Цена',
@@ -73,15 +68,12 @@ export const PriceRange: Story = {
     ),
   },
 };
-
 export const Disabled: Story = {
   args: { label: 'Недоступно', disabled: true },
 };
-
 export const NoDropdown: Story = {
   args: { label: 'Просто чип' },
 };
-
 export const FilterRow: Story = {
   render: () => (
     <div className="flex flex-wrap gap-2">
@@ -98,7 +90,6 @@ export const FilterRow: Story = {
           <UICheckbox label="4+" />
         </div>
       </UIChip>
-
       <UIChip label="Цена" popoverClassName="w-80">
         <div className="flex flex-col gap-3">
           <UIRangeField label="Цена, ₽" />
@@ -108,7 +99,6 @@ export const FilterRow: Story = {
           </div>
         </div>
       </UIChip>
-
       <UIChip label="Метро">
         <div className="flex flex-col gap-2">
           <UICheckbox label="Восток" />
@@ -117,11 +107,9 @@ export const FilterRow: Story = {
           <UICheckbox label="Малиновка" />
         </div>
       </UIChip>
-
       <UIChip label="Площадь" popoverClassName="w-80">
         <UIRangeField label="Площадь" unit="м²" />
       </UIChip>
-
       <UIChip label="Этаж">
         <UIRangeField label="Этаж" />
       </UIChip>

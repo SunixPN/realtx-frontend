@@ -1,5 +1,4 @@
 'use client'
-
 import useSWRMutation from 'swr/mutation'
 import { useSWRConfig } from 'swr'
 import { api } from '@/shared/api/api'
@@ -7,13 +6,11 @@ import { API_ROUTES } from '@/shared/const/api-routes'
 import { MUTATIONS } from '@/shared/const/mutations'
 import { subscriptionsKey } from './subscription-keys'
 import type { SearchSubscriptionType } from './subscription-types'
-
 export function useMarkSeenSubscription() {
     const { mutate } = useSWRConfig()
     return useSWRMutation<SearchSubscriptionType, Error, string, string>(
         MUTATIONS.MARK_SEEN_SUBSCRIPTION,
         async (_key, { arg: id }) => {
-            // Оптимистично обнуляем fresh — счётчик пропадёт сразу, до ответа.
             mutate(
                 subscriptionsKey(),
                 (current: SearchSubscriptionType[] | undefined) =>

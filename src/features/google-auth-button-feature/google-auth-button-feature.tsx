@@ -1,13 +1,10 @@
 'use client';
-
 import { useTranslations } from 'next-intl';
 import GoogleGlyph from '@/shared/icons/google-glyph-icon';
 import { useGoogleAuth } from '@/features/google-auth-button-feature/_hooks/use-google-auth';
-
 export default function GoogleAuthButtonFeature() {
     const t = useTranslations('auth');
     const { signInWithGoogle, isLoading } = useGoogleAuth();
-
     return (
         <button
             type="button"

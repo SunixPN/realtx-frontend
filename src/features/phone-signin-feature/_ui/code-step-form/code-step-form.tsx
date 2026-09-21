@@ -1,5 +1,4 @@
 'use client';
-
 import { Controller } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import type { RecaptchaVerifier } from 'firebase/auth';
@@ -7,12 +6,10 @@ import { UIButton } from '@/shared/ui/ui-button';
 import { useCodeStepForm } from '@/features/phone-signin-feature/_hooks/use-code-step-form';
 import { useResendCooldown } from '@/shared/hooks/use-resend-cooldown';
 import CodeBoxesInput from '@/features/phone-signin-feature/_ui/code-boxes-input/code-boxes-input';
-
 type CodeStepFormProps = {
     resetVerifier: () => RecaptchaVerifier | null;
     onChangeNumber: () => void;
 };
-
 export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStepFormProps) {
     const t = useTranslations('auth.phone');
     const cooldown = useResendCooldown(45);
@@ -20,9 +17,7 @@ export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStep
         resetVerifier,
         onResendDone: cooldown.restart,
     });
-
     const codeError = form.formState.errors.code?.message;
-
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
             <div className="flex flex-col gap-3">
@@ -43,11 +38,9 @@ export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStep
                 />
                 {codeError && <p className="text-center text-xs text-error">{codeError}</p>}
             </div>
-
             <UIButton type="submit" size="lg" fullWidth loading={isSubmitting}>
                 {t('submit')}
             </UIButton>
-
             <div className="flex flex-col items-center gap-2">
                 {cooldown.canResend ? (
                     <button

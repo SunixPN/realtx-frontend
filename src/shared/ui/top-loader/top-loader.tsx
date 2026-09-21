@@ -21,7 +21,6 @@ function emitNavDone()  { queueMicrotask(() => doneHandlers.forEach(h => h())) }
 // а к этому моменту RSC-fetch уже отработал — юзер успевает почувствовать
 // «залипание» без индикации. beginTopLoader стартует бар сразу,
 // NavWatcher закроет его при смене pathname.
-export function beginTopLoader() { emitNavStart() }
 export function endTopLoader()   { emitNavDone() }
 
 let navListenersInstalled = false

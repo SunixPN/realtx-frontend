@@ -1,11 +1,6 @@
 import { z } from 'zod';
-
 type T = (key: string) => string;
 
-/**
- * Правила пароля синхронизированы с RegisterDto/ResetDto на бэке:
- * 8–72 символа, обязательно строчная/заглавная/цифра/спецсимвол.
- */
 export const createPasswordSchema = (t: T) =>
     z
         .string()
@@ -16,7 +11,6 @@ export const createPasswordSchema = (t: T) =>
         .regex(/[A-Z]/, t('password_upper'))
         .regex(/[0-9]/, t('password_digit'))
         .regex(/[^a-zA-Z0-9]/, t('password_special'));
-
 export const createEmailSchema = (t: T) =>
     z
         .string()

@@ -1,18 +1,14 @@
 'use client';
-
 import { useTranslations } from 'next-intl';
 import { UIInput } from '@/shared/ui/ui-input';
 import { UIButton } from '@/shared/ui/ui-button';
 import { useResetRequestForm } from '@/features/reset-request-feature/_hooks/use-reset-request-form';
-
 type ResetRequestFormProps = {
     onSent: (email: string) => void;
 };
-
 export default function ResetRequestForm({ onSent }: ResetRequestFormProps) {
     const t = useTranslations('auth.reset_request');
     const { form, onSubmit, isSubmitting } = useResetRequestForm({ onSent });
-
     return (
         <div className="flex flex-col gap-5">
             <header>
@@ -21,7 +17,6 @@ export default function ResetRequestForm({ onSent }: ResetRequestFormProps) {
                     {t('subtitle')}
                 </p>
             </header>
-
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
                 <UIInput
                     label="Email"
@@ -31,12 +26,10 @@ export default function ResetRequestForm({ onSent }: ResetRequestFormProps) {
                     error={form.formState.errors.email?.message}
                     {...form.register('email')}
                 />
-
                 <UIButton type="submit" size="lg" fullWidth loading={isSubmitting}>
                     {t('submit')}
                 </UIButton>
             </form>
-
             <div className="rounded-md border border-border bg-surface-subtle p-3 text-xs leading-relaxed text-text-faint">
                 {t('help_prefix')}{' '}
                 <a href="mailto:help@realtx.local" className="font-medium text-brand hover:underline">

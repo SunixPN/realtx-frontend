@@ -13,5 +13,4 @@ export const QUERIES = {
     FAVORITE_IDS:            "favorite-ids",
     SUBSCRIPTIONS:           "subscriptions",
 } as const;
-
 export type QueryType = typeof QUERIES[keyof typeof QUERIES];

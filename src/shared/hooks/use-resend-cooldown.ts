@@ -1,10 +1,7 @@
 'use client';
-
 import { useEffect, useState } from 'react';
-
 export const useResendCooldown = (initialSec: number = 45) => {
     const [secondsLeft, setSecondsLeft] = useState(initialSec);
-
     useEffect(() => {
         if (secondsLeft <= 0) return;
         const id = setInterval(() => {
@@ -12,7 +9,6 @@ export const useResendCooldown = (initialSec: number = 45) => {
         }, 1000);
         return () => clearInterval(id);
     }, [secondsLeft]);
-
     return {
         secondsLeft,
         canResend: secondsLeft <= 0,

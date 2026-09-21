@@ -15,5 +15,4 @@ export const MUTATIONS = {
   PAUSE_SUBSCRIPTION:     'pause-subscription',
   MARK_SEEN_SUBSCRIPTION: 'mark-seen-subscription',
 } as const;
-
 export type MutationType = typeof MUTATIONS[keyof typeof MUTATIONS];

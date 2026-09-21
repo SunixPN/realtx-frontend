@@ -1,9 +1,7 @@
 'use client';
-
 import Link from "next/link";
 import { useTranslations } from 'next-intl';
 import {ROUTES} from "@/shared/const/routes";
-
 export default function SignInHeader() {
     const t = useTranslations('auth.sign_in');
     return (

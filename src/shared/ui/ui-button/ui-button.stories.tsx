@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { UIButton } from '@/shared/ui/ui-button';
-
 const meta = {
   title: 'UI/Button',
   component: UIButton,
@@ -32,48 +31,35 @@ const meta = {
     onClick: { action: 'clicked' },
   },
 } satisfies Meta<typeof UIButton>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-// ─── Варианты ─────────────────────────────────────────────────────
 
 export const Primary: Story = {
   args: { variant: 'primary' },
 };
-
 export const Secondary: Story = {
   args: { variant: 'secondary' },
 };
-
 export const Ghost: Story = {
   args: { variant: 'ghost' },
 };
-
 export const Danger: Story = {
   args: { variant: 'danger', children: 'Удалить' },
 };
 
-// ─── Размеры ──────────────────────────────────────────────────────
-
 export const Small: Story = {
   args: { size: 'sm', children: 'Маленькая' },
 };
-
 export const Large: Story = {
   args: { size: 'lg', children: 'Большая' },
 };
 
-// ─── Состояния ────────────────────────────────────────────────────
-
 export const Loading: Story = {
   args: { loading: true, children: 'Сохранение' },
 };
-
 export const Disabled: Story = {
   args: { disabled: true, children: 'Недоступна' },
 };
-
 export const FullWidth: Story = {
   args: { fullWidth: true, children: 'На всю ширину' },
   decorators: [
@@ -85,29 +71,22 @@ export const FullWidth: Story = {
   ],
 };
 
-// ─── С иконками ───────────────────────────────────────────────────
-
 const ArrowIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
-
 const PlusIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M12 5v14M5 12h14" strokeLinecap="round" />
   </svg>
 );
-
 export const WithIconLeft: Story = {
   args: { iconLeft: <PlusIcon />, children: 'Добавить' },
 };
-
 export const WithIconRight: Story = {
   args: { iconRight: <ArrowIcon />, children: 'Далее' },
 };
-
-// ─── Витрина всех вариантов ───────────────────────────────────────
 
 export const AllVariants: Story = {
   render: () => (

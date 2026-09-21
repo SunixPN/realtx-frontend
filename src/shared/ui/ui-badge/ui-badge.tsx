@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/helpers/cn';
-
 export type BadgeTone = 'neutral' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
-
 export interface BadgeProps {
   tone?:      BadgeTone;
   solid?:     boolean;
@@ -10,7 +8,6 @@ export interface BadgeProps {
   children:   ReactNode;
   className?: string;
 }
-
 const SUBTLE: Record<BadgeTone, string> = {
   neutral: 'bg-surface-subtle text-text-muted border-border',
   brand:   'bg-brand-bg text-brand border-brand/20',
@@ -19,7 +16,6 @@ const SUBTLE: Record<BadgeTone, string> = {
   danger:  'bg-error-bg text-error border-error/20',
   info:    'bg-info-bg text-info border-info/20',
 };
-
 const SOLID: Record<BadgeTone, string> = {
   neutral: 'bg-text-base/85 text-white border-transparent',
   brand:   'bg-brand text-white border-transparent',
@@ -28,7 +24,6 @@ const SOLID: Record<BadgeTone, string> = {
   danger:  'bg-error text-white border-transparent',
   info:    'bg-info text-white border-transparent',
 };
-
 export function UIBadge({
   tone = 'neutral',
   solid = false,

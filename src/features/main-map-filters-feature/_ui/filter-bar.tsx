@@ -1,5 +1,4 @@
 'use client'
-
 import { type ReactNode } from 'react'
 import { Bell, SlidersHorizontal } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -21,7 +20,6 @@ import {
 import type { DisplayCurrency } from '../_hooks/use-display-currency'
 import { useAuth } from "@/entities/me/api/auth-query";
 import { IconLoader } from "@/shared/ui/ui-icons";
-
 type FilterBarProps = {
     filters: MapFiltersType
     onChange: (updater: (prev: MapFiltersType) => MapFiltersType) => void
@@ -34,23 +32,18 @@ type FilterBarProps = {
     saved: boolean
     onSaveSearch: () => void
 }
-
 const CURRENCY_ORDER: DisplayCurrency[] = ['USD', 'BYN', 'EUR']
-
 function currencySymbol(c: DisplayCurrency): ReactNode {
     if (c === 'USD') return '$'
     if (c === 'EUR') return '€'
     return <BynSign />
 }
-
 const ROOM_OPTIONS = [1, 2, 3, 4, 5]
-
 export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, drawerOpen, total, currency, onCurrencyChange, saved, onSaveSearch }: FilterBarProps) {
     const t = useTranslations('filters')
     const { data, isLoading } = useAuth()
     const metroTimeOptions = useMetroTimeOptions()
     const districtOptions = useMinskDistrictOptions()
-
     const formatPriceLabel = (): ReactNode | undefined => {
         const sym = currencySymbol(currency)
         if (filters.priceMin && filters.priceMax) return <>{filters.priceMin.toLocaleString('ru-RU')} – {filters.priceMax.toLocaleString('ru-RU')} {sym}</>
@@ -58,33 +51,28 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
         if (filters.priceMax) return <>{t('price_to', { max: filters.priceMax.toLocaleString('ru-RU'), currency: '' })} {sym}</>
         return undefined
     }
-
     const formatRoomsLabel = (): string | undefined => {
         if (!filters.rooms?.length) return undefined
         return filters.rooms.map(r => r >= 5 ? '5+' : String(r)).join('–')
     }
-
     const formatAreaLabel = (): string | undefined => {
         if (filters.areaMin && filters.areaMax) return t('area_range', { min: filters.areaMin, max: filters.areaMax })
         if (filters.areaMin) return t('area_from', { min: filters.areaMin })
         if (filters.areaMax) return t('area_to', { max: filters.areaMax })
         return undefined
     }
-
     const extraCount = countActiveFilters(filters) -
         (formatPriceLabel() ? 1 : 0) -
         (formatRoomsLabel() ? 1 : 0) -
         (formatAreaLabel() ? 1 : 0) -
         (filters.districts?.length ? 1 : 0) -
         (filters.metroTimeMax ? 1 : 0)
-
     return (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface-page p-2 shadow-lg">
             <SearchSuggest
                 value={filters.q}
                 onChange={(next) => onChange(f => ({ ...f, q: next }))}
             />
-
             <UIChip
                 label={t('price')}
                 value={formatPriceLabel()}
@@ -117,7 +105,6 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                     />
                 </div>
             </UIChip>
-
             <UIChip
                 label={t('rooms')}
                 value={formatRoomsLabel()}
@@ -146,7 +133,6 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                     })}
                 </div>
             </UIChip>
-
             <UIChip
                 label={t('area')}
                 value={formatAreaLabel()}
@@ -163,7 +149,6 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                     />
                 </div>
             </UIChip>
-
             <UIChip
                 label={t('district')}
                 count={filters.districts?.length}
@@ -188,7 +173,6 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                     ))}
                 </div>
             </UIChip>
-
             <UIChip
                 label={t('metro')}
                 value={filters.metroTimeMax ? t('metro_chip_value', { min: filters.metroTimeMax }) : undefined}
@@ -203,7 +187,6 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                     />
                 </div>
             </UIChip>
-
             <button
                 type="button"
                 onClick={onOpenDrawer}
@@ -223,9 +206,7 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                     </span>
                 )}
             </button>
-
             <span className="mx-1 h-6 w-px bg-border" />
-
             <span className="px-1 text-sm font-medium text-text-base tabular-nums">
                 {t('results_count', { count: total })}
             </span>

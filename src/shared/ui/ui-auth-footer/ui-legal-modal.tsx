@@ -1,13 +1,10 @@
 'use client';
-
 import { forwardRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import type { TransitionStatus } from 'react-transition-group';
 import { useTranslations } from 'next-intl';
 import { IconX } from '@/shared/ui/ui-icons';
-
 export type LegalType = 'terms' | 'privacy';
-
 const BACKDROP_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     entering: { opacity: 0 },
     entered:  { opacity: 1 },
@@ -15,7 +12,6 @@ const BACKDROP_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     exited:   { opacity: 0 },
     unmounted: { opacity: 0 },
 };
-
 const CARD_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     entering: { opacity: 0, transform: 'scale(0.96) translateY(8px)' },
     entered:  { opacity: 1, transform: 'scale(1) translateY(0)' },
@@ -23,7 +19,6 @@ const CARD_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     exited:   { opacity: 0, transform: 'scale(0.96) translateY(8px)' },
     unmounted: { opacity: 0, transform: 'scale(0.96) translateY(8px)' },
 };
-
 function TermsBody() {
     const t = useTranslations('legal');
     return (
@@ -42,7 +37,6 @@ function TermsBody() {
         </div>
     );
 }
-
 function PrivacyBody() {
     const t = useTranslations('legal');
     return (
@@ -70,32 +64,26 @@ function PrivacyBody() {
         </div>
     );
 }
-
 type Props = {
     type: LegalType;
     state: TransitionStatus;
     onClose: () => void;
 };
-
 const UILegalModal = forwardRef<HTMLDivElement, Props>(function UILegalModal({ type, state, onClose }, ref) {
     const tFooter = useTranslations('auth.footer');
     const tCommon = useTranslations('common');
     const title = type === 'terms' ? tFooter('terms_title') : tFooter('privacy_title');
-
     useEffect(() => {
         const prev = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
         return () => { document.body.style.overflow = prev; };
     }, []);
-
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
         document.addEventListener('keydown', onKey);
         return () => document.removeEventListener('keydown', onKey);
     }, [onClose]);
-
     if (typeof document === 'undefined') return null;
-
     return createPortal(
         <div
             ref={ref}
@@ -109,7 +97,6 @@ const UILegalModal = forwardRef<HTMLDivElement, Props>(function UILegalModal({ t
                 className="absolute inset-0 bg-surface-overlay backdrop-blur-sm"
                 onClick={onClose}
             />
-
             <div
                 style={{
                     ...CARD_STYLE[state],
@@ -131,7 +118,6 @@ const UILegalModal = forwardRef<HTMLDivElement, Props>(function UILegalModal({ t
                         <IconX size={16} />
                     </button>
                 </div>
-
                 <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
                     {type === 'terms' ? <TermsBody /> : <PrivacyBody />}
                 </div>
@@ -140,5 +126,4 @@ const UILegalModal = forwardRef<HTMLDivElement, Props>(function UILegalModal({ t
         document.body,
     );
 });
-
 export default UILegalModal;

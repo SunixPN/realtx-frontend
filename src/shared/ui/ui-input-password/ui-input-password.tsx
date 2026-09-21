@@ -1,16 +1,12 @@
 "use client"
-
 import {ComponentProps, useState} from "react";
 import { useTranslations } from 'next-intl';
 import {UIInput} from "@/shared/ui/ui-input";
 import {IconEye, IconEyeOff} from "@/shared/ui/ui-icons";
-
 type UIInputPasswordProps = ComponentProps<typeof UIInput>
-
 export default function UIInputPassword(props: UIInputPasswordProps) {
     const t = useTranslations('common');
     const [showPassword, setShowPassword] = useState(false);
-
     return (
         <UIInput
             {...props}

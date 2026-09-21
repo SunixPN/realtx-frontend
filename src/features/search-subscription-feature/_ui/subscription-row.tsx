@@ -1,5 +1,4 @@
 'use client'
-
 import Link from 'next/link'
 import {
     Bell,
@@ -23,12 +22,10 @@ import { ROUTES } from '@/shared/const/routes'
 import { showToast } from '@/shared/helpers/show-toast'
 import { useFormatFrequency } from '../_helpers/format-frequency'
 import { useFormatLastCheck } from '../_helpers/format-last-check'
-
 type Props = {
     subscription: SearchSubscriptionType
     onEdit: (s: SearchSubscriptionType) => void
 }
-
 export function SubscriptionRow({ subscription: s, onEdit }: Props) {
     const t = useTranslations('subscriptions')
     const formatFrequency = useFormatFrequency()
@@ -36,7 +33,6 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
     const { trigger: togglePause, isMutating: isTogglingPause } = useTogglePauseSubscription()
     const { trigger: remove, isMutating: isRemoving } = useDeleteSubscription()
     const { trigger: markSeen } = useMarkSeenSubscription()
-
     const handlePauseToggle = async () => {
         try {
             await togglePause({ id: s.id, paused: !s.paused }, { throwOnError: true })
@@ -45,7 +41,6 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
             showToast({ status: 'error', text: t('toast_pause_error') })
         }
     }
-
     const handleDelete = async () => {
         try {
             await remove(s.id, { throwOnError: true })
@@ -54,14 +49,11 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
             showToast({ status: 'error', text: t('toast_delete_error') })
         }
     }
-
     const busy = isTogglingPause || isRemoving
-
     const searchHref = (() => {
         const qs = serializeFiltersToSearchParams(fromBackendFilters(s.filters)).toString()
         return qs ? `${ROUTES.ROOT}?${qs}` : ROUTES.ROOT
     })()
-
     return (
         <article
             className={cn(
@@ -107,7 +99,6 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
                         </div>
                     )}
                 </div>
-
                 <div className="flex shrink-0 items-center gap-1">
                     <IconButton label={t('row_edit_aria')} onClick={() => onEdit(s)}>
                         <Pencil className="size-4" />
@@ -124,7 +115,6 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
                     </IconButton>
                 </div>
             </div>
-
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-border pt-3 text-xs text-text-muted">
                 <span className="tabular-nums">{t('row_total', { count: s.total })}</span>
                 <span aria-hidden>·</span>
@@ -149,7 +139,6 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
         </article>
     )
 }
-
 function IconButton({
     label,
     children,

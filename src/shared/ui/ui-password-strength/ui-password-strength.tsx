@@ -1,29 +1,22 @@
 'use client';
-
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
-
 export type PasswordStrength = 'weak' | 'medium' | 'strong';
-
 interface UIPasswordStrengthProps {
     value: PasswordStrength;
     isEmpty?: boolean;
     className?: string;
 }
-
 const SEGMENTS = 3;
-
 const CONFIG: Record<PasswordStrength, { filled: number; bar: string; text: string }> = {
     weak:   { filled: 1, bar: 'bg-error',   text: 'text-error'   },
     medium: { filled: 2, bar: 'bg-warning',  text: 'text-warning' },
     strong: { filled: 3, bar: 'bg-success',  text: 'text-success' },
 };
-
 export function UIPasswordStrength({ value, isEmpty = false, className }: UIPasswordStrengthProps) {
     const t = useTranslations('common');
     const { filled, bar, text } = CONFIG[value];
     const label = t(value === 'weak' ? 'strength_weak' : value === 'medium' ? 'strength_medium' : 'strength_strong');
-
     return (
         <div className={cn('mt-2 flex items-center gap-2', className)}>
             <div
@@ -46,8 +39,7 @@ export function UIPasswordStrength({ value, isEmpty = false, className }: UIPass
                     );
                 })}
             </div>
-
-            {/* Фиксированная ширина по самому длинному слову "Надёжный" */}
+            {}
             <span className="w-14 text-center text-xs font-medium">
                 <span
                     className={cn(

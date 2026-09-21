@@ -1,5 +1,4 @@
 'use client'
-
 import useSWRMutation from 'swr/mutation'
 import { useSWRConfig } from 'swr'
 import { api } from '@/shared/api/api'
@@ -13,15 +12,11 @@ import {
 } from './favorite-keys'
 import type { FavoriteIdsType, FavoriteItemType } from './favorite-types'
 import type { EstateType, HouseEstatesResponseType } from '@/entities/estate'
-
 export function useRemoveFavorite() {
     const { mutate } = useSWRConfig()
     return useSWRMutation<void, Error, string, number>(
         MUTATIONS.REMOVE_FAVORITE,
         async (_key, { arg: id }) => {
-            // Оптимистично вычищаем удаляемый id из ВСЕХ кэшей favorites-списков
-            // (все sort/currency-варианты). Без этого keepPreviousData при смене
-            // сортировки на миг показывает уже удалённый айтем.
             mutate(
                 isFavoritesKey,
                 (old?: FavoriteItemType[]) => old?.filter(item => item.id !== id) ?? [],

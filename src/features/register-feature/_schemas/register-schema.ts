@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import { createEmailSchema, createPasswordSchema } from '@/shared/schemas/password-schema';
-
 type T = (key: string) => string;
-
 export const createRegisterSchema = (t: T) =>
     z.object({
         name: z
@@ -12,5 +10,4 @@ export const createRegisterSchema = (t: T) =>
         email: createEmailSchema(t),
         password: createPasswordSchema(t),
     });
-
 export type RegisterValues = z.infer<ReturnType<typeof createRegisterSchema>>;

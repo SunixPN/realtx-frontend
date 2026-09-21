@@ -1,18 +1,15 @@
 'use client'
-
 import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useHouseEstates, type HouseBbox } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { useEstateFilters } from '@/features/main-map-filters-feature/_hooks/use-estate-filters'
 import { EstateListCard } from './estate-list-card'
-
 type Props = {
     bbox: HouseBbox
     onSelect: (id: number, center: [number, number]) => void
     onClose: () => void
 }
-
 export function HouseListView({ bbox, onSelect, onClose }: Props) {
     const t = useTranslations('estate')
     const { currency } = useDisplayCurrency()
@@ -20,7 +17,6 @@ export function HouseListView({ bbox, onSelect, onClose }: Props) {
     const { data, isLoading: isPending, error } = useHouseEstates(bbox, filters, currency)
     const isError = !!error
     const items = data?.items ?? []
-
     return (
         <div className="flex h-full flex-col">
             <header className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--border-default)] px-4 py-3">
@@ -39,7 +35,6 @@ export function HouseListView({ bbox, onSelect, onClose }: Props) {
                     <X className="size-5" />
                 </button>
             </header>
-
             <div className="flex-1 overflow-y-auto p-4">
                 {isError && (
                     <div className="rounded-md bg-[var(--error-bg)] p-3 text-sm text-[var(--error)]">
@@ -62,7 +57,6 @@ export function HouseListView({ bbox, onSelect, onClose }: Props) {
         </div>
     )
 }
-
 function midLng(b: HouseBbox) {
     return (b.minLng + b.maxLng) / 2
 }

@@ -1,15 +1,11 @@
 'use client'
-
 import useSWRMutation from 'swr/mutation'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { MUTATIONS } from '@/shared/const/mutations'
 import { showToast } from '@/shared/helpers/show-toast'
-
 type Body = { email: string }
-
 export type ResetRequestResponseType = { message: string }
-
 export function useResetRequestMutation() {
     return useSWRMutation<ResetRequestResponseType, Error, string, Body>(
         MUTATIONS.RESET_REQUEST,

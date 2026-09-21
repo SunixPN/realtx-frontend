@@ -1,7 +1,5 @@
 import type { SVGProps } from 'react';
-
 type IconProps = SVGProps<SVGSVGElement> & { size?: number };
-
 const baseProps = (size: number, props: SVGProps<SVGSVGElement>) => ({
   width: size,
   height: size,
@@ -14,7 +12,6 @@ const baseProps = (size: number, props: SVGProps<SVGSVGElement>) => ({
   'aria-hidden': true,
   ...props,
 });
-
 export function IconChevronDown({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -22,7 +19,6 @@ export function IconChevronDown({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconCheck({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)} strokeWidth={3}>
@@ -30,7 +26,6 @@ export function IconCheck({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconX({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -38,7 +33,6 @@ export function IconX({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconMenu({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -46,7 +40,6 @@ export function IconMenu({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconInfo({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -55,7 +48,6 @@ export function IconInfo({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconAlertTriangle({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -63,7 +55,6 @@ export function IconAlertTriangle({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconCheckCircle({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -72,7 +63,6 @@ export function IconCheckCircle({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconEye({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -81,7 +71,6 @@ export function IconEye({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconEyeOff({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -90,7 +79,6 @@ export function IconEyeOff({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconMoon({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -98,7 +86,6 @@ export function IconMoon({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconSun({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -107,7 +94,6 @@ export function IconSun({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconMonitor({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -116,7 +102,6 @@ export function IconMonitor({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconHeart({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -124,7 +109,6 @@ export function IconHeart({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconBell({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -133,7 +117,6 @@ export function IconBell({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconGitCompare({ size = 20, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -143,7 +126,6 @@ export function IconGitCompare({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconPhone({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -151,7 +133,6 @@ export function IconPhone({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconMail({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -160,7 +141,6 @@ export function IconMail({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconLoader({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)} className={`animate-spin ${props.className ?? ''}`}>
@@ -168,7 +148,6 @@ export function IconLoader({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconUser({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -177,7 +156,6 @@ export function IconUser({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconClock({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -186,7 +164,6 @@ export function IconClock({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconLogOut({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -196,7 +173,6 @@ export function IconLogOut({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconArrowLeft({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>
@@ -205,7 +181,6 @@ export function IconArrowLeft({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
-
 export function IconKey({ size = 16, ...props }: IconProps) {
   return (
     <svg {...baseProps(size, props)}>

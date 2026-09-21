@@ -1,19 +1,14 @@
 "use client";
-
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-
 import { cn } from '@/shared/helpers/cn';
 import { AuthUserType } from '@/entities/me/types/me-type';
 import { IconClock, IconLogOut, IconUser } from '@/shared/ui/ui-icons';
 import { useLogout } from '@/features/logout-feature/_hooks/use-logout';
-
 const CLOSE_MS = 120;
-
 type UserMenuProps = {
     user: AuthUserType;
 };
-
 function getInitials(user: AuthUserType): string {
     const source = user.name ?? user.email ?? '?';
     return source
@@ -23,14 +18,12 @@ function getInitials(user: AuthUserType): string {
         .map(word => word[0]?.toUpperCase() ?? '')
         .join('') || '?';
 }
-
 export function UserMenu({ user }: UserMenuProps) {
     const t = useTranslations('user_menu');
     const [open, setOpen] = useState(false);
     const [closing, setClosing] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const { logout, isPending } = useLogout();
-
     function startClose() {
         setClosing(true);
         setTimeout(() => {
@@ -38,7 +31,6 @@ export function UserMenu({ user }: UserMenuProps) {
             setClosing(false);
         }, CLOSE_MS);
     }
-
     function toggle() {
         if (open) {
             startClose();
@@ -46,7 +38,6 @@ export function UserMenu({ user }: UserMenuProps) {
             setOpen(true);
         }
     }
-
     useEffect(() => {
         if (!open) return;
         const handler = (e: MouseEvent) => {
@@ -58,7 +49,6 @@ export function UserMenu({ user }: UserMenuProps) {
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, [open]);
-
     return (
         <div ref={containerRef} className="relative">
             <button
@@ -73,7 +63,6 @@ export function UserMenu({ user }: UserMenuProps) {
             >
                 {getInitials(user)}
             </button>
-
             {(open || closing) && (
                 <div
                     role="menu"
@@ -100,12 +89,10 @@ export function UserMenu({ user }: UserMenuProps) {
                             )}
                         </div>
                     </div>
-
                     <div className="flex flex-col py-1">
                         <MenuItem icon={<IconUser size={16} />} label={t('profile')} />
                         <MenuItem icon={<IconClock size={16} />} label={t('viewed')} />
                     </div>
-
                     <div className="border-t border-border">
                         <MenuItem
                             icon={<IconLogOut size={16} />}
@@ -120,7 +107,6 @@ export function UserMenu({ user }: UserMenuProps) {
         </div>
     );
 }
-
 type MenuItemProps = {
     icon: React.ReactNode;
     label: string;
@@ -128,7 +114,6 @@ type MenuItemProps = {
     disabled?: boolean;
     onClick?: () => void;
 };
-
 function MenuItem({ icon, label, tone = 'neutral', disabled, onClick }: MenuItemProps) {
     return (
         <button

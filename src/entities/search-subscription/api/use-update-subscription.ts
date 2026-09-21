@@ -1,5 +1,4 @@
 'use client'
-
 import useSWRMutation from 'swr/mutation'
 import { useSWRConfig } from 'swr'
 import { api } from '@/shared/api/api'
@@ -8,9 +7,7 @@ import { MUTATIONS } from '@/shared/const/mutations'
 import { subscriptionsKey } from './subscription-keys'
 import { toBackendFilters } from '../_helpers/filters-bridge'
 import type { SearchSubscriptionType, UpdateSubscriptionDtoType } from './subscription-types'
-
 type Arg = { id: string; patch: UpdateSubscriptionDtoType }
-
 export function useUpdateSubscription() {
     const { mutate } = useSWRConfig()
     return useSWRMutation<SearchSubscriptionType, Error, string, Arg>(

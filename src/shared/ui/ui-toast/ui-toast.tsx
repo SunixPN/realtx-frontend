@@ -1,5 +1,4 @@
 'use client';
-
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
@@ -9,9 +8,7 @@ import {
   IconInfo,
   IconX,
 } from '@/shared/ui/ui-icons';
-
 export type ToastTone = 'success' | 'danger' | 'info' | 'warning';
-
 export interface ToastProps {
   tone?:     ToastTone;
   title:     string;
@@ -20,14 +17,12 @@ export interface ToastProps {
   onClose?:  () => void;
   className?: string;
 }
-
 const TONE_ICON: Record<ToastTone, ReactNode> = {
   success: <IconCheckCircle    className="text-success" />,
   danger:  <IconAlertTriangle  className="text-error" />,
   warning: <IconAlertTriangle  className="text-warning" />,
   info:    <IconInfo           className="text-info" />,
 };
-
 export function UIToast({
   tone = 'info',
   title,

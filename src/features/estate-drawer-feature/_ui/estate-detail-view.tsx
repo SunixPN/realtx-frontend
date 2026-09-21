@@ -1,5 +1,4 @@
 'use client'
-
 import Link from 'next/link'
 import { ArrowLeft, ExternalLink, Heart, Maximize2, Train, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -14,14 +13,12 @@ import { formatStorey } from './format'
 import { useAuth } from "@/entities/me/api/auth-query";
 import { IconLoader } from "@/shared/ui/ui-icons";
 import { cn } from '@/shared/helpers/cn';
-
 type Props = {
     id: number
     onBack?: () => void
     onClose: () => void
     showBack: boolean
 }
-
 function Row({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex items-baseline justify-between gap-4 py-2">
@@ -30,7 +27,6 @@ function Row({ label, value }: { label: string; value: string }) {
         </div>
     )
 }
-
 export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
     const t = useTranslations('estate')
     const { currency } = useDisplayCurrency()
@@ -42,7 +38,6 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
     const repairLabels = useRepairStateLabels()
     const formatRooms = useFormatRooms()
     const formatArea = useFormatArea()
-
     return (
         <div className="flex h-full flex-col">
             <header className="flex shrink-0 items-center gap-2 border-b border-[var(--border-default)] px-3 py-2.5">
@@ -70,16 +65,13 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                     <X className="size-5" />
                 </button>
             </header>
-
             <div className="flex-1 overflow-y-auto">
                 {isError && (
                     <div className="m-4 rounded-md bg-[var(--error-bg)] p-3 text-sm text-[var(--error)]">
                         {t('error_load')}
                     </div>
                 )}
-
                 <PhotoSlider photos={estate?.photos ?? []} loading={isPending} />
-
                 {estate && (
                     <div className="flex flex-col gap-5 p-4">
                         <div>
@@ -105,7 +97,6 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                 />
                             </div>
                         </div>
-
                         <div className="flex flex-col gap-2">
                             {
                                 isLoading ? (
@@ -157,7 +148,6 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                 </a>
                             )}
                         </div>
-
                         <div>
                             {estate.address && (
                                 <div className="text-base text-[var(--text-base)]">{estate.address}</div>
@@ -172,13 +162,11 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                 </div>
                             )}
                         </div>
-
                         <PriceHistorySection
                             history={estate.priceHistory}
                             priceChange={estate.priceChange}
                             currency={currency}
                         />
-
                         <section>
                             <h3 className="mb-1 text-base font-semibold text-[var(--text-base)]">{t('section_specs')}</h3>
                             <dl className="divide-y divide-[var(--border-default)]">
@@ -198,7 +186,6 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                 />
                             </dl>
                         </section>
-
                         {estate.description && (
                             <section>
                                 <h3 className="mb-2 text-base font-semibold text-[var(--text-base)]">{t('section_description')}</h3>
@@ -207,7 +194,6 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                 </p>
                             </section>
                         )}
-
                         <section className="rounded-lg bg-[var(--surface-muted)] p-4">
                             <div className="text-sm text-[var(--text-faint)]">
                                 {(estate.sellerType === 0 && estate.agencyName) ? t('seller_agency') : t('seller_owner')}

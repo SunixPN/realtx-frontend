@@ -7,21 +7,16 @@ import { PropertyDetailWidget } from '@/widgets/property-detail-widget/property-
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { serverFetch } from '@/shared/api/server-fetch'
 import type { DisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
-
 type RouteParams = { id: string }
 type RouteSearch = { currency?: string }
-
 const VALID_CURRENCIES: DisplayCurrency[] = ['USD', 'BYN', 'EUR']
-
 function resolveCurrency(raw: string | undefined): DisplayCurrency {
     const up = raw?.toUpperCase()
     return VALID_CURRENCIES.includes(up as DisplayCurrency) ? (up as DisplayCurrency) : 'USD'
 }
-
 function fetchEstate(id: number, currency: DisplayCurrency) {
     return serverFetch<EstateType>(API_ROUTES.ESTATE.BY_ID(id), { displayCurrency: currency })
 }
-
 export async function generateMetadata({
     params,
     searchParams,
@@ -34,7 +29,6 @@ export async function generateMetadata({
     const { currency: cur } = await searchParams
     const numId = Number(id)
     if (!Number.isFinite(numId)) return { title: t('property_not_found_title') }
-
     try {
         const currency = resolveCurrency(cur)
         const estate = await fetchEstate(numId, currency)
@@ -48,7 +42,6 @@ export async function generateMetadata({
         return { title: t('property_not_found_title') }
     }
 }
-
 export default async function PropertyPage({
     params,
     searchParams,
@@ -60,20 +53,16 @@ export default async function PropertyPage({
     const { currency: cur } = await searchParams
     const numId = Number(id)
     if (!Number.isFinite(numId)) notFound()
-
     const currency = resolveCurrency(cur)
-
     let estate: EstateType
     try {
         estate = await fetchEstate(numId, currency)
     } catch {
         notFound()
     }
-
     const fallback = {
         [unstable_serialize(estateByIdKey(numId, currency))]: estate!,
     }
-
     return (
         <SWRConfig value={{ fallback }}>
             <div className="min-h-screen bg-surface-subtle">

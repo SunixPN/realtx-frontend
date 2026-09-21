@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { Transition } from 'react-transition-group'
@@ -43,30 +42,24 @@ import { PriceDisplay, PricePerM2Display } from '@/features/estate-drawer-featur
 import { PriceChangeBadge } from '@/features/estate-drawer-feature/_ui/price-change-badge'
 import { formatStorey, formatNumber } from '@/features/estate-drawer-feature/_ui/format'
 import { cn } from '@/shared/helpers/cn'
-
 const PropertyMiniMap = dynamic(
     () => import('./property-mini-map').then((m) => m.PropertyMiniMap),
     { ssr: false },
 )
-
 type Props = {
     id: number
 }
-
 function daysBetween(a: string, b = new Date().toISOString()): number {
     return Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / (1000 * 60 * 60 * 24)))
 }
-
 function pickHistoryValue(p: PriceHistoryPoint, currency: DisplayCurrency): number | null {
     return currency === 'USD' ? p.usd : currency === 'BYN' ? p.byn : p.eur
 }
-
 export function PropertyDetailWidget({ id }: Props) {
     const t = useTranslations('estate')
     const { currency } = useDisplayCurrency()
     const { data: estate, error } = useEstateById(id, currency)
     const isError = !!error
-
     if (isError) {
         return (
             <div className="mx-auto flex min-h-[60vh] w-full max-w-[1520px] items-center justify-center px-6 py-12">
@@ -76,7 +69,6 @@ export function PropertyDetailWidget({ id }: Props) {
             </div>
         )
     }
-
     if (!estate) {
         return (
             <div className="mx-auto w-full max-w-[1520px] px-6 py-6">
@@ -87,11 +79,9 @@ export function PropertyDetailWidget({ id }: Props) {
             </div>
         )
     }
-
     return (
         <div className="mx-auto flex w-full max-w-[1520px] flex-col gap-8 px-6 py-6">
             <Breadcrumbs estate={estate} />
-
             <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-8">
                     <Gallery estate={estate} currency={currency} />
@@ -104,7 +94,6 @@ export function PropertyDetailWidget({ id }: Props) {
                     </aside>
                 </div>
             </div>
-
             <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-8 flex flex-col gap-6">
                     <KeyFacts estate={estate} />
@@ -114,22 +103,18 @@ export function PropertyDetailWidget({ id }: Props) {
                     <LocationSection estate={estate} currency={currency} />
                 </div>
             </div>
-
             <Disclaimer estate={estate} />
         </div>
     )
 }
-
 function Breadcrumbs({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     const formatRooms = useFormatRooms()
-
     const parts = [
         estate.townName ?? t('default_town'),
         estate.districtName ? t('district_suffix', { name: estate.districtName }) : null,
         t('title_flat', { rooms: formatRooms(estate.rooms) }),
     ].filter(Boolean) as string[]
-
     return (
         <nav aria-label={t('breadcrumbs_aria')} className="flex items-center gap-2 text-sm text-text-muted">
             <Link
@@ -148,12 +133,10 @@ function Breadcrumbs({ estate }: { estate: EstateType }) {
         </nav>
     )
 }
-
 function isNew(estate: EstateType): boolean {
     if (!estate.publishedAt) return false
     return daysBetween(estate.publishedAt) <= 3
 }
-
 function Gallery({ estate, currency }: { estate: EstateType; currency: DisplayCurrency }) {
     const t = useTranslations('estate')
     const isAgency = estate.sellerType === 0 && !!estate.agencyName
@@ -162,7 +145,6 @@ function Gallery({ estate, currency }: { estate: EstateType; currency: DisplayCu
         currency === 'BYN' ? (estate.priceChange.deltaByn ?? 0) < 0 :
         (estate.priceChange.deltaEur ?? 0) < 0
     )
-
     return (
         <div className="relative overflow-hidden rounded-lg">
             <PhotoSlider photos={estate.photos} />
@@ -182,7 +164,6 @@ function Gallery({ estate, currency }: { estate: EstateType; currency: DisplayCu
         </div>
     )
 }
-
 function FavoriteIconAction({ estateId, serverIsFavorite }: { estateId: number; serverIsFavorite: boolean }) {
     const t = useTranslations('estate')
     const { isFavorite, toggle, isPending } = useToggleFavorite(estateId, serverIsFavorite)
@@ -203,20 +184,16 @@ function FavoriteIconAction({ estateId, serverIsFavorite }: { estateId: number; 
         </button>
     )
 }
-
 function PriceCard({ estate, currency }: { estate: EstateType; currency: DisplayCurrency }) {
     const t = useTranslations('estate')
     const locale = useLocale()
     const { data: auth, isLoading: isAuthLoading } = useAuth()
     const isAuthed = !!auth?.user
-
     const formatDate = (iso: string | null) => {
         if (!iso) return '—'
         return new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
     }
-
     const formatDays = (days: number) => t('days_n', { count: days })
-
     return (
         <div className="flex flex-col gap-4 rounded-lg border border-border bg-surface-page p-5 shadow-lg">
             <div>
@@ -234,7 +211,6 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
                     <PricePerM2Display price={estate.pricePerM2} currency={currency} className="tabular-nums" />
                 </div>
             </div>
-
             <div className="grid grid-cols-3 gap-2">
                 {isAuthLoading ? (
                     <>
@@ -254,7 +230,6 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
                     </>
                 )}
             </div>
-
             {estate.sourceUrl && (
                 <a
                     href={estate.sourceUrl}
@@ -266,7 +241,6 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
                     {t('source_link_full')}
                 </a>
             )}
-
             {estate.publishedAt && (
                 <p className="text-xs text-text-faint">
                     {t('published_info', {
@@ -278,7 +252,6 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
         </div>
     )
 }
-
 function IconAction({
     label,
     icon,
@@ -299,31 +272,23 @@ function IconAction({
         </button>
     )
 }
-
 function ShareIconAction({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     const formatRooms = useFormatRooms()
-
     const handleShare = async () => {
         const url = typeof window !== 'undefined' ? window.location.href : ''
         const title = t('share_title', {
             rooms: formatRooms(estate.rooms),
             address: estate.address ?? t('default_town'),
         })
-
-        // Web Share API — на мобильных вызывает нативный шит.
-        // На десктопе почти всегда отсутствует → падаем в copy-to-clipboard.
         if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
             try {
                 await navigator.share({ title, url })
                 return
             } catch (err) {
-                // AbortError = юзер сам закрыл шит, тост не показываем.
                 if ((err as { name?: string })?.name === 'AbortError') return
-                // fallthrough в copy
             }
         }
-
         try {
             await navigator.clipboard.writeText(url)
             showToast({ status: 'success', text: t('share_toast_copied') })
@@ -331,7 +296,6 @@ function ShareIconAction({ estate }: { estate: EstateType }) {
             showToast({ status: 'error', text: t('share_toast_error') })
         }
     }
-
     return (
         <IconAction
             label={t('action_share')}
@@ -340,7 +304,6 @@ function ShareIconAction({ estate }: { estate: EstateType }) {
         />
     )
 }
-
 function IconActionSkeleton() {
     return (
         <div
@@ -349,7 +312,6 @@ function IconActionSkeleton() {
         />
     )
 }
-
 const BACKDROP_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     entering: { opacity: 0 },
     entered:  { opacity: 1 },
@@ -357,7 +319,6 @@ const BACKDROP_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     exited:   { opacity: 0 },
     unmounted: { opacity: 0 },
 }
-
 const CARD_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     entering: { opacity: 0, transform: 'scale(0.96) translateY(8px)' },
     entered:  { opacity: 1, transform: 'scale(1) translateY(0)' },
@@ -365,7 +326,6 @@ const CARD_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     exited:   { opacity: 0, transform: 'scale(0.96) translateY(8px)' },
     unmounted: { opacity: 0, transform: 'scale(0.96) translateY(8px)' },
 }
-
 function ContactButton({
     phone,
     sourceUrl,
@@ -386,14 +346,12 @@ function ContactButton({
     const h = size === 'lg' ? 'h-11' : 'h-10'
     const text = size === 'lg' ? 'text-sm font-semibold' : 'text-sm font-medium'
     const iconSize = size === 'lg' ? 'size-5' : 'size-4'
-
     useEffect(() => {
         if (!open) return
         const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
         window.addEventListener('keydown', handler)
         return () => window.removeEventListener('keydown', handler)
     }, [open, close])
-
     return (
         <>
             <button
@@ -419,7 +377,6 @@ function ContactButton({
         </>
     )
 }
-
 function ContactModal({
     nodeRef,
     transitionState,
@@ -439,15 +396,12 @@ function ContactModal({
 }) {
     const t = useTranslations('estate')
     const [copied, setCopied] = useState(false)
-
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text)
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
     }
-
     const agencyLabel = t('seller_agency')
-
     return createPortal(
         <div ref={nodeRef} className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
@@ -455,7 +409,6 @@ function ContactModal({
                 className="absolute inset-0 bg-surface-overlay backdrop-blur-sm"
                 onClick={onClose}
             />
-
             <div
                 style={{ ...CARD_STYLE[transitionState], transition: 'opacity 220ms ease-out, transform 220ms cubic-bezier(0.34, 1.4, 0.64, 1)' }}
                 className="relative w-full max-w-[380px] rounded-xl border border-border bg-surface-page p-6 shadow-xl"
@@ -470,7 +423,6 @@ function ContactModal({
                         <X className="size-4" />
                     </button>
                 </div>
-
                 <div className="flex items-center gap-3 border-b border-border pb-4">
                     <div className={cn(
                         'flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-semibold',
@@ -485,7 +437,6 @@ function ContactModal({
                         <div className="truncate text-sm font-medium text-text-base">{sellerName}</div>
                     </div>
                 </div>
-
                 <div className="pt-4">
                     {phone ? (
                         <div className="flex flex-col gap-3">
@@ -552,7 +503,6 @@ function ContactModal({
                         </div>
                     )}
                 </div>
-
                 <p className="mt-5 text-xs text-text-faint">
                     {t('contact_safety_note')}
                 </p>
@@ -561,12 +511,10 @@ function ContactModal({
         document.body,
     )
 }
-
 function KeyFacts({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     const formatRooms = useFormatRooms()
     const formatArea = useFormatArea()
-
     const items = [
         { label: t('spec_rooms'), value: String(estate.rooms ?? '—') },
         { label: t('spec_area_total'), value: formatArea(estate.areaTotal) },
@@ -582,7 +530,6 @@ function KeyFacts({ estate }: { estate: EstateType }) {
             {estate.address && (
                 <div className="mt-1 text-base text-text-muted">{estate.address}</div>
             )}
-
             <dl className="mt-4 grid grid-cols-4 divide-x divide-border overflow-hidden rounded-lg border border-border bg-surface-page">
                 {items.map((i) => (
                     <div key={i.label} className="flex flex-col gap-1 px-4 py-3">
@@ -594,17 +541,14 @@ function KeyFacts({ estate }: { estate: EstateType }) {
         </section>
     )
 }
-
 function PriceHistoryBlock({ estate, currency }: { estate: EstateType; currency: DisplayCurrency }) {
     const t = useTranslations('estate')
     const locale = useLocale()
-
     if (estate.priceHistory.length < 2) return null
     const firstDate = estate.priceHistory[0]?.date
     const formattedDate = firstDate
         ? new Date(firstDate).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
         : ''
-
     return (
         <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface-page p-5">
             <div className="flex items-center justify-between gap-4">
@@ -620,9 +564,7 @@ function PriceHistoryBlock({ estate, currency }: { estate: EstateType; currency:
                     </div>
                 )}
             </div>
-
             <PriceHistoryChart history={estate.priceHistory} currency={currency} />
-
             <div className="mt-2 grid max-h-40 grid-cols-2 gap-x-6 gap-y-1.5 overflow-y-auto pr-2">
                 {[...estate.priceHistory]
                     .reverse()
@@ -662,33 +604,27 @@ function PriceHistoryBlock({ estate, currency }: { estate: EstateType; currency:
         </section>
     )
 }
-
 function PriceHistoryChart({ history, currency }: { history: PriceHistoryPoint[]; currency: DisplayCurrency }) {
     const t = useTranslations('estate')
     const locale = useLocale()
     const width = 640
     const height = 160
     const padL = 48, padR = 12, padT = 10, padB = 22
-
     const points = history
         .map((h) => ({ date: h.date, v: pickHistoryValue(h, currency) }))
         .filter((p): p is { date: string; v: number } => p.v !== null)
-
     if (points.length < 2) return null
-
     const min = Math.min(...points.map((p) => p.v))
     const max = Math.max(...points.map((p) => p.v))
     const span = max - min || 1
     const chartW = width - padL - padR
     const chartH = height - padT - padB
     const stepX = chartW / (points.length - 1)
-
     const coords = points.map((p, i) => ({
         x: padL + i * stepX,
         y: padT + chartH - ((p.v - min) / span) * chartH,
         v: p.v,
     }))
-
     const line = coords.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ')
     const area = `${line} L${coords[coords.length - 1].x},${padT + chartH} L${coords[0].x},${padT + chartH} Z`
     const down = points[points.length - 1].v < points[0].v
@@ -696,10 +632,8 @@ function PriceHistoryChart({ history, currency }: { history: PriceHistoryPoint[]
     const fill = down ? 'rgba(22, 163, 74, 0.1)' : 'rgba(220, 38, 38, 0.1)'
     const midIdx = Math.floor(points.length / 2)
     const suffix = t('chart_thousands_suffix')
-
     const formatChartDate = (iso: string) =>
         new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
-
     return (
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full" role="img" aria-label={t('chart_aria')}>
             {[0, 0.5, 1].map((tVal) => {
@@ -714,10 +648,8 @@ function PriceHistoryChart({ history, currency }: { history: PriceHistoryPoint[]
                     </g>
                 )
             })}
-
             <path d={area} fill={fill} />
             <path d={line} fill="none" stroke={stroke} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-
             {coords.map((c, i) => (
                 <circle
                     key={i}
@@ -729,7 +661,6 @@ function PriceHistoryChart({ history, currency }: { history: PriceHistoryPoint[]
                     strokeWidth="1.5"
                 />
             ))}
-
             {Array.from(new Set([0, midIdx, coords.length - 1])).map((i) => (
                 <text
                     key={i}
@@ -746,7 +677,6 @@ function PriceHistoryChart({ history, currency }: { history: PriceHistoryPoint[]
         </svg>
     )
 }
-
 function Description({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     if (!estate.description) return null
@@ -759,21 +689,17 @@ function Description({ estate }: { estate: EstateType }) {
         </section>
     )
 }
-
 function SpecsGrid({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     const locale = useLocale()
     const wallLabels = useWallMaterialLabels()
     const repairLabels = useRepairStateLabels()
     const formatArea = useFormatArea()
-
     const formatDate = (iso: string | null) => {
         if (!iso) return '—'
         return new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
     }
-
     const formatDays = (days: number) => t('days_n', { count: days })
-
     const groups: { title: string; rows: [string, string][] }[] = [
         {
             title: t('specs_group_flat'),
@@ -805,7 +731,6 @@ function SpecsGrid({ estate }: { estate: EstateType }) {
             ],
         },
     ]
-
     return (
         <section className="rounded-lg border border-border bg-surface-page p-6">
             <div className="mb-5 flex items-center gap-2">
@@ -835,10 +760,8 @@ function SpecsGrid({ estate }: { estate: EstateType }) {
         </section>
     )
 }
-
 function LocationSection({ estate, currency: _currency }: { estate: EstateType; currency: DisplayCurrency }) {
     const t = useTranslations('estate')
-
     return (
         <section className="rounded-lg border border-border bg-surface-page p-5">
             <div className="mb-3 flex items-center gap-2">
@@ -849,13 +772,11 @@ function LocationSection({ estate, currency: _currency }: { estate: EstateType; 
             {estate.districtName && (
                 <div className="mt-0.5 text-sm text-text-muted">{t('district_suffix', { name: estate.districtName })}</div>
             )}
-
             {estate.lat != null && estate.lng != null && (
                 <div className="relative mt-4 aspect-[16/6] overflow-hidden rounded-md border border-border">
                     <PropertyMiniMap lat={estate.lat} lng={estate.lng} />
                 </div>
             )}
-
             {estate.metroStation && (
                 <div className="mt-4">
                     <div className="mb-2 text-xs font-medium tracking-wide text-text-faint uppercase">
@@ -879,13 +800,11 @@ function LocationSection({ estate, currency: _currency }: { estate: EstateType; 
         </section>
     )
 }
-
 function SellerCard({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     const isAgency = estate.sellerType === 0 && !!estate.agencyName
     const sellerLabel = isAgency ? t('seller_agency') : t('seller_owner_short')
     const sellerName = isAgency ? (estate.agencyName ?? '') : t('seller_private')
-
     return (
         <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-page p-5">
             <div className="flex items-center gap-3">
@@ -917,7 +836,6 @@ function SellerCard({ estate }: { estate: EstateType }) {
         </div>
     )
 }
-
 function SafetyNote() {
     const t = useTranslations('estate')
     return (
@@ -927,7 +845,6 @@ function SafetyNote() {
         </div>
     )
 }
-
 function Disclaimer({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     return (

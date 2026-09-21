@@ -1,28 +1,22 @@
 'use client'
-
 import { GitCompare, Trash2, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useBulkRemoveFavorites } from '@/entities/favorite'
-
 type SelectionBarProps = {
     selected: Set<number>
     onClear: () => void
 }
-
 export function SelectionBar({ selected, onClear }: SelectionBarProps) {
     const t = useTranslations('favorites')
     const count = selected.size
     const { trigger: bulkRemove, isMutating: isPending } = useBulkRemoveFavorites()
-
     const handleRemove = async () => {
         try {
             await bulkRemove([...selected])
             onClear()
         } catch {
-            // ошибка обрабатывается в мутации (откат кэша)
         }
     }
-
     return (
         <div className="sticky top-4 z-10 flex items-center justify-between gap-3 rounded-lg border border-brand/20 bg-brand/5 px-4 py-3 shadow-md">
             <div className="flex items-center gap-2 text-sm">

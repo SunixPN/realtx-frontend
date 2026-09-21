@@ -1,5 +1,4 @@
 'use client'
-
 import { Check, ImageOff, Train, X } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
@@ -8,13 +7,11 @@ import { useRemoveFavorite, type FavoriteItemType } from '@/entities/favorite'
 import { useFormatRooms, useFormatArea } from '@/entities/estate'
 import { formatNumber, formatStorey } from '../../estate-drawer-feature/_ui/format'
 import { BynSign } from '@/shared/ui/byn-sign/byn-sign'
-
 type FavoriteCardProps = {
     item: FavoriteItemType
     selected: boolean
     onToggleSelect: (id: number) => void
 }
-
 function formatPrice(price: number | null, currency: number): React.ReactNode {
     if (price == null) return '—'
     const formatted = formatNumber(price)
@@ -22,17 +19,14 @@ function formatPrice(price: number | null, currency: number): React.ReactNode {
     const sym = currency === 840 ? '$' : '€'
     return `${formatted} ${sym}`
 }
-
 function formatPricePerM2(price: number | null, currency: number): React.ReactNode {
     if (price == null) return null
     return <>{formatPrice(Math.round(price), currency)} / м²</>
 }
-
 function formatPriceDeltaUsd(delta: number): string {
     const sign = delta < 0 ? '−' : '+'
     return `${sign}${Math.abs(delta).toLocaleString()} $`
 }
-
 export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardProps) {
     const t = useTranslations('favorites')
     const tEstate = useTranslations('estate')
@@ -43,7 +37,6 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
     const delta = item.priceDeltaUsd
     const hasDelta = delta !== null && delta !== 0
     const isDrop = hasDelta && delta! < 0
-
     return (
         <div className={cn('relative h-full', isPending && 'opacity-50 pointer-events-none transition-opacity')}>
             <Link
@@ -56,10 +49,9 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                     !item.isActive && 'opacity-60',
                 )}
             >
-                {/* Image */}
+                {}
                 <div className="relative h-[220px] shrink-0 bg-surface-muted">
                     {photo ? (
-                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                             src={photo}
                             alt=""
@@ -72,8 +64,7 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                             <span className="text-xs">{t('no_photos')}</span>
                         </div>
                     )}
-
-                    {/* "Снято с продажи" badge */}
+                    {}
                     {!item.isActive && (
                         <div className="absolute inset-x-3 top-3 z-10">
                             <span className="inline-flex items-center gap-1.5 rounded-xs bg-neutral-900/85 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
@@ -82,8 +73,7 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                             </span>
                         </div>
                     )}
-
-                    {/* Price change badge */}
+                    {}
                     {hasDelta && (
                         <div className="absolute left-2 bottom-2 z-10">
                             <span
@@ -96,16 +86,14 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                             </span>
                         </div>
                     )}
-
-                    {/* Photo count */}
+                    {}
                     {item.photos.length > 1 && (
                         <span className="absolute right-2 bottom-2 rounded-xs bg-neutral-900/70 px-1.5 py-0.5 text-xs font-medium text-white tabular-nums">
                             {t('photo_count', { count: item.photos.length })}
                         </span>
                     )}
                 </div>
-
-                {/* Content */}
+                {}
                 <div className="flex flex-1 flex-col gap-2 p-4">
                     <div className="flex items-baseline justify-between gap-3">
                         <span className="text-lg font-semibold text-text-base tabular-nums">
@@ -133,8 +121,7 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                     </div>
                 </div>
             </Link>
-
-            {/* Checkbox overlay — top-left */}
+            {}
             <label
                 className={cn(
                     'absolute top-3 left-3 z-10 flex size-6 cursor-pointer items-center justify-center rounded-sm border-2 shadow-sm transition-colors',
@@ -147,8 +134,7 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
             >
                 <Check className="size-3.5" strokeWidth={3} aria-hidden />
             </label>
-
-            {/* Heart remove button — top-right */}
+            {}
             <button
                 type="button"
                 aria-label={t('remove_aria')}

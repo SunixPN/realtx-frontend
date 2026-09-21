@@ -1,16 +1,13 @@
 import { forwardRef, useId, type InputHTMLAttributes } from 'react';
 import { cn } from '@/shared/helpers/cn';
-
 export interface SwitchProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
 }
-
 export const UISwitch = forwardRef<HTMLInputElement, SwitchProps>(
   ({ label, id, className, checked, defaultChecked, disabled, ...props }, ref) => {
     const autoId = useId();
     const inputId = id ?? autoId;
-
     return (
       <label
         htmlFor={inputId}
@@ -50,5 +47,4 @@ export const UISwitch = forwardRef<HTMLInputElement, SwitchProps>(
     );
   },
 );
-
 UISwitch.displayName = 'UISwitch';

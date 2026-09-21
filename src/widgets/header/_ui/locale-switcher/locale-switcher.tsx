@@ -1,16 +1,12 @@
 'use client';
-
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-
 import { cn } from '@/shared/helpers/cn';
 import { IconCheck } from '@/shared/ui/ui-icons';
 import { LOCALES, LOCALE_LABELS, LOCALE_SHORT, type Locale } from '@/shared/i18n/config';
 import { setLocale } from '@/shared/i18n/actions';
 import { beginTopLoader, endTopLoader } from '@/shared/ui/top-loader/top-loader';
-
 const CLOSE_MS = 120;
-
 export function LocaleSwitcher() {
     const current = useLocale() as Locale;
     const t = useTranslations('header');
@@ -18,7 +14,6 @@ export function LocaleSwitcher() {
     const [closing, setClosing] = useState(false);
     const [isPending, startTransition] = useTransition();
     const containerRef = useRef<HTMLDivElement>(null);
-
     function startClose() {
         setClosing(true);
         setTimeout(() => {
@@ -26,12 +21,10 @@ export function LocaleSwitcher() {
             setClosing(false);
         }, CLOSE_MS);
     }
-
     function toggle() {
         if (open) startClose();
         else setOpen(true);
     }
-
     useEffect(() => {
         if (!open) return;
         const handler = (e: MouseEvent) => {
@@ -40,13 +33,9 @@ export function LocaleSwitcher() {
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, [open]);
-
     function pick(locale: Locale) {
         startClose();
         if (locale === current) return;
-        // Смена локали через server action ре-рендерит layout — юзер видит
-        // «залипание» без индикации. Стартуем top-loader сразу, закрываем
-        // после завершения транзиции.
         beginTopLoader();
         startTransition(async () => {
             try {
@@ -56,7 +45,6 @@ export function LocaleSwitcher() {
             }
         });
     }
-
     return (
         <div ref={containerRef} className="relative">
             <button
@@ -73,7 +61,6 @@ export function LocaleSwitcher() {
             >
                 {LOCALE_SHORT[current]}
             </button>
-
             {(open || closing) && (
                 <div
                     role="menu"

@@ -1,8 +1,6 @@
 'use client'
-
 import { useTranslations } from 'next-intl'
 import type { SubscriptionFrequency } from '@/entities/search-subscription'
-
 export function useFormatFrequency(): (f: SubscriptionFrequency) => string {
     const t = useTranslations('subscriptions')
     return (f) => {

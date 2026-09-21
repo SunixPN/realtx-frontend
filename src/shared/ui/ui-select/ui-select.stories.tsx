@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { UISelect } from '@/shared/ui/ui-select';
-
 const cityOptions = [
   { value: 'minsk',    label: 'Минск' },
   { value: 'brest',    label: 'Брест' },
@@ -9,7 +8,6 @@ const cityOptions = [
   { value: 'vitebsk',  label: 'Витебск' },
   { value: 'mogilev',  label: 'Могилёв' },
 ];
-
 const meta = {
   title: 'UI/Select',
   component: UISelect,
@@ -29,20 +27,15 @@ const meta = {
     ),
   ],
 } satisfies Meta<typeof UISelect>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 export const Default: Story = {};
-
 export const WithLabel: Story = {
   args: { label: 'Город' },
 };
-
 export const Filled: Story = {
   args: { label: 'Город', defaultValue: 'minsk' },
 };
-
 export const WithHint: Story = {
   args: {
     label: 'Тип недвижимости',
@@ -55,18 +48,15 @@ export const WithHint: Story = {
     placeholder: 'Выберите тип',
   },
 };
-
 export const WithError: Story = {
   args: {
     label: 'Город',
     error: 'Выберите город',
   },
 };
-
 export const Disabled: Story = {
   args: { label: 'Город', defaultValue: 'minsk', disabled: true },
 };
-
 export const LongList: Story = {
   args: {
     label: 'Район',

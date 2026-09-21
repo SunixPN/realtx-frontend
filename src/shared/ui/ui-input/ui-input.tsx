@@ -1,6 +1,5 @@
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from 'react';
 import { cn } from '@/shared/helpers/cn';
-
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?:     string;
   hint?:      string;
@@ -8,14 +7,11 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?:      ReactNode;
   rightSlot?: ReactNode;
 }
-
 export const UIInput = forwardRef<HTMLInputElement, InputProps>(
   ({ label, hint, error, icon, rightSlot, id, className, disabled, ...props }, ref) => {
     const autoId = useId();
     const inputId = id ?? autoId;
-
     const hasError = !!error;
-
     return (
       <div className={cn('flex flex-col gap-1.5', className)}>
         {label && (
@@ -23,7 +19,6 @@ export const UIInput = forwardRef<HTMLInputElement, InputProps>(
             {label}
           </label>
         )}
-
         <div
           className={cn(
             'flex h-11 w-full items-center gap-2 rounded-md border bg-surface-page px-3',
@@ -45,7 +40,6 @@ export const UIInput = forwardRef<HTMLInputElement, InputProps>(
           />
           {rightSlot && <span className="flex items-center shrink-0">{rightSlot}</span>}
         </div>
-
         {error ? (
           <span className="text-xs text-error">{error}</span>
         ) : hint ? (
@@ -55,5 +49,4 @@ export const UIInput = forwardRef<HTMLInputElement, InputProps>(
     );
   },
 );
-
 UIInput.displayName = 'UIInput';

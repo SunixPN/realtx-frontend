@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Search, Train, MapPin, X } from 'lucide-react'
@@ -7,12 +6,10 @@ import { useTranslations } from 'next-intl'
 import { useSuggest, type SuggestItemType } from '@/entities/estate'
 import { usePopoverPosition } from '@/shared/helpers/use-popover-position'
 import { cn } from '@/shared/helpers/cn'
-
 type SearchSuggestProps = {
     value: string | undefined
     onChange: (next: string | undefined) => void
 }
-
 function useDebounced<T>(value: T, delay: number): T {
     const [d, setD] = useState(value)
     useEffect(() => {
@@ -21,23 +18,18 @@ function useDebounced<T>(value: T, delay: number): T {
     }, [value, delay])
     return d
 }
-
 export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
     const t = useTranslations('filters')
     const [input, setInput] = useState(value ?? '')
     const [open, setOpen] = useState(false)
     const wrapperRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
-
     useEffect(() => {
         setInput(value ?? '')
     }, [value])
-
     const debounced = useDebounced(input.trim(), 250)
     const { data: suggestions = [], isValidating: isFetching } = useSuggest(debounced, 10, { enabled: open })
-
     const pos = usePopoverPosition(wrapperRef, open)
-
     useEffect(() => {
         if (!open) return
         const handler = (e: MouseEvent) => {
@@ -49,20 +41,17 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
         document.addEventListener('mousedown', handler)
         return () => document.removeEventListener('mousedown', handler)
     }, [open])
-
     const commit = (next: string | undefined) => {
         setInput(next ?? '')
         onChange(next && next.trim() ? next : undefined)
         setOpen(false)
         inputRef.current?.blur()
     }
-
     const clear = () => {
         setInput('')
         onChange(undefined)
         setOpen(false)
     }
-
     return (
         <div ref={wrapperRef} className="relative">
             <div
@@ -96,7 +85,6 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
                     </button>
                 )}
             </div>
-
             {open && pos && typeof window !== 'undefined' && createPortal(
                 <ul
                     data-suggest-popover="true"

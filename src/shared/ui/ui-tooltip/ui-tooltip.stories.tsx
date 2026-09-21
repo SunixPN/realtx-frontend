@@ -3,7 +3,6 @@ import { UITooltip } from '@/shared/ui/ui-tooltip';
 import { UIButton } from '@/shared/ui/ui-button';
 import { UIIconButton } from '@/shared/ui/ui-icon-button';
 import { IconInfo } from '@/shared/ui/ui-icons';
-
 const meta = {
   title: 'UI/Tooltip',
   component: UITooltip,
@@ -24,38 +23,32 @@ const meta = {
     ),
   ],
 } satisfies Meta<typeof UITooltip>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 export const Top: Story = {
   args: {
     placement: 'top',
     children: <UIButton>Наведи на меня</UIButton>,
   },
 };
-
 export const Bottom: Story = {
   args: {
     placement: 'bottom',
     children: <UIButton>Внизу</UIButton>,
   },
 };
-
 export const Left: Story = {
   args: {
     placement: 'left',
     children: <UIButton>Слева</UIButton>,
   },
 };
-
 export const Right: Story = {
   args: {
     placement: 'right',
     children: <UIButton>Справа</UIButton>,
   },
 };
-
 export const OnIconButton: Story = {
   args: {
     content: 'Сохранить в избранное',

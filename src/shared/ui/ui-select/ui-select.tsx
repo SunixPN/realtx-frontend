@@ -1,5 +1,4 @@
 'use client';
-
 import {
   useEffect,
   useId,
@@ -12,13 +11,11 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 import { usePopoverPosition } from '@/shared/helpers/use-popover-position';
 import { IconChevronDown, IconCheck, IconX } from '@/shared/ui/ui-icons';
-
 export interface SelectOption {
   value: string;
   label: string;
   icon?: ReactNode;
 }
-
 export interface SelectProps {
   options:       SelectOption[];
   value?:        string;
@@ -31,10 +28,8 @@ export interface SelectProps {
   disabled?:     boolean;
   className?:    string;
   name?:         string;
-  /** Показывает крестик очистки в триггере, когда есть значение. */
   clearable?:    boolean;
 }
-
 export function UISelect({
   options,
   value: controlledValue,
@@ -56,15 +51,11 @@ export function UISelect({
   const popoverRef = useRef<HTMLUListElement>(null);
   const [open, setOpen] = useState(false);
   const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue);
-
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;
   const selected = options.find((o) => o.value === value);
   const hasError = !!error;
-
   const pos = usePopoverPosition(triggerRef, open);
-
-  // Закрытие по клику вне триггера и попапа
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -79,8 +70,6 @@ export function UISelect({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
-
-  // Закрытие по Escape
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -89,20 +78,17 @@ export function UISelect({
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [open]);
-
   const handleSelect = (next: string) => {
     if (!isControlled) setInternalValue(next);
     onChange?.(next);
     setOpen(false);
   };
-
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isControlled) setInternalValue(undefined);
     onChange?.('');
     setOpen(false);
   };
-
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       {label && (
@@ -110,7 +96,6 @@ export function UISelect({
           {label}
         </label>
       )}
-
       <button
         ref={triggerRef}
         id={autoId}
@@ -155,7 +140,6 @@ export function UISelect({
           />
         )}
       </button>
-
       {open && !disabled && pos && typeof window !== 'undefined' &&
         createPortal(
           <ul
@@ -194,9 +178,7 @@ export function UISelect({
           document.body,
         )
       }
-
       {name && <input type="hidden" name={name} value={value ?? ''} />}
-
       {error ? (
         <span className="text-xs text-error">{error}</span>
       ) : hint ? (

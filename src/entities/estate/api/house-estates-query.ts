@@ -1,12 +1,10 @@
 'use client'
-
 import useSWR from 'swr'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { QUERIES } from '@/shared/const/queries'
 import { normalizeFilters, type MapFiltersType } from '../model/estate-filters'
 import type { HouseEstatesResponseType } from './estate-types'
-
 export type HouseBbox = {
     minLat: number
     maxLat: number
@@ -14,7 +12,6 @@ export type HouseBbox = {
     maxLng: number
 }
 
-// bbox округляем до 5 знаков (~1 м), чтобы кэш совпадал между кликами по одному дому.
 function bboxKeyParts(b: HouseBbox) {
     return [
         Number(b.minLat.toFixed(5)),
@@ -23,15 +20,12 @@ function bboxKeyParts(b: HouseBbox) {
         Number(b.maxLng.toFixed(5)),
     ] as const
 }
-
 export const houseEstatesKey = (
     bbox: HouseBbox,
     filters: MapFiltersType = {},
     displayCurrency: 'USD' | 'BYN' | 'EUR' = 'USD',
 ) => [QUERIES.HOUSE_ESTATES, displayCurrency, bboxKeyParts(bbox), normalizeFilters(filters)] as const
-
 type Key = ReturnType<typeof houseEstatesKey>
-
 const fetcher = async ([, displayCurrency, bboxParts, normFilters]: Key): Promise<HouseEstatesResponseType> => {
     const [minLat, maxLat, minLng, maxLng] = bboxParts
     const r = await api.get<HouseEstatesResponseType>(API_ROUTES.ESTATE.HOUSE, {
@@ -39,7 +33,6 @@ const fetcher = async ([, displayCurrency, bboxParts, normFilters]: Key): Promis
     })
     return r.data
 }
-
 export function useHouseEstates(
     bbox: HouseBbox,
     filters: MapFiltersType = {},

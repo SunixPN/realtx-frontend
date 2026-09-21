@@ -11,5 +11,4 @@ export const ROUTES = {
     SUBSCRIPTIONS: "/subscriptions",
     PROPERTY: "/property",
 } as const
-
 export type RoutesType = typeof ROUTES[keyof typeof ROUTES]

@@ -1,10 +1,8 @@
 'use client';
-
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { IconCheck } from '@/shared/ui/ui-icons';
 import { ROUTES } from '@/shared/const/routes';
-
 export default function ResetSuccessView() {
     const t = useTranslations('auth.reset_confirm');
     return (
@@ -18,7 +16,6 @@ export default function ResetSuccessView() {
                     {t('success_subtitle')}
                 </p>
             </div>
-
             <Link
                 href={ROUTES.SIGN_IN}
                 className="flex h-11 items-center justify-center rounded-md bg-brand text-sm font-medium text-white hover:bg-brand-hover"

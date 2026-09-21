@@ -1,7 +1,5 @@
 'use client'
-
 import { useState } from 'react'
-
 export function useFiltersDrawer() {
     const [isOpen, setIsOpen] = useState(false)
     return {

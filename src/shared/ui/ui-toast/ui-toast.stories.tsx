@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { UIToast } from '@/shared/ui/ui-toast';
-
 const meta = {
   title: 'UI/Toast',
   component: UIToast,
@@ -15,24 +14,18 @@ const meta = {
     onClose: { action: 'closed' },
   },
 } satisfies Meta<typeof UIToast>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 export const Info: Story = {};
-
 export const Success: Story = {
   args: { tone: 'success', title: 'Объявление добавлено в избранное' },
 };
-
 export const Warning: Story = {
   args: { tone: 'warning', title: 'Скоро закончится подписка' },
 };
-
 export const Danger: Story = {
   args: { tone: 'danger', title: 'Не удалось сохранить изменения' },
 };
-
 export const WithAction: Story = {
   args: {
     tone: 'success',
@@ -40,7 +33,6 @@ export const WithAction: Story = {
     actionLabel: 'Отменить',
   },
 };
-
 export const WithClose: Story = {
   args: {
     tone: 'info',
@@ -48,7 +40,6 @@ export const WithClose: Story = {
     onClose: () => {},
   },
 };
-
 export const Full: Story = {
   args: {
     tone: 'success',

@@ -1,7 +1,5 @@
 'use client'
-
 import { useTranslations } from 'next-intl'
-
 export function useFormatLastCheck(): (iso: string | null) => string {
     const t = useTranslations('subscriptions')
     return (iso) => {

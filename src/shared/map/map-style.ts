@@ -1,7 +1,5 @@
 import type mapboxgl from "mapbox-gl"
-
 export type MapPalette = typeof MAP_PALETTE_LIGHT
-
 export const MAP_PALETTE_LIGHT = {
     land:       "#DDE4EC",
     water:      "#A9C3D3",
@@ -21,8 +19,6 @@ export const MAP_PALETTE_LIGHT = {
     border:     "#64748B",
 }
 
-// Тёмная палитра — нейтральный графит, синхронизирована с --surface-*.
-// Без сине-лавандового саташна, чтобы карта не «резала глаз».
 export const MAP_PALETTE_DARK: MapPalette = {
     land:       "#363E4D",
     water:      "#2F3D4A",
@@ -41,18 +37,13 @@ export const MAP_PALETTE_DARK: MapPalette = {
     labelPlace: "#F1F4F8",
     border:     "#66708A",
 }
-
-/** @deprecated Используй MAP_PALETTE_LIGHT / MAP_PALETTE_DARK или applyMapStyle(map, mode). */
 export const MAP_PALETTE = MAP_PALETTE_LIGHT
-
 export function applyMapStyle(map: mapboxgl.Map, mode: "light" | "dark" = "light") {
     const MAP_PALETTE = mode === "dark" ? MAP_PALETTE_DARK : MAP_PALETTE_LIGHT
     const layers = map.getStyle().layers ?? []
-
     for (const layer of layers) {
         const id = layer.id
         const type = layer.type
-
         if (type === "symbol") {
             const field = (layer as mapboxgl.SymbolLayer).layout?.["text-field"]
             if (field) {
@@ -63,12 +54,10 @@ export function applyMapStyle(map: mapboxgl.Map, mode: "light" | "dark" = "light
                 ])
             }
         }
-
         if (type === "background") {
             map.setPaintProperty(id, "background-color", MAP_PALETTE.land)
             continue
         }
-
         if (id.includes("water") && type === "fill") {
             map.setPaintProperty(id, "fill-color", MAP_PALETTE.water)
             continue
@@ -78,23 +67,19 @@ export function applyMapStyle(map: mapboxgl.Map, mode: "light" | "dark" = "light
             map.setPaintProperty(id, "text-halo-color", MAP_PALETTE.labelHalo)
             continue
         }
-
         if ((id.includes("park") || id.includes("wood") || id.includes("forest") || id.includes("grass")) && type === "fill") {
             map.setPaintProperty(id, "fill-color", id.includes("wood") || id.includes("forest") ? MAP_PALETTE.parkDark : MAP_PALETTE.park)
             continue
         }
-
         if (id.includes("landuse") && type === "fill") {
             map.setPaintProperty(id, "fill-color", MAP_PALETTE.land)
             continue
         }
-
         if (id.includes("building") && type === "fill") {
             map.setPaintProperty(id, "fill-color", MAP_PALETTE.building)
             map.setPaintProperty(id, "fill-outline-color", MAP_PALETTE.buildingOutline)
             continue
         }
-
         if ((id.includes("motorway") || id.includes("trunk")) && type === "line") {
             if (id.includes("casing")) {
                 map.setPaintProperty(id, "line-color", MAP_PALETTE.roadMotorCasing)
@@ -103,7 +88,6 @@ export function applyMapStyle(map: mapboxgl.Map, mode: "light" | "dark" = "light
             }
             continue
         }
-
         if ((id.includes("road") || id.includes("street") || id.includes("primary") || id.includes("secondary") || id.includes("tertiary")) && type === "line") {
             if (id.includes("casing")) {
                 map.setPaintProperty(id, "line-color", MAP_PALETTE.roadCasing)
@@ -112,18 +96,15 @@ export function applyMapStyle(map: mapboxgl.Map, mode: "light" | "dark" = "light
             }
             continue
         }
-
         if (id.includes("admin") && type === "line") {
             map.setPaintProperty(id, "line-color", MAP_PALETTE.border)
             continue
         }
-
         if ((id.includes("settlement") || id.includes("place")) && type === "symbol") {
             map.setPaintProperty(id, "text-color", MAP_PALETTE.labelPlace)
             map.setPaintProperty(id, "text-halo-color", MAP_PALETTE.labelHalo)
             continue
         }
-
         if (type === "symbol") {
             map.setPaintProperty(id, "text-color", MAP_PALETTE.labelText)
             map.setPaintProperty(id, "text-halo-color", MAP_PALETTE.labelHalo)

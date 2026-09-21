@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { UIInput } from '@/shared/ui/ui-input';
-
 const meta = {
   title: 'UI/Input',
   component: UIInput,
@@ -20,20 +19,15 @@ const meta = {
     ),
   ],
 } satisfies Meta<typeof UIInput>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 export const Default: Story = {};
-
 export const WithLabel: Story = {
   args: { label: 'Email', placeholder: 'you@example.com' },
 };
-
 export const WithHint: Story = {
   args: { label: 'Пароль', type: 'password', hint: 'Минимум 8 символов' },
 };
-
 export const WithError: Story = {
   args: {
     label: 'Email',
@@ -41,15 +35,12 @@ export const WithError: Story = {
     error: 'Некорректный email',
   },
 };
-
 export const Filled: Story = {
   args: { label: 'Имя', defaultValue: 'Иван' },
 };
-
 export const Disabled: Story = {
   args: { label: 'Заблокировано', value: 'Нельзя редактировать', disabled: true },
 };
-
 export const FormExample: Story = {
   render: () => (
     <div className="flex flex-col gap-4">

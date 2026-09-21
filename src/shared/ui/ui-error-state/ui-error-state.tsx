@@ -1,17 +1,14 @@
 'use client';
-
 import { useTranslations } from 'next-intl';
 import { UIEmptyState } from '@/shared/ui/ui-empty-state';
 import { UIButton } from '@/shared/ui/ui-button';
 import { IconAlertTriangle } from '@/shared/ui/ui-icons';
-
 export interface ErrorStateProps {
   title?:       string;
   description?: string;
   onRetry?:     () => void;
   retryLabel?:  string;
 }
-
 export function UIErrorState({
   title,
   description,

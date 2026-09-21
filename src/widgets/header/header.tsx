@@ -1,5 +1,4 @@
 'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -12,23 +11,18 @@ import { LocaleSwitcher } from '@/widgets/header/_ui/locale-switcher/locale-swit
 import { useAuth } from "@/entities/me/api/auth-query";
 import { useFavoriteIds } from '@/entities/favorite';
 import { useSubscriptions } from '@/entities/search-subscription';
-
 export function Header() {
   const t = useTranslations('header');
   const { theme, resolvedTheme, setTheme } = useTheme();
-
   const { isLoading: isPending, data } = useAuth()
   const { data: favIds } = useFavoriteIds({ enabled: !!data?.user })
   const favCount = favIds?.ids.length ?? 0
   const { data: subs } = useSubscriptions({ enabled: !!data?.user })
   const freshCount = subs?.reduce((n, s) => n + (s.paused ? 0 : s.fresh), 0) ?? 0
-
   const cycleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light');
   };
-
   const ThemeIcon = theme === 'system' ? IconMonitor : resolvedTheme === 'dark' ? IconSun : IconMoon;
-
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center justify-between gap-4 border-b border-border bg-surface-raised px-4">
       <Link href={ROUTES.ROOT} className="flex items-center hover:opacity-80">
@@ -49,7 +43,6 @@ export function Header() {
           className="hidden dark:block"
         />
       </Link>
-
       <div className="flex items-center gap-1">
         {data?.user && (
             <>
@@ -96,11 +89,8 @@ export function Header() {
         >
           <ThemeIcon size={20} />
         </button>
-
         <LocaleSwitcher />
-
         <span className="mx-1.5 h-6 w-px bg-border" />
-
         {isPending ? (
           <div
             aria-label={t('auth_checking_aria')}

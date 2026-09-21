@@ -1,22 +1,17 @@
 'use client';
-
 import { useTranslations } from 'next-intl';
 import { IconMail } from '@/shared/ui/ui-icons';
 import { UIButton } from '@/shared/ui/ui-button';
 import { useResendCooldown } from '@/shared/hooks/use-resend-cooldown';
 import { useResetRequestMutation } from '@/features/reset-request-feature/_api/reset-request-mutation';
 import { showToast } from '@/shared/helpers/show-toast';
-
 type ResetSentViewProps = {
     email: string;
 };
-
 export default function ResetSentView({ email }: ResetSentViewProps) {
     const t = useTranslations('auth.reset_request');
     const cooldown = useResendCooldown(45);
-
     const { trigger: resend, isMutating: isResending } = useResetRequestMutation();
-
     const handleResend = async () => {
         const result = await resend({ email });
         if (result) {
@@ -24,7 +19,6 @@ export default function ResetSentView({ email }: ResetSentViewProps) {
             cooldown.restart();
         }
     };
-
     return (
         <div className="flex flex-col gap-5">
             <div className="flex flex-col items-center gap-3 pb-2 text-center">
@@ -38,7 +32,6 @@ export default function ResetSentView({ email }: ResetSentViewProps) {
                     {t('sent_body_suffix')}
                 </p>
             </div>
-
             <div className="flex flex-col gap-2 border-t border-border pt-4">
                 <UIButton
                     variant="secondary"
@@ -49,7 +42,6 @@ export default function ResetSentView({ email }: ResetSentViewProps) {
                 >
                     {t('open_mail')}
                 </UIButton>
-
                 {cooldown.canResend ? (
                     <button
                         type="button"
@@ -65,7 +57,6 @@ export default function ResetSentView({ email }: ResetSentViewProps) {
                     </span>
                 )}
             </div>
-
             <div className="rounded-md border border-border bg-surface-subtle p-3 text-xs leading-relaxed text-text-faint">
                 {t('spam_hint')}
             </div>

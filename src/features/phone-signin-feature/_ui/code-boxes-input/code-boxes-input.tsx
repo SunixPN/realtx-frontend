@@ -1,9 +1,7 @@
 'use client';
-
 import { useRef, type ChangeEvent, type ClipboardEvent, type KeyboardEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
-
 type CodeBoxesInputProps = {
     value:     string;
     onChange:  (value: string) => void;
@@ -11,7 +9,6 @@ type CodeBoxesInputProps = {
     hasError?: boolean;
     disabled?: boolean;
 };
-
 export default function CodeBoxesInput({
     value,
     onChange,
@@ -21,20 +18,16 @@ export default function CodeBoxesInput({
 }: CodeBoxesInputProps) {
     const t = useTranslations('auth.phone');
     const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
-
     const digits = Array.from({ length }, (_, i) => value[i] ?? '');
-
     const focusIndex = (i: number) => {
         inputsRef.current[i]?.focus();
         inputsRef.current[i]?.select();
     };
-
     const setDigit = (i: number, digit: string) => {
         const next = digits.slice();
         next[i] = digit;
         onChange(next.join(''));
     };
-
     const handleChange = (i: number, e: ChangeEvent<HTMLInputElement>) => {
         const raw = e.target.value.replace(/\D/g, '');
         if (!raw) {
@@ -46,7 +39,6 @@ export default function CodeBoxesInput({
             if (i < length - 1) focusIndex(i + 1);
             return;
         }
-        // Пользователь вставил / быстро набрал несколько цифр — раскидываем по боксам
         const next = digits.slice();
         for (let k = 0; k < raw.length && i + k < length; k++) {
             next[i + k] = raw[k]!;
@@ -55,7 +47,6 @@ export default function CodeBoxesInput({
         const nextFocus = Math.min(i + raw.length, length - 1);
         focusIndex(nextFocus);
     };
-
     const handleKeyDown = (i: number, e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Backspace' && !digits[i] && i > 0) {
             e.preventDefault();
@@ -69,7 +60,6 @@ export default function CodeBoxesInput({
             focusIndex(i + 1);
         }
     };
-
     const handlePaste = (i: number, e: ClipboardEvent<HTMLInputElement>) => {
         const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
         if (!pasted) return;
@@ -81,7 +71,6 @@ export default function CodeBoxesInput({
         onChange(next.join(''));
         focusIndex(Math.min(i + pasted.length, length - 1));
     };
-
     return (
         <div className="flex justify-center gap-2">
             {digits.map((d, i) => (

@@ -8,18 +8,13 @@ import {
 } from "@/shared/const/routes-guard";
 import { env } from "@/shared/config/env";
 import { API_ROUTES } from "@/shared/const/api-routes";
-
 const EXP_SKEW_SEC = 30;
-
 type RefreshResult = {
     accessToken: string;
     setCookies: string[];
 } | null;
 
-// Coalescing: параллельные запросы с одним refresh_token делят один Promise.
-// Ключ — сам токен, чтобы после ротации новый вызов не подхватил чужое обещание.
 const inflight = new Map<string, Promise<RefreshResult>>();
-
 function decodeJwtExp(token: string): number | null {
     const parts = token.split(".");
     if (parts.length < 2) return null;
@@ -32,18 +27,15 @@ function decodeJwtExp(token: string): number | null {
         return null;
     }
 }
-
 function isExpired(token: string | undefined): boolean {
     if (!token) return true;
     const exp = decodeJwtExp(token);
     if (exp === null) return true;
     return Date.now() / 1000 >= exp - EXP_SKEW_SEC;
 }
-
 async function refresh(refreshToken: string): Promise<RefreshResult> {
     const existing = inflight.get(refreshToken);
     if (existing) return existing;
-
     const promise = (async (): Promise<RefreshResult> => {
         try {
             const base = env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
@@ -62,13 +54,10 @@ async function refresh(refreshToken: string): Promise<RefreshResult> {
             return null;
         }
     })();
-
     inflight.set(refreshToken, promise);
-    // Освобождаем ключ после завершения — новый refresh_token стартует свою запись.
     promise.finally(() => inflight.delete(refreshToken));
     return promise;
 }
-
 type ParsedCookie = {
     name: string;
     value: string;
@@ -82,7 +71,6 @@ type ParsedCookie = {
         sameSite?: "lax" | "strict" | "none";
     };
 };
-
 function parseSetCookie(header: string): ParsedCookie | null {
     const [nameValue, ...attrs] = header.split(";").map((p) => p.trim());
     const eq = nameValue.indexOf("=");
@@ -104,14 +92,12 @@ function parseSetCookie(header: string): ParsedCookie | null {
     }
     return { name, value, options };
 }
-
 function applyRefreshedCookies(
     response: NextResponse,
     request: NextRequest,
     accessToken: string,
     setCookies: string[],
 ) {
-    // Обновляем и response (для браузера), и request.cookies (для downstream RSC/route handlers в этом же запросе).
     let hasAccessInSetCookie = false;
     for (const raw of setCookies) {
         const parsed = parseSetCookie(raw);
@@ -120,7 +106,6 @@ function applyRefreshedCookies(
         response.cookies.set(parsed.name, parsed.value, parsed.options);
         request.cookies.set(parsed.name, parsed.value);
     }
-    // Страховка: если бэк не кладёт access_token в куку — ставим сами.
     if (!hasAccessInSetCookie) {
         const domain = env.COOKIE_DOMAIN || undefined;
         response.cookies.set(TOKENS.ACCESS_TOKEN, accessToken, {
@@ -133,7 +118,6 @@ function applyRefreshedCookies(
         request.cookies.set(TOKENS.ACCESS_TOKEN, accessToken);
     }
 }
-
 function clearAuthCookies(response: NextResponse) {
     const domain = env.COOKIE_DOMAIN || undefined;
     response.cookies.delete({ name: TOKENS.REFRESH_TOKEN, path: "/" });
@@ -143,44 +127,27 @@ function clearAuthCookies(response: NextResponse) {
         response.cookies.delete({ name: TOKENS.ACCESS_TOKEN, path: "/", domain });
     }
 }
-
 export const proxy: NextProxy = async (request) => {
     const { pathname } = request.nextUrl;
     const refreshToken = request.cookies.get(TOKENS.REFRESH_TOKEN)?.value;
     const accessToken = request.cookies.get(TOKENS.ACCESS_TOKEN)?.value;
-
-    // RSC-prefetch запросы летят параллельно с user-navigation. Если бэк
-    // ротирует refresh_token, любой параллельный prefetch со старым токеном
-    // ловит 401 и рушит сессию. Prefetch не нуждается в свежих cookies —
-    // пропускаем refresh для них полностью.
     const isRscPrefetch =
         request.headers.get("next-router-prefetch") === "1" ||
         request.headers.get("purpose") === "prefetch";
-
     let refreshed: NonNullable<RefreshResult> | null = null;
-
-    // Проактивный refresh: access протух (или отсутствует), но refresh есть.
     if (refreshToken && isExpired(accessToken) && !isRscPrefetch) {
         const result = await refresh(refreshToken);
         if (result) {
             refreshed = result;
         } else {
-            // Refresh не удался — может быть race с параллельной ротацией
-            // (текущий refresh_token уже использован соседним запросом). Не
-            // стираем куки здесь, иначе рушим валидную сессию. Пусть
-            // client-side interceptor или следующий user-navigation
-            // разберётся. На protected-route редиректим на sign-in только
-            // если нет никаких токенов — иначе просто пропускаем.
             if (PROTECTED_ROUTES.includes(pathname) && !accessToken) {
                 return NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url));
             }
             return NextResponse.next();
         }
     }
-
     const hasRefresh = refreshed ? true : Boolean(refreshToken);
     const hasAccess = refreshed ? true : !!accessToken;
-
     if (PROTECTED_ROUTES.includes(pathname) && !(hasAccess || hasRefresh)) {
         const url = request.nextUrl.clone();
         url.pathname = PROTECTED_REDIRECT_ROUTE;
@@ -188,27 +155,21 @@ export const proxy: NextProxy = async (request) => {
         clearAuthCookies(response);
         return response;
     }
-
     if (AUTH_ROUTES.includes(pathname) && (hasAccess || hasRefresh)) {
         const url = request.nextUrl.clone();
         url.pathname = AUTH_REDIRECT_ROUTE;
         const response = NextResponse.redirect(url);
-        // Бэк ротирует refresh_token при рефреше — если не пробросить новый
-        // Set-Cookie на редирект, браузер оставит инвалидный старый, и на
-        // следующем запросе proxy получит 401 и стирает сессию.
         if (refreshed) {
             applyRefreshedCookies(response, request, refreshed.accessToken, refreshed.setCookies);
         }
         return response;
     }
-
     const response = NextResponse.next({ request });
     if (refreshed) {
         applyRefreshedCookies(response, request, refreshed.accessToken, refreshed.setCookies);
     }
     return response;
 };
-
 export const config = {
     matcher: ["/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)"],
 };

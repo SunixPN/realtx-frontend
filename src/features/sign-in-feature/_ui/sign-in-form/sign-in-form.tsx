@@ -1,5 +1,4 @@
 'use client';
-
 import { useTranslations } from 'next-intl';
 import {UIInput} from "@/shared/ui/ui-input";
 import UIInputPassword from "@/shared/ui/ui-input-password/ui-input-password";
@@ -7,11 +6,9 @@ import Link from "next/link";
 import {ROUTES} from "@/shared/const/routes";
 import {UIButton} from "@/shared/ui/ui-button";
 import {useSignInForm} from "@/features/sign-in-feature/_hooks/use-sign-in-form";
-
 export default function SignInForm() {
     const t = useTranslations('auth.sign_in');
     const { form, onSubmit, isSubmitting } = useSignInForm()
-
     return (
         <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -26,7 +23,6 @@ export default function SignInForm() {
                 error={form.formState.errors.email?.message}
                 {...form.register('email')}
             />
-
             <div>
                 <UIInputPassword
                     label={t('password_label')}
@@ -44,7 +40,6 @@ export default function SignInForm() {
                     </Link>
                 </div>
             </div>
-
             <UIButton type="submit" size="lg" fullWidth loading={isSubmitting}>
                 {t('submit')}
             </UIButton>

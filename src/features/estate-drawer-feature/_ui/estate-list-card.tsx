@@ -1,5 +1,4 @@
 'use client'
-
 import { ImageOff, Train } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { getThumbPhoto, type EstateShortType, useFormatRooms, useFormatArea } from '@/entities/estate'
@@ -7,18 +6,15 @@ import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/u
 import { FavoriteHeartButton } from '@/features/favorite-toggle-feature'
 import { PriceDisplay, PricePerM2Display } from './price-display'
 import { formatStorey } from './format'
-
 type Props = {
     item: EstateShortType
     onClick: () => void
 }
-
 export function EstateListCard({ item, onClick }: Props) {
     const t = useTranslations('estate')
     const { currency } = useDisplayCurrency()
     const formatRooms = useFormatRooms()
     const formatArea = useFormatArea()
-
     return (
         <div
             role="button"
@@ -29,7 +25,6 @@ export function EstateListCard({ item, onClick }: Props) {
         >
             <div className="relative size-24 shrink-0 overflow-hidden rounded-md bg-[var(--surface-muted)]">
                 {item.photo ? (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={getThumbPhoto(item.photo)} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
                 ) : (
                     <div className="flex size-full items-center justify-center text-[var(--text-faint)]">

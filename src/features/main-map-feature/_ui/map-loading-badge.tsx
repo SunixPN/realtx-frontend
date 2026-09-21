@@ -1,9 +1,6 @@
 'use client'
-
 import { useTranslations } from 'next-intl'
 
-// Спиннер-бейдж в правом верхнем углу карты. При открытом drawer'е
-// смещается влево на его ширину (420px) + отступ (16px) — поверх блюра.
 export function MapLoadingBadge({ drawerOpen }: { drawerOpen: boolean }) {
     const t = useTranslations('common')
     return (

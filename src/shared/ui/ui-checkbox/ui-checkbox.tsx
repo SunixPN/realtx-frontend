@@ -1,17 +1,14 @@
 import { forwardRef, useId, type InputHTMLAttributes } from 'react';
 import { cn } from '@/shared/helpers/cn';
 import { IconCheck } from '@/shared/ui/ui-icons';
-
 export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
 }
-
 export const UICheckbox = forwardRef<HTMLInputElement, CheckboxProps>(
   ({ label, id, className, checked, defaultChecked, disabled, ...props }, ref) => {
     const autoId = useId();
     const inputId = id ?? autoId;
-
     return (
       <label
         htmlFor={inputId}
@@ -51,5 +48,4 @@ export const UICheckbox = forwardRef<HTMLInputElement, CheckboxProps>(
     );
   },
 );
-
 UICheckbox.displayName = 'UICheckbox';

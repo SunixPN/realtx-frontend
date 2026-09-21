@@ -42,5 +42,4 @@ export const API_ROUTES = {
     REMOVE: (id: string) => `/search-subscriptions/${id}`,
   },
 } as const;
-
 export type ApiRouteType = typeof API_ROUTES[keyof typeof API_ROUTES];

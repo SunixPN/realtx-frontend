@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { UIErrorState } from '@/shared/ui/ui-error-state';
-
 const meta = {
   title: 'UI/ErrorState',
   component: UIErrorState,
@@ -10,16 +9,12 @@ const meta = {
   },
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof UIErrorState>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 export const Default: Story = {};
-
 export const WithRetry: Story = {
   args: { onRetry: () => {} },
 };
-
 export const NetworkError: Story = {
   args: {
     title: 'Нет соединения',
@@ -27,7 +22,6 @@ export const NetworkError: Story = {
     onRetry: () => {},
   },
 };
-
 export const NotFound: Story = {
   args: {
     title: 'Объявление не найдено',

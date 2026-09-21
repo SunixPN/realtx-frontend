@@ -1,5 +1,4 @@
 import {ROUTES} from "@/shared/const/routes";
-
 export const PROTECTED_ROUTES: string[] = [ROUTES.FAVORITES, ROUTES.PROPERTY, ROUTES.SUBSCRIPTIONS]
 export const PROTECTED_REDIRECT_ROUTE = ROUTES.SIGN_IN
 export const AUTH_REDIRECT_ROUTE = ROUTES.ROOT

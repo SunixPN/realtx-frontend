@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { UIBadge } from '@/shared/ui/ui-badge';
-
 const meta = {
   title: 'UI/Badge',
   component: UIBadge,
@@ -19,22 +18,17 @@ const meta = {
     icon: { control: false },
   },
 } satisfies Meta<typeof UIBadge>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 export const Default: Story = {};
-
 export const Brand: Story = { args: { tone: 'brand', children: 'Хит' } };
 export const Success: Story = { args: { tone: 'success', children: 'Продано' } };
 export const Warning: Story = { args: { tone: 'warning', children: 'Торг' } };
 export const Danger: Story = { args: { tone: 'danger', children: 'Срочно' } };
 export const Info: Story = { args: { tone: 'info', children: 'Новостройка' } };
-
 export const Solid: Story = {
   args: { tone: 'brand', solid: true, children: 'На фото' },
 };
-
 export const AllTones: Story = {
   render: () => (
     <div className="flex flex-col gap-3">

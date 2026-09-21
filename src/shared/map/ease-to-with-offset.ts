@@ -1,11 +1,5 @@
 import type mapboxgl from 'mapbox-gl'
 
-/**
- * Плавно центрирует карту на точке [lng, lat], учитывая ширину drawer'а справа:
- * реальный оптический центр видимой области смещается влево на rightPanelPx / 2,
- * поэтому пятно интереса нужно расположить именно там. Мировые координаты
- * получаем через unproject от пиксельного смещения от текущего центра.
- */
 export function easeToWithOffset(
     map: mapboxgl.Map,
     coords: [number, number],

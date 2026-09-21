@@ -13,7 +13,6 @@ import {
 } from '@/entities/estate'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { serverFetch } from '@/shared/api/server-fetch'
-
 export default async function HomePage({
     searchParams,
 }: {
@@ -23,7 +22,6 @@ export default async function HomePage({
     const filters = parseFiltersFromSearchParams(new URLSearchParams(params))
     const currency = (params.currency ?? 'USD') as 'USD' | 'BYN' | 'EUR'
     const mapMode = params.mapMode === 'heat' ? 'heat' : 'objects'
-
     const normFilters = normalizeFilters(filters)
     const qs = new URLSearchParams()
     qs.set('displayCurrency', currency)
@@ -31,9 +29,7 @@ export default async function HomePage({
         if (Array.isArray(v)) v.forEach((item) => qs.append(k, String(item)))
         else qs.set(k, String(v))
     }
-
     let fallback: Record<string, unknown> = {}
-
     try {
         if (mapMode === 'heat') {
             const [districts, geojson] = await Promise.all([
@@ -59,7 +55,6 @@ export default async function HomePage({
     } catch (e) {
         console.error('[SSR map-points] prefetch failed:', e)
     }
-
     return (
         <SWRConfig value={{ fallback }}>
             <MapProvider>

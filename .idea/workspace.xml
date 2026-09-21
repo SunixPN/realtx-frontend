@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="11a43f35-ec77-4978-a0c6-3ea470ddf8ba" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/shared/actions/sign-in-redirect-action.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/shared/api/query.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/shared/lib/begin-top-loader.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/shared/lib/use-router.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/_providers/query-provider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/_providers/query-provider.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/auth/refresh/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/favorites/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/favorites/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/entities/favorite/api/use-favorites.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/favorite/api/use-favorites.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/entities/me/api/auth-api-interceptors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/me/api/auth-api-interceptors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/entities/me/api/auth-query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/me/api/auth-query.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/favorite-toggle-feature/_hooks/use-toggle-favorite.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/favorite-toggle-feature/_hooks/use-toggle-favorite.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/favorites-feature/_ui/favorites-grid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/favorites-feature/_ui/favorites-grid.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/google-auth-button-feature/_hooks/use-google-auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/google-auth-button-feature/_hooks/use-google-auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/logout-feature/_api/logout-mutation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/logout-feature/_api/logout-mutation.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/logout-feature/_hooks/use-logout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/logout-feature/_hooks/use-logout.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/_hooks/use-code-step-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/_hooks/use-code-step-form.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/phone-signin-feature.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/phone-signin-feature.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/register-feature/_hooks/use-register-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/register-feature/_hooks/use-register-form.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/sign-in-feature/_hooks/use-sign-in-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/sign-in-feature/_hooks/use-sign-in-form.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/proxy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/proxy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/actions/clear-tokens-action.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/actions/clear-tokens-action.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/ui/top-loader/top-loader.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/ui/top-loader/top-loader.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/widgets/favorites-widget/favorites-widget.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/favorites-widget/favorites-widget.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/widgets/header/_ui/locale-switcher/locale-switcher.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/_ui/locale-switcher/locale-switcher.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/widgets/header/_ui/mobile-menu/mobile-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/_ui/mobile-menu/mobile-menu.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/widgets/header/_ui/user-menu/user-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/_ui/user-menu/user-menu.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/widgets/header/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/header.tsx" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="3Jbcl0tYsKYxircTDHjQeZ2feXj" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "js.debugger.nextJs.config.created.client": "true",
+    "js.debugger.nextJs.config.created.server": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "D:\\development\\realtx-frontend\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="npm.Next.js: server-side">
+    <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3002/">
+      <method v="2" />
+    </configuration>
+    <configuration name="Next.js: server-side" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-WS-251.23774.424" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="11a43f35-ec77-4978-a0c6-3ea470ddf8ba" name="Changes" comment="" />
+      <created>1789933356500</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1789933356500</updated>
+      <workItem from="1789933358167" duration="15508000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

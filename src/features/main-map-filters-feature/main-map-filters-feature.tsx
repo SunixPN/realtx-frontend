@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useRef, useState } from 'react'
 import { useEstateFilters } from './_hooks/use-estate-filters'
 import { useDisplayCurrency } from './_hooks/use-display-currency'
@@ -11,35 +10,21 @@ import {
 } from '@/entities/search-subscription'
 import { EditSubscriptionDrawer } from '@/features/search-subscription-feature'
 import type { MapFiltersType } from '@/entities/estate'
-
 type Props = {
     drawerOpen: boolean
     onToggleDrawer: () => void
     onCloseDrawer: () => void
     total: number
 }
-
 type SaveMode =
     | { kind: 'create'; initialFilters: MapFiltersType }
     | { kind: 'edit'; subscription: SearchSubscriptionType }
-
 export default function MainMapFiltersFeature({ drawerOpen, onToggleDrawer, onCloseDrawer, total }: Props) {
     const { filters, setFilters, clearFilters } = useEstateFilters()
     const { currency, setCurrency } = useDisplayCurrency()
-
-    // Подписки нам нужны только чтобы понять: сохранён ли текущий поиск.
-    // Загружаем без принуждения (SWR подтянет фон), но если пользователь
-    // не логинен — запрос отвалится и мы просто останемся в состоянии
-    // «не сохранено».
     const { data: subscriptions } = useSubscriptions()
-
     const [savedSubscriptionId, setSavedSubscriptionId] = useState<string | null>(null)
     const [saveMode, setSaveMode] = useState<SaveMode | null>(null)
-
-    // При изменении фильтров/валюты флаг «сохранено» сбрасываем — предположение
-    // «этот поиск = сохранённая подписка» перестаёт быть верным.
-    // Сравниваем сериализованное представление, чтобы не реагировать на
-    // безобидные пересборки объекта.
     const lastSerialized = useRef<string>('')
     useEffect(() => {
         const key = JSON.stringify({ ...filters, currency })
@@ -52,7 +37,6 @@ export default function MainMapFiltersFeature({ drawerOpen, onToggleDrawer, onCl
             setSavedSubscriptionId(null)
         }
     }, [filters, currency])
-
     const handleSaveSearch = () => {
         if (savedSubscriptionId) {
             const found = subscriptions?.find(s => s.id === savedSubscriptionId)
@@ -63,7 +47,6 @@ export default function MainMapFiltersFeature({ drawerOpen, onToggleDrawer, onCl
         }
         setSaveMode({ kind: 'create', initialFilters: { ...filters, currency } })
     }
-
     return (
         <>
             <div className="absolute top-4 left-4 z-30 max-w-[calc(100%-2rem)]">
@@ -80,7 +63,6 @@ export default function MainMapFiltersFeature({ drawerOpen, onToggleDrawer, onCl
                     onSaveSearch={handleSaveSearch}
                 />
             </div>
-
             <FiltersDrawer
                 isOpen={drawerOpen}
                 filters={filters}
@@ -91,7 +73,6 @@ export default function MainMapFiltersFeature({ drawerOpen, onToggleDrawer, onCl
                 currency={currency}
                 onCurrencyChange={setCurrency}
             />
-
             <EditSubscriptionDrawer
                 isOpen={saveMode !== null}
                 mode={saveMode}

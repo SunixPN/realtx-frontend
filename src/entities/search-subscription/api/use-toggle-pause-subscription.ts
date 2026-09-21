@@ -1,5 +1,4 @@
 'use client'
-
 import useSWRMutation from 'swr/mutation'
 import { useSWRConfig } from 'swr'
 import { api } from '@/shared/api/api'
@@ -7,15 +6,12 @@ import { API_ROUTES } from '@/shared/const/api-routes'
 import { MUTATIONS } from '@/shared/const/mutations'
 import { subscriptionsKey } from './subscription-keys'
 import type { SearchSubscriptionType } from './subscription-types'
-
 type Arg = { id: string; paused: boolean }
-
 export function useTogglePauseSubscription() {
     const { mutate } = useSWRConfig()
     return useSWRMutation<SearchSubscriptionType, Error, string, Arg>(
         MUTATIONS.PAUSE_SUBSCRIPTION,
         async (_key, { arg }) => {
-            // Оптимистично меняем paused у элемента.
             mutate(
                 subscriptionsKey(),
                 (current: SearchSubscriptionType[] | undefined) =>

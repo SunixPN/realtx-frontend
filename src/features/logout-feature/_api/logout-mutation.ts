@@ -1,5 +1,4 @@
 'use client'
-
 import useSWRMutation from 'swr/mutation'
 import { useSWRConfig } from 'swr'
 import { useTranslations } from 'next-intl'
@@ -9,7 +8,6 @@ import { MUTATIONS } from '@/shared/const/mutations'
 import { showToast } from '@/shared/helpers/show-toast'
 import { authKey } from '@/entities/me/api/auth-query'
 import { clearTokensAction } from '@/shared/actions/clear-tokens-action'
-
 export function useLogoutMutation() {
     const { mutate } = useSWRConfig()
     const t = useTranslations('auth.logout')

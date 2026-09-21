@@ -1,5 +1,4 @@
 export type FavoriteSort = 'recent' | 'price-drop' | 'price-asc'
-
 export type FavoriteItemType = {
     id: number
     favoritedAt: string
@@ -22,7 +21,6 @@ export type FavoriteItemType = {
     sourceUrl: string | null
     headline: string | null
 }
-
 export type FavoriteIdsType = {
     ids: number[]
 }

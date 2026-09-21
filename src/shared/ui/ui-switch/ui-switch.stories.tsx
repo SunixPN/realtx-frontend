@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { UISwitch } from '@/shared/ui/ui-switch';
-
 const meta = {
   title: 'UI/Switch',
   component: UISwitch,
@@ -13,22 +12,15 @@ const meta = {
     onChange: { action: 'changed' },
   },
 } satisfies Meta<typeof UISwitch>;
-
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 export const Off: Story = {};
-
 export const On: Story = { args: { defaultChecked: true } };
-
 export const NoLabel: Story = { args: { label: undefined } };
-
 export const Disabled: Story = { args: { disabled: true, label: 'Заблокировано' } };
-
 export const DisabledOn: Story = {
   args: { disabled: true, defaultChecked: true, label: 'Уже включено' },
 };
-
 export const SettingsList: Story = {
   render: () => (
     <div className="flex flex-col gap-3">

@@ -7,7 +7,6 @@ export type {
     CreateSubscriptionDtoType,
     UpdateSubscriptionDtoType,
 } from './api/subscription-types'
-
 export { subscriptionsKey, isSubscriptionsKey } from './api/subscription-keys'
 export { useSubscriptions } from './api/use-subscriptions'
 export { useCreateSubscription } from './api/use-create-subscription'

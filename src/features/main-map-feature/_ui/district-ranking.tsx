@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { ChevronDown, TrendingUp } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
@@ -7,26 +6,21 @@ import { cn } from '@/shared/helpers/cn'
 import { scoreToColor } from '@/shared/map/heat-palette'
 import { useDistrictLabel } from '@/entities/estate'
 import type { DistrictProfitabilityType } from '@/entities/estate'
-
 type DistrictRankingProps = {
     districts: DistrictProfitabilityType[]
 }
-
 export function DistrictRanking({ districts }: DistrictRankingProps) {
     const t = useTranslations('filters')
     const locale = useLocale()
     const districtLabel = useDistrictLabel()
     const [collapsed, setCollapsed] = useState(false)
-
     const sorted = [...districts].sort((a, b) => b.score - a.score)
     const top = sorted[0]
-
     const formatPpm = (price: number | null, currency: number): string => {
         if (price === null) return '—'
         const sym = currency === 840 ? '$' : currency === 933 ? 'Br' : '€'
         return `${price.toLocaleString(locale)} ${sym}${t('per_m2')}`
     }
-
     return (
         <div className="w-64 rounded-lg border border-border bg-surface-raised shadow-lg overflow-hidden">
             <button
@@ -44,7 +38,6 @@ export function DistrictRanking({ districts }: DistrictRankingProps) {
                     aria-hidden
                 />
             </button>
-
             <div
                 className={cn(
                     'grid transition-[grid-template-rows] duration-300 ease-out',

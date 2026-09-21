@@ -1,5 +1,4 @@
 'use client'
-
 import useSWRMutation from 'swr/mutation'
 import { useSWRConfig } from 'swr'
 import { api } from '@/shared/api/api'
@@ -8,7 +7,6 @@ import { MUTATIONS } from '@/shared/const/mutations'
 import { subscriptionsKey } from './subscription-keys'
 import { toBackendFilters } from '../_helpers/filters-bridge'
 import type { CreateSubscriptionDtoType, SearchSubscriptionType } from './subscription-types'
-
 export function useCreateSubscription() {
     const { mutate } = useSWRConfig()
     return useSWRMutation<SearchSubscriptionType, Error, string, CreateSubscriptionDtoType>(
@@ -20,7 +18,6 @@ export function useCreateSubscription() {
         },
         {
             onSuccess: (created) => {
-                // Оптимистично добавляем в начало кэша, чтобы не ждать ревалидации.
                 mutate(
                     subscriptionsKey(),
                     (current: SearchSubscriptionType[] | undefined) =>

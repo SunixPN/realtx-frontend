@@ -7,8 +7,8 @@ import {Header} from "@/widgets/header";
 import "./globals.css";
 import QueryProvider from "@/app/_providers/query-provider";
 import {ReactNode} from "react";
-import { TopLoader } from "@/shared/ui/top-loader/top-loader";
 import { ThemeInitScript, ThemeProvider } from "@/shared/theme";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -39,7 +39,10 @@ export default async function RootLayout({
                 <body className="min-h-screen bg-surface-page text-text-base antialiased">
                     <ThemeProvider>
                         <NextIntlClientProvider locale={locale} messages={messages}>
-                            <TopLoader />
+                            <NextTopLoader
+                                color={"var(--brand)"}
+                                height={4}
+                            />
                             <Header/>
                             {children}
                             <Toaster position="top-right" richColors closeButton />

@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-
 export interface EmptyStateProps {
   icon:             ReactNode;
   title:            string;
@@ -7,7 +6,6 @@ export interface EmptyStateProps {
   action?:          ReactNode;
   secondaryAction?: ReactNode;
 }
-
 export function UIEmptyState({
   icon,
   title,

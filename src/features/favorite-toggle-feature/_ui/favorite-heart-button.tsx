@@ -1,20 +1,16 @@
 'use client'
-
 import { Heart } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/shared/helpers/cn'
 import { useToggleFavorite } from '../_hooks/use-toggle-favorite'
-
 type FavoriteHeartButtonProps = {
     estateId: number
     isFavorite: boolean
     className?: string
 }
-
 export function FavoriteHeartButton({ estateId, isFavorite: serverIsFavorite, className }: FavoriteHeartButtonProps) {
     const t = useTranslations('favorites')
     const { isFavorite, toggle, isPending } = useToggleFavorite(estateId, serverIsFavorite)
-
     return (
         <button
             type="button"

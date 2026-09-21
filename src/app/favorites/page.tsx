@@ -1,7 +1,5 @@
-import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { SWRConfig, unstable_serialize } from 'swr'
 import {
     favoritesKey,
     favoriteIdsKey,
@@ -13,6 +11,8 @@ import { API_ROUTES } from '@/shared/const/api-routes'
 import { serverFetch } from '@/shared/api/server-fetch'
 import { FavoritesWidget } from '@/widgets/favorites-widget'
 import type { DisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
+import {getQueryClient} from "@/shared/api/query";
+import {dehydrate, HydrationBoundary, noop} from "@tanstack/react-query";
 
 export async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations('common')
@@ -21,19 +21,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const VALID_SORTS = new Set<FavoriteSort>(['recent', 'price-drop', 'price-asc'])
 const VALID_CURRENCIES: DisplayCurrency[] = ['USD', 'BYN', 'EUR']
-
-function FavoritesPageSkeleton() {
-    return (
-        <div className="mx-auto flex w-full max-w-[1520px] flex-col gap-6 px-6 py-6">
-            <div className="h-14 border-b border-border pb-5" />
-            <div className="grid grid-cols-3 gap-4">
-                {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="aspect-[3/4] animate-pulse rounded-lg bg-surface-muted" />
-                ))}
-            </div>
-        </div>
-    )
-}
 
 export default async function FavoritesPage({
     searchParams,
@@ -49,25 +36,22 @@ export default async function FavoritesPage({
     const up = currParam?.toUpperCase() as DisplayCurrency | undefined
     const currency: DisplayCurrency = up && VALID_CURRENCIES.includes(up) ? up : 'USD'
 
-    let fallback: Record<string, unknown> = {}
+    const queryClient = getQueryClient()
 
-    try {
-        const [favorites, ids] = await Promise.all([
-            serverFetch<FavoriteItemType[]>(API_ROUTES.FAVORITES.LIST, { sort, displayCurrency: currency }),
-            serverFetch<FavoriteIdsType>(API_ROUTES.FAVORITES.IDS),
-        ])
+    await queryClient.query({
+        queryKey: [favoritesKey(sort, currency)],
+        queryFn: () => serverFetch<FavoriteItemType[]>(API_ROUTES.FAVORITES.LIST, { sort, displayCurrency: currency })
+    }).catch(noop)
 
-        fallback = {
-            [unstable_serialize(favoritesKey(sort, currency))]: favorites,
-            [unstable_serialize(favoriteIdsKey())]: ids,
-        }
-    } catch {
-        // prefetch failed — client загрузит данные сам
-    }
+    await queryClient.query({
+        queryKey: [favoriteIdsKey()],
+        queryFn: () => serverFetch<FavoriteIdsType>(API_ROUTES.FAVORITES.IDS)
+    }).catch(noop)
 
     return (
-        <SWRConfig value={{ fallback }}>
+        <HydrationBoundary state={dehydrate(queryClient)}>
             <FavoritesWidget />
-        </SWRConfig>
+        </HydrationBoundary>
+
     )
 }
