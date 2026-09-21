@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAddFavorite, useRemoveFavorite } from '@/entities/favorite'
 import { useAuth } from '@/entities/me/api/auth-query'
 import { ROUTES } from '@/shared/const/routes'
+import useRouter from '@/shared/lib/use-router'
 
 type Override = { id: number; value: boolean }
 export function useToggleFavorite(estateId: number, serverIsFavorite: boolean) {

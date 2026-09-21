@@ -5,7 +5,7 @@ import { cn } from '@/shared/helpers/cn';
 import { IconCheck } from '@/shared/ui/ui-icons';
 import { LOCALES, LOCALE_LABELS, LOCALE_SHORT, type Locale } from '@/shared/i18n/config';
 import { setLocale } from '@/shared/i18n/actions';
-import { beginTopLoader, endTopLoader } from '@/shared/ui/top-loader/top-loader';
+import {beginTopLoader, doneTopLoader} from "@/shared/lib/begin-top-loader";
 const CLOSE_MS = 120;
 export function LocaleSwitcher() {
     const current = useLocale() as Locale;
@@ -41,7 +41,7 @@ export function LocaleSwitcher() {
             try {
                 await setLocale(locale);
             } finally {
-                endTopLoader();
+                doneTopLoader();
             }
         });
     }

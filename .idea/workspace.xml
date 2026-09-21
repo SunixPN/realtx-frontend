@@ -5,36 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="11a43f35-ec77-4978-a0c6-3ea470ddf8ba" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/shared/actions/sign-in-redirect-action.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/shared/api/query.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/shared/lib/begin-top-loader.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/shared/lib/use-router.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/_providers/query-provider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/_providers/query-provider.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/api/auth/refresh/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/favorites/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/favorites/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/favorite/api/use-favorites.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/favorite/api/use-favorites.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/me/api/auth-api-interceptors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/me/api/auth-api-interceptors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/me/api/auth-query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/me/api/auth-query.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/claudeCodeTabState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/claudeCodeTabState.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/features/favorite-toggle-feature/_hooks/use-toggle-favorite.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/favorite-toggle-feature/_hooks/use-toggle-favorite.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/favorites-feature/_ui/favorites-grid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/favorites-feature/_ui/favorites-grid.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/features/google-auth-button-feature/_hooks/use-google-auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/google-auth-button-feature/_hooks/use-google-auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/logout-feature/_api/logout-mutation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/logout-feature/_api/logout-mutation.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/features/logout-feature/_hooks/use-logout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/logout-feature/_hooks/use-logout.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/_hooks/use-code-step-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/_hooks/use-code-step-form.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/phone-signin-feature.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/phone-signin-feature.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/features/register-feature/_hooks/use-register-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/register-feature/_hooks/use-register-form.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/features/sign-in-feature/_hooks/use-sign-in-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/sign-in-feature/_hooks/use-sign-in-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/proxy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/proxy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/shared/actions/clear-tokens-action.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/actions/clear-tokens-action.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/shared/ui/top-loader/top-loader.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/ui/top-loader/top-loader.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/widgets/favorites-widget/favorites-widget.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/favorites-widget/favorites-widget.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/lib/begin-top-loader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/lib/begin-top-loader.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/lib/use-router.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/lib/use-router.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/widgets/header/_ui/locale-switcher/locale-switcher.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/_ui/locale-switcher/locale-switcher.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/widgets/header/_ui/mobile-menu/mobile-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/_ui/mobile-menu/mobile-menu.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/widgets/header/_ui/user-menu/user-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/_ui/user-menu/user-menu.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/widgets/header/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/header.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +91,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1789933356500</updated>
-      <workItem from="1789933358167" duration="15508000" />
+      <workItem from="1789933358167" duration="16438000" />
     </task>
     <servers />
   </component>

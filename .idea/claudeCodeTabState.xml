@@ -7,8 +7,6 @@
           <value>
             <TabSessionState>
               <option name="provider" value="claude" />
-              <option name="sessionId" value="3a8c6c3b-9188-4f0c-a398-1457f0c660bf" />
-              <option name="cwd" value="D:\development\realtx-frontend" />
               <option name="model" value="claude-opus-5[1m]" />
               <option name="permissionMode" value="bypassPermissions" />
             </TabSessionState>

@@ -22,9 +22,9 @@ import {
 import { useTheme, type Theme } from '@/shared/theme';
 import { LOCALES, LOCALE_LABELS, type Locale } from '@/shared/i18n/config';
 import { setLocale } from '@/shared/i18n/actions';
-import { beginTopLoader, endTopLoader } from '@/shared/ui/top-loader/top-loader';
 import type { AuthUserType } from '@/entities/me/types/me-type';
 import { useLogout } from '@/features/logout-feature/_hooks/use-logout';
+import {beginTopLoader, doneTopLoader} from "@/shared/lib/begin-top-loader";
 const DURATION = 320;
 type MobileMenuProps = {
     isOpen: boolean;
@@ -79,7 +79,7 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                 await setLocale(locale);
                 onClose();
             } finally {
-                endTopLoader();
+                doneTopLoader();
             }
         });
     }

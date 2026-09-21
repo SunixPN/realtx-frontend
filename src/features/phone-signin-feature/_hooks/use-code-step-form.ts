@@ -1,8 +1,9 @@
 'use client';
+
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import useRouter from '@/shared/lib/use-router';
 import { signInWithPhoneNumber, type RecaptchaVerifier } from 'firebase/auth';
 import { useTranslations } from 'next-intl';
 import { firebaseAuth } from '@/shared/firebase/firebase';
@@ -11,11 +12,12 @@ import { usePhoneLoginMutation } from '@/features/phone-signin-feature/_api/phon
 import { phoneConfirmationStore } from '@/entities/phone-auth/state/phone-confirmation-store';
 import { showToast } from '@/shared/helpers/show-toast';
 import { ROUTES } from '@/shared/const/routes';
-import { beginTopLoader } from '@/shared/ui/top-loader/top-loader';
+
 type UseCodeStepFormArgs = {
     resetVerifier: () => RecaptchaVerifier | null;
     onResendDone:  () => void;
 };
+
 export const useCodeStepForm = ({ resetVerifier, onResendDone }: UseCodeStepFormArgs) => {
     const router = useRouter();
     const [isConfirming, setIsConfirming] = useState(false);
@@ -23,11 +25,14 @@ export const useCodeStepForm = ({ resetVerifier, onResendDone }: UseCodeStepForm
     const tV = useTranslations('validation');
     const tPhone = useTranslations('auth.phone');
     const schema = useMemo(() => createCodeSchema(tV), [tV]);
+
     const form = useForm<CodeValues>({
         resolver: zodResolver(schema),
         defaultValues: { code: '' },
     });
+
     const { trigger: login, isMutating: isMutationPending } = usePhoneLoginMutation();
+
     const onSubmit = async (values: CodeValues) => {
         const { confirmation } = phoneConfirmationStore.get();
         if (!confirmation) {
@@ -41,7 +46,6 @@ export const useCodeStepForm = ({ resetVerifier, onResendDone }: UseCodeStepForm
             const auth = await login({ idToken });
             if (auth) {
                 phoneConfirmationStore.clear();
-                beginTopLoader();
                 router.push(ROUTES.ROOT);
             }
         } catch {
@@ -50,6 +54,7 @@ export const useCodeStepForm = ({ resetVerifier, onResendDone }: UseCodeStepForm
             setIsConfirming(false);
         }
     };
+
     const resend = async () => {
         const { phone } = phoneConfirmationStore.get();
         if (!phone) return;
@@ -67,6 +72,7 @@ export const useCodeStepForm = ({ resetVerifier, onResendDone }: UseCodeStepForm
             setIsResending(false);
         }
     };
+
     return {
         form,
         onSubmit,

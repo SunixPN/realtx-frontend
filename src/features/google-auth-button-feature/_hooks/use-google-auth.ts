@@ -1,19 +1,23 @@
 'use client';
+
 import { useState } from 'react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
+import useRouter from '@/shared/lib/use-router';
 import { useTranslations } from 'next-intl';
 import { firebaseAuth } from '@/shared/firebase/firebase';
 import { useGoogleLoginMutation } from '@/features/google-auth-button-feature/_api/google-login-mutation';
 import { showToast } from '@/shared/helpers/show-toast';
 import { ROUTES } from '@/shared/const/routes';
-import { beginTopLoader } from '@/shared/ui/top-loader/top-loader';
+
 const POPUP_CLOSE_CODES = new Set(['auth/popup-closed-by-user', 'auth/cancelled-popup-request']);
+
 export const useGoogleAuth = () => {
     const t = useTranslations('auth');
     const router = useRouter();
     const [isPopupPending, setIsPopupPending] = useState(false);
+
     const { trigger, isMutating: isMutationPending } = useGoogleLoginMutation();
+
     const signInWithGoogle = async () => {
         setIsPopupPending(true);
         let settled = false;
@@ -22,11 +26,13 @@ export const useGoogleAuth = () => {
             settled = true;
             setIsPopupPending(false);
         };
+
         const onFocus = () => {
             window.removeEventListener('focus', onFocus);
             setTimeout(settle, 1500);
         };
         window.addEventListener('focus', onFocus);
+
         try {
             const provider = new GoogleAuthProvider();
             const result = await signInWithPopup(firebaseAuth, provider);
@@ -34,7 +40,6 @@ export const useGoogleAuth = () => {
             const idToken = await result.user.getIdToken();
             const auth = await trigger({ idToken });
             if (auth) {
-                beginTopLoader();
                 router.push(ROUTES.ROOT);
             }
         } catch (error) {
@@ -47,6 +52,7 @@ export const useGoogleAuth = () => {
             settle();
         }
     };
+
     return {
         signInWithGoogle,
         isLoading: isPopupPending || isMutationPending,
