@@ -5,6 +5,8 @@ import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { QUERIES } from '@/shared/const/queries'
 import { AuthUserType } from '@/entities/me/types/me-type'
+import readCookieAction from "@/shared/actions/read-cookie-action";
+import {TOKENS} from "@/shared/const/tokens";
 
 export const authKey = QUERIES.AUTH_QUERY
 

@@ -83,9 +83,10 @@ export const proxy: NextProxy = async (request) => {
     if (hasAccess && isInvalidOrExpired(accessToken)) {
         try {
             const base = env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+            const cookieHeader = request.headers.get("cookie") ?? "";
             const res = await fetch(`${base}${API_ROUTES.AUTH.REFRESH}`, {
                 method: "POST",
-                credentials: "include",
+                headers: cookieHeader ? { cookie: cookieHeader } : {},
             });
 
             if (!res.ok) {
@@ -97,6 +98,9 @@ export const proxy: NextProxy = async (request) => {
             const data = (await res.json()) as { accessToken: string };
             const response = authRoutesProtection(request, true)
             response.cookies.set(TOKENS.ACCESS_TOKEN, data.accessToken)
+
+            const setCookie = res.headers.get("set-cookie");
+            if (setCookie) response.headers.append("set-cookie", setCookie);
 
             return response
 
