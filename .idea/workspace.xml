@@ -7,17 +7,13 @@
     <list default="true" id="11a43f35-ec77-4978-a0c6-3ea470ddf8ba" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/claudeCodeTabState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/claudeCodeTabState.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/favorite-toggle-feature/_hooks/use-toggle-favorite.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/favorite-toggle-feature/_hooks/use-toggle-favorite.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/google-auth-button-feature/_hooks/use-google-auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/google-auth-button-feature/_hooks/use-google-auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/logout-feature/_hooks/use-logout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/logout-feature/_hooks/use-logout.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/_hooks/use-code-step-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/_hooks/use-code-step-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/phone-signin-feature.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/phone-signin-feature.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/register-feature/_hooks/use-register-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/register-feature/_hooks/use-register-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/features/sign-in-feature/_hooks/use-sign-in-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/sign-in-feature/_hooks/use-sign-in-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/shared/lib/begin-top-loader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/lib/begin-top-loader.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/shared/lib/use-router.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/lib/use-router.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/widgets/header/_ui/locale-switcher/locale-switcher.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/_ui/locale-switcher/locale-switcher.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/widgets/header/_ui/mobile-menu/mobile-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/_ui/mobile-menu/mobile-menu.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/favorites/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/favorites/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/subscriptions/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/subscriptions/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/entities/favorite/api/use-favorites.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/favorite/api/use-favorites.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/entities/search-subscription/api/use-subscriptions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/entities/search-subscription/api/use-subscriptions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/favorites-feature/_ui/favorites-grid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/favorites-feature/_ui/favorites-grid.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/widgets/favorites-widget/favorites-widget.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/favorites-widget/favorites-widget.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/widgets/subscriptions-widget/subscriptions-widget.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/subscriptions-widget/subscriptions-widget.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +49,7 @@
     "git-widget-placeholder": "master",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
+    "last_opened_file_path": "D:/development/realtx-frontend/src/app/subscriptions",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -62,6 +59,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\development\realtx-frontend\src\app\subscriptions" />
+    </key>
+  </component>
   <component name="RunManager" selected="npm.Next.js: server-side">
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3002/">
       <method v="2" />
@@ -91,7 +93,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1789933356500</updated>
-      <workItem from="1789933358167" duration="16438000" />
+      <workItem from="1789933358167" duration="18430000" />
     </task>
     <servers />
   </component>

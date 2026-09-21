@@ -39,12 +39,12 @@ export default async function FavoritesPage({
     const queryClient = getQueryClient()
 
     await queryClient.query({
-        queryKey: [favoritesKey(sort, currency)],
+        queryKey: favoritesKey(sort, currency),
         queryFn: () => serverFetch<FavoriteItemType[]>(API_ROUTES.FAVORITES.LIST, { sort, displayCurrency: currency })
     }).catch(noop)
 
     await queryClient.query({
-        queryKey: [favoriteIdsKey()],
+        queryKey: favoriteIdsKey(),
         queryFn: () => serverFetch<FavoriteIdsType>(API_ROUTES.FAVORITES.IDS)
     }).catch(noop)
 
