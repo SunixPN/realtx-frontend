@@ -350,6 +350,8 @@
         "all_filters_aria": "All filters",
         "save_search": "Save search",
         "search_saved": "Search saved",
+        "search_open_aria": "Open search",
+        "search_close_aria": "Close search",
         "auth_checking_aria": "Checking authentication",
         "results_count": "{count, plural, one {# property} other {# properties}}",
         "show_results": "Show {count, plural, one {# property} other {# properties}}",

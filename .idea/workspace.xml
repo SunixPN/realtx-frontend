@@ -4,7 +4,49 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="11a43f35-ec77-4978-a0c6-3ea470ddf8ba" name="Changes" comment="" />
+    <list default="true" id="11a43f35-ec77-4978-a0c6-3ea470ddf8ba" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/estate-drawer-feature/_ui/drawer-shell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/estate-drawer-feature/_ui/drawer-shell.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/estate-drawer-feature/_ui/estate-detail-view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/estate-drawer-feature/_ui/estate-detail-view.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/estate-drawer-feature/_ui/house-list-view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/estate-drawer-feature/_ui/house-list-view.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/estate-drawer-feature/estate-drawer-feature.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/estate-drawer-feature/estate-drawer-feature.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/main-map-feature/_hooks/use-map-markers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/main-map-feature/_hooks/use-map-markers.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/main-map-feature/_ui/district-ranking.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/main-map-feature/_ui/district-ranking.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/main-map-feature/_ui/map-mode-toggle.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/main-map-feature/_ui/map-mode-toggle.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/main-map-feature/main-map-feature.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/main-map-feature/main-map-feature.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/main-map-filters-feature/_ui/filter-bar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/main-map-filters-feature/_ui/filter-bar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/main-map-filters-feature/_ui/filters-drawer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/main-map-filters-feature/_ui/filters-drawer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/main-map-filters-feature/_ui/search-suggest.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/main-map-filters-feature/_ui/search-suggest.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/main-map-filters-feature/main-map-filters-feature.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/main-map-filters-feature/main-map-filters-feature.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/_ui/code-boxes-input/code-boxes-input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/_ui/code-boxes-input/code-boxes-input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/_ui/code-step-form/code-step-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/_ui/code-step-form/code-step-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/_ui/country-select/country-select.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/_ui/country-select/country-select.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/phone-signin-feature/_ui/phone-signin-header/phone-signin-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/phone-signin-feature/_ui/phone-signin-header/phone-signin-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/register-feature/_ui/register-header/register-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/register-feature/_ui/register-header/register-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/reset-confirm-feature/_ui/reset-confirm-form/reset-confirm-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/reset-confirm-feature/_ui/reset-confirm-form/reset-confirm-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/reset-confirm-feature/_ui/reset-success-view/reset-success-view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/reset-confirm-feature/_ui/reset-success-view/reset-success-view.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/reset-request-feature/_ui/reset-back-link/reset-back-link.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/reset-request-feature/_ui/reset-back-link/reset-back-link.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/reset-request-feature/_ui/reset-request-form/reset-request-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/reset-request-feature/_ui/reset-request-form/reset-request-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/reset-request-feature/_ui/reset-sent-view/reset-sent-view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/reset-request-feature/_ui/reset-sent-view/reset-sent-view.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/sign-in-feature/_ui/sign-in-form/sign-in-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/sign-in-feature/_ui/sign-in-form/sign-in-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/features/sign-in-feature/_ui/sign-in-header/sign-in-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/features/sign-in-feature/_ui/sign-in-header/sign-in-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/i18n/messages/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/i18n/messages/en.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/i18n/messages/ru.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/i18n/messages/ru.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/map/ease-to-with-offset.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/map/ease-to-with-offset.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/map/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/map/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/map/map-provider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/map/map-provider.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/ui/ui-auth-footer/ui-auth-footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/ui/ui-auth-footer/ui-auth-footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/ui/ui-auth-footer/ui-legal-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/ui/ui-auth-footer/ui-legal-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/ui/ui-auth-shell/ui-auth-shell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/ui/ui-auth-shell/ui-auth-shell.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/ui/ui-chip/ui-chip.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/ui/ui-chip/ui-chip.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/ui/ui-expired-link/ui-expired-link.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/ui/ui-expired-link/ui-expired-link.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/ui/ui-input/ui-input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/ui/ui-input/ui-input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/ui/ui-link-checker/ui-link-checker.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/shared/ui/ui-link-checker/ui-link-checker.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/widgets/header/_ui/mobile-menu/mobile-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/_ui/mobile-menu/mobile-menu.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/widgets/header/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/widgets/header/header.tsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,9 +63,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="3Jbcl0tYsKYxircTDHjQeZ2feXj" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
@@ -31,24 +73,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "js.debugger.nextJs.config.created.client": "true",
-    "js.debugger.nextJs.config.created.server": "true",
-    "last_opened_file_path": "D:/development/realtx-frontend/src/app/subscriptions",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "D:\\development\\realtx-frontend\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
+    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/development/realtx-frontend/src/app/subscriptions&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\development\\realtx-frontend\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\development\realtx-frontend\src\app\subscriptions" />
@@ -84,6 +126,7 @@
       <option name="presentableId" value="Default" />
       <updated>1789933356500</updated>
       <workItem from="1789933358167" duration="18903000" />
+      <workItem from="1789980783762" duration="4962000" />
     </task>
     <servers />
   </component>

@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useHouseEstates, type HouseBbox } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { useEstateFilters } from '@/features/main-map-filters-feature/_hooks/use-estate-filters'
+import { useBottomSheetDrag } from '@/shared/ui/ui-bottom-sheet'
 import { EstateListCard } from './estate-list-card'
 type Props = {
     bbox: HouseBbox
@@ -17,9 +18,14 @@ export function HouseListView({ bbox, onSelect, onClose }: Props) {
     const { data, isLoading: isPending, error } = useHouseEstates(bbox, filters, currency)
     const isError = !!error
     const items = data?.items ?? []
+    const drag = useBottomSheetDrag()
     return (
         <div className="flex h-full flex-col">
-            <header className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--border-default)] px-4 py-3">
+            <header
+                {...(drag?.handlers ?? {})}
+                style={drag?.style}
+                className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--border-default)] px-4 py-3"
+            >
                 <div>
                     <div className="text-base font-semibold text-[var(--text-base)]">
                         {isPending ? t('house_loading') : t('house_count', { count: items.length })}

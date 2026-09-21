@@ -1,4 +1,4 @@
-import type {Metadata} from "next";
+import type {Metadata, Viewport} from "next";
 import {Inter} from "next/font/google";
 import {Toaster} from "sonner";
 import {NextIntlClientProvider} from "next-intl";
@@ -15,6 +15,13 @@ const inter = Inter({
     subsets: ["latin", "cyrillic"],
     display: "swap",
 });
+
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+};
 
 export async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations("common");
@@ -36,7 +43,7 @@ export default async function RootLayout({
                 <ThemeInitScript />
             </head>
             <QueryProvider>
-                <body className="min-h-screen bg-surface-page text-text-base antialiased">
+                <body className="min-h-dvh bg-surface-page text-text-base antialiased">
                     <ThemeProvider>
                         <NextIntlClientProvider locale={locale} messages={messages}>
                             <NextTopLoader

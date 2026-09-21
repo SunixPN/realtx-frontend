@@ -9,6 +9,8 @@ import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/helpers/cn';
 import { usePopoverPosition } from '@/shared/helpers/use-popover-position';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
+import { UIBottomSheet } from '@/shared/ui/ui-bottom-sheet';
 import { IconChevronDown, IconX } from '@/shared/ui/ui-icons';
 export interface ChipProps {
   label:      string;
@@ -31,14 +33,15 @@ export function UIChip({
   className,
 }: ChipProps) {
   const tCommon = useTranslations('common');
+  const isMobile = useIsMobile();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const hasValue = value !== undefined && value !== null && value !== '';
   const variant = open ? 'open' : hasValue ? 'filled' : 'empty';
-  const pos = usePopoverPosition(triggerRef, open);
+  const pos = usePopoverPosition(triggerRef, open && !isMobile);
   useEffect(() => {
-    if (!open) return;
+    if (!open || isMobile) return;
     const handler = (e: MouseEvent) => {
       const t = e.target as Node;
       const inNestedPopover =
@@ -53,7 +56,7 @@ export function UIChip({
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+  }, [open, isMobile]);
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -114,7 +117,41 @@ export function UIChip({
           )
         )}
       </button>
-      {open && children && !disabled && pos && typeof window !== 'undefined' &&
+      {children && !disabled && isMobile && (
+        <UIBottomSheet
+          open={open}
+          onClose={() => setOpen(false)}
+          autoHeight
+          ariaLabel={label}
+        >
+          <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+            <h3 className="text-[15px] font-semibold text-text-base">{label}</h3>
+            <button
+              type="button"
+              aria-label={tCommon('close')}
+              onClick={() => setOpen(false)}
+              className="flex size-9 items-center justify-center rounded-md text-text-muted transition-colors active:bg-surface-muted"
+            >
+              <IconX size={18} />
+            </button>
+          </div>
+          <div className="max-h-[70dvh] overflow-y-auto overscroll-contain px-4 py-4">
+            {children}
+          </div>
+          {onClear && hasValue && (
+            <div className="flex shrink-0 border-t border-border px-4 py-3">
+              <button
+                type="button"
+                onClick={() => { onClear(); setOpen(false); }}
+                className="flex-1 rounded-md border border-border py-3 text-sm font-medium text-text-muted transition-colors active:bg-surface-muted"
+              >
+                {tCommon('clear_aria')}
+              </button>
+            </div>
+          )}
+        </UIBottomSheet>
+      )}
+      {open && children && !disabled && !isMobile && pos && typeof window !== 'undefined' &&
         createPortal(
           <div
             ref={popoverRef}

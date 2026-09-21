@@ -370,6 +370,16 @@ html.dark {
   }
 }
 
+/* iOS Safari zooms on focus if input font-size < 16px. Правило вне
+ * @layer base намеренно — иначе оно проигрывает утилите text-sm (14px)
+ * от Tailwind, и Safari продолжает зумить. !important чтобы гарантированно
+ * перебить любые text-* классы на mobile-ширинах. */
+@media (max-width: 1023px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* ─── Map pins ──────────────────────────────────────────────────────── */
 /* ВАЖНО: на .map-pin (root-элементе маркера) нельзя вешать transform или
  * transition transform — Mapbox сам пишет ему inline `transform: translate(...)`
@@ -512,6 +522,39 @@ html.dark .map-pin--visited .map-pin__tail {
 
 .mapboxgl-marker {
   will-change: transform;
+}
+
+/* Mobile/tablet: enlarge marker tap targets */
+@media (max-width: 1023px) {
+  .map-pin__label {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+  .map-pin__tail {
+    border-left-width: 6px;
+    border-right-width: 6px;
+    border-top-width: 6px;
+  }
+  .map-cluster--sm {
+    width: 44px;
+    height: 44px;
+    font-size: 13px;
+  }
+  .map-cluster--md {
+    width: 54px;
+    height: 54px;
+    font-size: 16px;
+  }
+  .map-cluster--lg {
+    width: 68px;
+    height: 68px;
+    font-size: 19px;
+  }
+  .map-house__inner {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
 
 /* ─── FiltersDrawer transitions (react-transition-group) ─────────────── */

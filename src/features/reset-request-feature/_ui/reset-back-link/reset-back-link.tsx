@@ -8,7 +8,7 @@ export default function ResetBackLink() {
     return (
         <Link
             href={ROUTES.SIGN_IN}
-            className="flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text-base"
+            className="-ml-2 flex w-fit items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-text-muted transition-colors active:bg-surface-muted hover:text-text-base"
         >
             <IconArrowLeft size={14} />
             {t('back_to_signin')}

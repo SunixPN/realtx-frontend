@@ -14,8 +14,13 @@ export function MapModeToggle({ mode, onChange }: MapModeToggleProps) {
         { key: 'heat',    label: t('mode_heat') },
     ]
     return (
-        <div className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-raised p-1 shadow-md">
-            <Layers className="mx-1.5 size-4 text-text-faint shrink-0" aria-hidden />
+        <div
+            className={cn(
+                'flex w-full items-center gap-1 rounded-md border border-border bg-surface-raised/95 p-1 shadow-md backdrop-blur-sm',
+                'lg:inline-flex lg:w-auto lg:bg-surface-raised',
+            )}
+        >
+            <Layers className="ml-1.5 hidden size-4 shrink-0 text-text-faint lg:block" aria-hidden />
             {ITEMS.map((item) => (
                 <button
                     key={item.key}
@@ -23,10 +28,10 @@ export function MapModeToggle({ mode, onChange }: MapModeToggleProps) {
                     aria-pressed={mode === item.key}
                     onClick={() => onChange(item.key)}
                     className={cn(
-                        'rounded-sm px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer',
+                        'flex-1 cursor-pointer rounded-sm px-3 py-2.5 text-sm font-medium transition-colors lg:flex-initial lg:py-1.5',
                         mode === item.key
                             ? 'bg-brand text-white'
-                            : 'text-text-muted hover:bg-surface-muted',
+                            : 'text-text-muted hover:bg-surface-muted active:bg-surface-muted',
                     )}
                 >
                     {item.label}

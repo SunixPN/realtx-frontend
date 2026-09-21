@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { CSSTransition } from 'react-transition-group';
@@ -53,6 +53,71 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
     const { logout, isPending: isLoggingOut } = useLogout();
     const backdropRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLElement>(null);
+    const dragStart = useRef<{ x: number; y: number; t: number } | null>(null);
+    const [dragX, setDragX] = useState(0);
+    const [dragging, setDragging] = useState(false);
+    const capturedRef = useRef(false);
+    const dismissingRef = useRef(false);
+    const onPointerDown = (e: React.PointerEvent) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        const target = e.target as HTMLElement | null;
+        if (target && target.closest('button, a, input, textarea, select, [role="button"]')) {
+            return;
+        }
+        dragStart.current = { x: e.clientX, y: e.clientY, t: Date.now() };
+        capturedRef.current = false;
+    };
+    const onPointerMove = (e: React.PointerEvent) => {
+        const s = dragStart.current;
+        if (!s) return;
+        const dx = e.clientX - s.x;
+        const dy = e.clientY - s.y;
+        if (!capturedRef.current) {
+            if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy)) return;
+            capturedRef.current = true;
+            setDragging(true);
+            try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch {}
+        }
+        setDragX(Math.max(0, dx));
+    };
+    const onPointerUp = (e: React.PointerEvent) => {
+        const s = dragStart.current;
+        dragStart.current = null;
+        if (!capturedRef.current || !s) {
+            capturedRef.current = false;
+            return;
+        }
+        capturedRef.current = false;
+        const dx = e.clientX - s.x;
+        const dt = Date.now() - s.t;
+        const v = dx / Math.max(1, dt);
+        setDragging(false);
+        try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+        const panelWidth = panelRef.current?.offsetWidth ?? 320;
+        if (dx > panelWidth * 0.3 || (v > 0.5 && dx > 40)) {
+            // Smooth exit: animate inline transform out to full width in
+            // parallel with the CSSTransition exit so the panel never snaps
+            // back to translateX(0) for a frame before unmounting.
+            dismissingRef.current = true;
+            setDragX(panelWidth);
+            onClose();
+            window.setTimeout(() => {
+                dismissingRef.current = false;
+                setDragX(0);
+                setDragging(false);
+            }, DURATION + 20);
+            return;
+        }
+        setDragX(0);
+    };
+    useEffect(() => {
+        if (!isOpen && !dismissingRef.current) {
+            setDragX(0);
+            setDragging(false);
+            capturedRef.current = false;
+            dragStart.current = null;
+        }
+    }, [isOpen]);
     useEffect(() => {
         if (!isOpen) return;
         const handler = (e: KeyboardEvent) => {
@@ -114,8 +179,23 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                 <aside
                     ref={panelRef}
                     aria-label={t('menu_title')}
+                    onPointerDown={onPointerDown}
+                    onPointerMove={onPointerMove}
+                    onPointerUp={onPointerUp}
+                    onPointerCancel={onPointerUp}
+                    style={{
+                        paddingTop: 'env(safe-area-inset-top)',
+                        paddingBottom: 'env(safe-area-inset-bottom)',
+                        transform: dragX > 0 ? `translateX(${dragX}px)` : undefined,
+                        transition: dragging
+                            ? 'none'
+                            : dragX > 0
+                                ? `transform ${DURATION}ms cubic-bezier(.32,.72,0,1)`
+                                : undefined,
+                        touchAction: 'pan-y',
+                    }}
                     className={cn(
-                        'fixed inset-y-0 right-0 z-50 flex w-[min(320px,100vw)] flex-col',
+                        'fixed inset-y-0 right-0 z-50 flex w-[min(320px,calc(100vw-32px))] flex-col',
                         'border-l border-border bg-surface-page',
                         'shadow-[0_12px_32px_-8px_rgb(15_23_42/0.16)]',
                     )}
@@ -289,7 +369,7 @@ function MenuLink({ href, icon, label, badge, onClose }: MenuLinkProps) {
         <Link
             href={href}
             onClick={onClose}
-            className="flex items-center gap-3 px-4 py-3 text-sm text-text-base transition-colors hover:bg-surface-subtle active:bg-surface-muted"
+            className="flex min-h-12 items-center gap-3 px-4 py-3 text-sm text-text-base transition-colors active:bg-surface-muted hover:bg-surface-subtle"
         >
             <span className="text-text-muted">{icon}</span>
             <span className="flex-1">{label}</span>
@@ -311,7 +391,7 @@ function MenuButton({ icon, label, onClick }: MenuButtonProps) {
         <button
             type="button"
             onClick={onClick}
-            className="flex items-center gap-3 px-4 py-3 text-left text-sm text-text-base transition-colors hover:bg-surface-subtle active:bg-surface-muted"
+            className="flex min-h-12 items-center gap-3 px-4 py-3 text-left text-sm text-text-base transition-colors active:bg-surface-muted hover:bg-surface-subtle"
         >
             <span className="text-text-muted">{icon}</span>
             <span className="flex-1">{label}</span>

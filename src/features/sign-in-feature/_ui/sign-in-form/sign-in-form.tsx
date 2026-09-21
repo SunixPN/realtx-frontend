@@ -31,10 +31,10 @@ export default function SignInForm() {
                     error={form.formState.errors.password?.message}
                     {...form.register('password')}
                 />
-                <div className="mt-1.5 text-right">
+                <div className="mt-1 text-right">
                     <Link
                         href={ROUTES.RESET}
-                        className="text-xs font-medium text-brand hover:underline"
+                        className="-mr-1 inline-block px-1 py-1.5 text-xs font-medium text-brand hover:underline"
                     >
                         {t('forgot_password')}
                     </Link>

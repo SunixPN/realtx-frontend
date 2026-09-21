@@ -118,29 +118,32 @@ export function useMapMarkers(
     handlersRef.current = handlers
     useEffect(() => {
         if (!map) return
-        if (!map.getSource(SOURCE_ID)) {
-            map.addSource(SOURCE_ID, {
-                type: 'geojson',
-                data: toFeatureCollection(pointsRef.current),
-                cluster: true,
-                clusterMaxZoom: 22,
-                clusterRadius: 60,
-                clusterProperties: {
-                    minLng: ['min', ['get', 'lng']],
-                    maxLng: ['max', ['get', 'lng']],
-                    minLat: ['min', ['get', 'lat']],
-                    maxLat: ['max', ['get', 'lat']],
-                },
-            })
+        const ensureSourceAndLayer = () => {
+            if (!map.getSource(SOURCE_ID)) {
+                map.addSource(SOURCE_ID, {
+                    type: 'geojson',
+                    data: toFeatureCollection(pointsRef.current),
+                    cluster: true,
+                    clusterMaxZoom: 22,
+                    clusterRadius: 60,
+                    clusterProperties: {
+                        minLng: ['min', ['get', 'lng']],
+                        maxLng: ['max', ['get', 'lng']],
+                        minLat: ['min', ['get', 'lat']],
+                        maxLat: ['max', ['get', 'lat']],
+                    },
+                })
+            }
+            if (!map.getLayer(HIDDEN_LAYER_ID)) {
+                map.addLayer({
+                    id: HIDDEN_LAYER_ID,
+                    type: 'circle',
+                    source: SOURCE_ID,
+                    paint: { 'circle-radius': 15, 'circle-opacity': 0, 'circle-stroke-width': 0 },
+                })
+            }
         }
-        if (!map.getLayer(HIDDEN_LAYER_ID)) {
-            map.addLayer({
-                id: HIDDEN_LAYER_ID,
-                type: 'circle',
-                source: SOURCE_ID,
-                paint: { 'circle-radius': 15, 'circle-opacity': 0, 'circle-stroke-width': 0 },
-            })
-        }
+        ensureSourceAndLayer()
         const updateMarkers = () => {
             const src = map.getSource(SOURCE_ID) as mapboxgl.GeoJSONSource | undefined
             if (!src || !map.getLayer(HIDDEN_LAYER_ID)) return
@@ -227,14 +230,24 @@ export function useMapMarkers(
             if (e.sourceId !== SOURCE_ID || !e.isSourceLoaded) return
             updateMarkers()
         }
+        const onStyleLoad = () => {
+            for (const key in onScreenRef.current) onScreenRef.current[key].remove()
+            onScreenRef.current = {}
+            for (const key in markersRef.current) markersRef.current[key].remove()
+            markersRef.current = {}
+            ensureSourceAndLayer()
+            updateMarkers()
+        }
         map.on('move', updateMarkers)
         map.on('moveend', updateMarkers)
         map.on('sourcedata', onSourceData)
+        map.on('style.load', onStyleLoad)
         updateMarkers()
         return () => {
             map.off('move', updateMarkers)
             map.off('moveend', updateMarkers)
             map.off('sourcedata', onSourceData)
+            map.off('style.load', onStyleLoad)
             for (const key in markersRef.current) markersRef.current[key].remove()
             markersRef.current = {}
             onScreenRef.current = {}

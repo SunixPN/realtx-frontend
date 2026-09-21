@@ -22,11 +22,19 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
     const t = useTranslations('filters')
     const [input, setInput] = useState(value ?? '')
     const [open, setOpen] = useState(false)
+    const [isMobile, setIsMobile] = useState(false)
     const wrapperRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
     useEffect(() => {
         setInput(value ?? '')
     }, [value])
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 1023px)')
+        const update = () => setIsMobile(mq.matches)
+        update()
+        mq.addEventListener('change', update)
+        return () => mq.removeEventListener('change', update)
+    }, [])
     const debounced = useDebounced(input.trim(), 250)
     const { data: suggestions = [], isValidating: isFetching } = useSuggest(debounced, 10, { enabled: open })
     const pos = usePopoverPosition(wrapperRef, open)
@@ -56,7 +64,7 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
         <div ref={wrapperRef} className="relative">
             <div
                 className={cn(
-                    'flex h-9 w-96 items-center gap-2 rounded-sm border bg-surface-page px-3 transition-colors',
+                    'flex h-11 w-full items-center gap-2 rounded-sm border bg-surface-page px-3 transition-colors lg:h-9 lg:w-96',
                     open ? 'border-brand ring-2 ring-brand/20' : 'border-border-strong hover:border-text-faint',
                 )}
             >
@@ -64,14 +72,22 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
                 <input
                     ref={inputRef}
                     type="text"
+                    size={1}
+                    suppressHydrationWarning
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
                     value={input}
                     onChange={(e) => { setInput(e.target.value); setOpen(true) }}
                     onFocus={() => setOpen(true)}
+                    onBlur={() => { if (typeof window !== 'undefined') window.scrollTo(0, 0) }}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') commit(input.trim() || undefined)
                         if (e.key === 'Escape') setOpen(false)
                     }}
                     placeholder={t('search_placeholder')}
+                    style={{ minWidth: 0 }}
                     className="min-w-0 flex-1 bg-transparent text-sm text-text-base placeholder:text-text-muted outline-none"
                 />
                 {input && (
@@ -88,12 +104,9 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
             {open && pos && typeof window !== 'undefined' && createPortal(
                 <ul
                     data-suggest-popover="true"
-                    style={{
-                        position: 'fixed',
-                        top: pos.top + 4,
-                        left: pos.left,
-                        width: pos.width,
-                    }}
+                    style={isMobile
+                        ? { position: 'fixed', top: pos.top + 4, left: 8, right: 8 }
+                        : { position: 'fixed', top: pos.top + 4, left: pos.left, width: pos.width }}
                     className="z-[9999] max-h-72 overflow-y-auto rounded-sm border border-border bg-surface-raised py-1 shadow-lg"
                 >
                     {suggestions.length === 0 && !isFetching && (

@@ -15,7 +15,7 @@ export function UIAuthFooter() {
     const closeModal = () => setOpen(null);
     return (
         <>
-            <footer className="border-t border-border bg-surface-raised px-4 py-4 text-center text-xs text-text-faint">
+            <footer className="border-t border-border bg-surface-raised px-3 py-3 text-center text-[11px] leading-relaxed text-text-faint xs:px-4 xs:py-4 xs:text-xs">
                 {t('prefix')}{' '}
                 <button
                     type="button"

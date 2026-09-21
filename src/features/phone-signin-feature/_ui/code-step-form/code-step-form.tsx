@@ -47,7 +47,7 @@ export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStep
                         type="button"
                         onClick={resend}
                         disabled={isResending || isSubmitting}
-                        className="cursor-pointer text-sm font-medium text-brand hover:underline disabled:cursor-not-allowed disabled:opacity-60 disabled:no-underline"
+                        className="cursor-pointer px-2 py-1.5 text-sm font-medium text-brand hover:underline disabled:cursor-not-allowed disabled:opacity-60 disabled:no-underline"
                     >
                         {isResending ? t('resend_pending') : t('resend')}
                     </button>
@@ -59,7 +59,7 @@ export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStep
                 <button
                     type="button"
                     onClick={onChangeNumber}
-                    className="cursor-pointer text-sm font-medium text-text-muted hover:text-text-base"
+                    className="cursor-pointer px-2 py-1.5 text-sm font-medium text-text-muted hover:text-text-base"
                 >
                     {t('change_number')}
                 </button>

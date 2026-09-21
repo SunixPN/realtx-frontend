@@ -18,10 +18,10 @@ export default function ResetConfirmForm({ token, onSuccess }: ResetConfirmFormP
     return (
         <div className="flex flex-col gap-5">
             <div className="flex flex-col items-center gap-3 pb-1 text-center">
-                <span className="flex size-14 items-center justify-center rounded-2xl bg-brand-bg text-brand">
-                    <IconKey size={28} />
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-brand-bg text-brand xs:size-14">
+                    <IconKey size={26} />
                 </span>
-                <h1 className="text-2xl font-semibold text-text-base">{t('title')}</h1>
+                <h1 className="text-xl font-semibold text-text-base xs:text-2xl">{t('title')}</h1>
                 <p className="max-w-sm text-sm text-text-muted">
                     {t('subtitle')}
                 </p>

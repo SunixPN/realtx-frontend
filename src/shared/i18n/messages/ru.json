@@ -350,6 +350,8 @@
         "all_filters_aria": "Все фильтры",
         "save_search": "Сохранить поиск",
         "search_saved": "Поиск сохранён",
+        "search_open_aria": "Открыть поиск",
+        "search_close_aria": "Закрыть поиск",
         "auth_checking_aria": "Проверка авторизации",
         "results_count": "{count, plural, one {# объект} few {# объекта} many {# объектов} other {# объектов}}",
         "show_results": "Показать {count, plural, one {# объект} few {# объекта} many {# объектов} other {# объектов}}",

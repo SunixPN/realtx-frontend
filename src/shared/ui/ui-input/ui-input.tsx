@@ -13,7 +13,7 @@ export const UIInput = forwardRef<HTMLInputElement, InputProps>(
     const inputId = id ?? autoId;
     const hasError = !!error;
     return (
-      <div className={cn('flex flex-col gap-1.5', className)}>
+      <div className={cn('flex min-w-0 flex-col gap-1.5', className)}>
         {label && (
           <label htmlFor={inputId} className="text-sm font-medium text-text-base">
             {label}
@@ -35,7 +35,7 @@ export const UIInput = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             disabled={disabled}
             aria-invalid={hasError || undefined}
-            className="flex-1  bg-transparent text-sm text-text-base placeholder:text-text-faint outline-none disabled:cursor-not-allowed"
+            className="min-w-0 flex-1 bg-transparent text-sm text-text-base placeholder:text-text-faint outline-none disabled:cursor-not-allowed"
             {...props}
           />
           {rightSlot && <span className="flex items-center shrink-0">{rightSlot}</span>}

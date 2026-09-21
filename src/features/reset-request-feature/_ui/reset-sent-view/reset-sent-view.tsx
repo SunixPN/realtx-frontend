@@ -22,10 +22,10 @@ export default function ResetSentView({ email }: ResetSentViewProps) {
     return (
         <div className="flex flex-col gap-5">
             <div className="flex flex-col items-center gap-3 pb-2 text-center">
-                <span className="flex size-14 items-center justify-center rounded-2xl bg-success/10 text-success">
-                    <IconMail size={28} />
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-success/10 text-success xs:size-14">
+                    <IconMail size={26} />
                 </span>
-                <h1 className="text-2xl font-semibold text-text-base">{t('sent_title')}</h1>
+                <h1 className="text-xl font-semibold text-text-base xs:text-2xl">{t('sent_title')}</h1>
                 <p className="max-w-sm text-sm text-text-muted">
                     {t('sent_body_prefix')}{' '}
                     <span className="font-medium text-text-base">{email}</span>
@@ -47,7 +47,7 @@ export default function ResetSentView({ email }: ResetSentViewProps) {
                         type="button"
                         onClick={handleResend}
                         disabled={isResending}
-                        className="cursor-pointer text-sm font-medium text-text-muted transition-colors hover:text-text-base disabled:cursor-not-allowed disabled:opacity-60"
+                        className="cursor-pointer px-2 py-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text-base disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {isResending ? t('resend_pending') : t('resend')}
                     </button>

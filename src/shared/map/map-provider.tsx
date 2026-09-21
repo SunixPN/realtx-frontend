@@ -40,6 +40,19 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
         mapRef.current = instance
     }, [])
     useEffect(() => {
+        if (!map) return
+        const instance = mapRef.current
+        if (!instance) return
+        const resize = () => instance.resize()
+        const vv = window.visualViewport
+        vv?.addEventListener('resize', resize)
+        window.addEventListener('orientationchange', resize)
+        return () => {
+            vv?.removeEventListener('resize', resize)
+            window.removeEventListener('orientationchange', resize)
+        }
+    }, [map])
+    useEffect(() => {
         const instance = mapRef.current
         if (!instance || !map) return
         const swap = () => {

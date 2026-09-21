@@ -49,7 +49,7 @@ export default function MainMapFiltersFeature({ drawerOpen, onToggleDrawer, onCl
     }
     return (
         <>
-            <div className="absolute top-4 left-4 z-30 max-w-[calc(100%-2rem)]">
+            <div className="absolute top-2 left-2 right-2 z-30 lg:right-auto lg:top-4 lg:left-4 lg:max-w-[calc(100%-2rem)]">
                 <FilterBar
                     filters={filters}
                     onChange={setFilters}

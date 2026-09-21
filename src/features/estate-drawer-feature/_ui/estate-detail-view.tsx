@@ -13,6 +13,7 @@ import { formatStorey } from './format'
 import { useAuth } from "@/entities/me/api/auth-query";
 import { IconLoader } from "@/shared/ui/ui-icons";
 import { cn } from '@/shared/helpers/cn';
+import { useBottomSheetDrag } from '@/shared/ui/ui-bottom-sheet';
 type Props = {
     id: number
     onBack?: () => void
@@ -38,9 +39,14 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
     const repairLabels = useRepairStateLabels()
     const formatRooms = useFormatRooms()
     const formatArea = useFormatArea()
+    const drag = useBottomSheetDrag()
     return (
         <div className="flex h-full flex-col">
-            <header className="flex shrink-0 items-center gap-2 border-b border-[var(--border-default)] px-3 py-2.5">
+            <header
+                {...(drag?.handlers ?? {})}
+                style={drag?.style}
+                className="flex shrink-0 items-center gap-2 border-b border-[var(--border-default)] px-3 py-2.5"
+            >
                 {showBack ? (
                     <button
                         type="button"

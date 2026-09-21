@@ -87,7 +87,7 @@ const UILegalModal = forwardRef<HTMLDivElement, Props>(function UILegalModal({ t
     return createPortal(
         <div
             ref={ref}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 xs:p-4"
             role="dialog"
             aria-modal="true"
             aria-labelledby="legal-modal-title"
@@ -101,24 +101,24 @@ const UILegalModal = forwardRef<HTMLDivElement, Props>(function UILegalModal({ t
                 style={{
                     ...CARD_STYLE[state],
                     transition: 'opacity 220ms ease-out, transform 220ms cubic-bezier(0.34, 1.4, 0.64, 1)',
-                    maxHeight: 'calc(100dvh - 2rem)',
+                    maxHeight: 'calc(100dvh - 1.5rem)',
                 }}
-                className="relative flex w-full max-w-[560px] flex-col overflow-hidden rounded-xl border border-border bg-surface-page shadow-xl"
+                className="relative flex w-full max-w-[560px] flex-col overflow-hidden rounded-lg border border-border bg-surface-page shadow-xl xs:rounded-xl"
             >
-                <div className="flex shrink-0 items-center justify-between border-b border-border px-6 py-4">
+                <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3 xs:px-6 xs:py-4">
                     <h2 id="legal-modal-title" className="text-base font-semibold text-text-base">
                         {title}
                     </h2>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex size-8 cursor-pointer items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-muted"
+                        className="flex size-10 cursor-pointer items-center justify-center rounded-md text-text-muted transition-colors active:bg-surface-muted hover:bg-surface-muted xs:size-8"
                         aria-label={tCommon('close')}
                     >
-                        <IconX size={16} />
+                        <IconX size={18} />
                     </button>
                 </div>
-                <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+                <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 xs:px-6 xs:py-5">
                     {type === 'terms' ? <TermsBody /> : <PrivacyBody />}
                 </div>
             </div>

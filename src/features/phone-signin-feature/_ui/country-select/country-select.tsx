@@ -36,7 +36,7 @@ export default function CountrySelect({ value, onChange }: CountrySelectProps) {
                 type="button"
                 onClick={() => setOpen((v) => !v)}
                 className={cn(
-                    'flex h-11 items-center gap-2 rounded-md border bg-surface-page px-3 text-sm font-medium text-text-base transition-colors',
+                    'flex h-11 shrink-0 items-center gap-1.5 rounded-md border bg-surface-page px-2.5 text-sm font-medium text-text-base transition-colors xs:gap-2 xs:px-3',
                     open
                         ? 'border-brand ring-2 ring-brand/20'
                         : 'border-border hover:border-border-strong',
@@ -45,7 +45,7 @@ export default function CountrySelect({ value, onChange }: CountrySelectProps) {
                 aria-expanded={open}
             >
                 <Flag />
-                <span className="text-xs text-text-muted">{selected.short}</span>
+                <span className="hidden text-xs text-text-muted xs:inline">{selected.short}</span>
                 <span className="tabular-nums">{selected.code}</span>
                 <IconChevronDown
                     size={14}

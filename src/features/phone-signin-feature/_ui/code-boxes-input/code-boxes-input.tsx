@@ -72,7 +72,7 @@ export default function CodeBoxesInput({
         focusIndex(Math.min(i + pasted.length, length - 1));
     };
     return (
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-1.5 xs:gap-2">
             {digits.map((d, i) => (
                 <input
                     key={i}
@@ -88,7 +88,7 @@ export default function CodeBoxesInput({
                     maxLength={1}
                     aria-label={t('digit_aria', { index: i + 1 })}
                     className={cn(
-                        'flex size-12 items-center justify-center rounded-md border bg-surface-page text-center text-2xl font-semibold tabular-nums text-text-base outline-none transition-colors',
+                        'flex size-10 items-center justify-center rounded-md border bg-surface-page text-center text-xl font-semibold tabular-nums text-text-base outline-none transition-colors xs:size-12 xs:text-2xl',
                         hasError
                             ? 'border-error ring-2 ring-error/20'
                             : d

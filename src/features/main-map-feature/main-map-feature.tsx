@@ -1,7 +1,7 @@
 'use client'
-import { ReactNode, useMemo } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { MapCanvas, useMap } from '@/shared/map'
+import { MapCanvas, useMap, useViewportHeight } from '@/shared/map'
 import {
     useMapPoints,
     useDistrictProfitability,
@@ -24,6 +24,7 @@ type MainMapFeatureProps = {
     drawerOpen?: boolean
 }
 export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }: MainMapFeatureProps) {
+    useViewportHeight()
     const searchParams = useSearchParams()
     const filters = parseFiltersFromSearchParams(searchParams)
     const { currency } = useDisplayCurrency()
@@ -48,19 +49,27 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
     useMapMarkers(deferredMode === 'objects' ? map : null, points, handlers, favoriteIds)
     useDistrictHeatLayers(map, deferredMode, districts, geojson)
     const isFetching = fetchingPoints || fetchingDistricts
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => setMounted(true), [])
     return (
-        <div className="map-container relative w-full" style={{ height: 'calc(100vh - var(--header-height))' }}>
+        <div className="map-container relative w-full" style={{ height: 'calc(var(--app-height, 100dvh) - var(--header-height))' }}>
             {mapFilter && mapFilter({ total: points.length })}
-            <div className="absolute top-20 left-4 z-30">
+            <div
+                className="absolute z-30 left-2 right-2 bottom-2 lg:left-4 lg:right-auto lg:top-20 lg:bottom-auto"
+                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+            >
                 <MapModeToggle mode={mode} onChange={setMode} />
             </div>
             {deferredMode === 'heat' && districts.length > 0 && (
-                <div className="absolute bottom-6 left-4 z-30">
+                <div
+                    className="absolute z-30 left-2 right-2 bottom-16 lg:left-4 lg:right-auto lg:bottom-6"
+                    style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+                >
                     <DistrictRanking districts={districts} />
                 </div>
             )}
             <MapCanvas className="w-full h-full" />
-            {isFetching && <MapLoadingBadge drawerOpen={drawerOpen} />}
+            {mounted && isFetching && <MapLoadingBadge drawerOpen={drawerOpen} />}
             {drawer}
         </div>
     )

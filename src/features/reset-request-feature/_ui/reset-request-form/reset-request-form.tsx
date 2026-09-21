@@ -12,8 +12,8 @@ export default function ResetRequestForm({ onSent }: ResetRequestFormProps) {
     return (
         <div className="flex flex-col gap-5">
             <header>
-                <h1 className="text-2xl font-semibold text-text-base">{t('title')}</h1>
-                <p className="mt-1.5 text-sm text-text-muted">
+                <h1 className="text-xl font-semibold text-text-base xs:text-2xl">{t('title')}</h1>
+                <p className="mt-1 text-sm text-text-muted xs:mt-1.5">
                     {t('subtitle')}
                 </p>
             </header>
