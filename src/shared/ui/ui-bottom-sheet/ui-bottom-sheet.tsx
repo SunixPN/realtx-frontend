@@ -311,7 +311,7 @@ export function UIBottomSheet({
                 className={cn(
                     'fixed inset-0 z-[80] bg-black/40 backdrop-blur-[2px]',
                     'transition-opacity duration-300 ease-out',
-                    visible ? 'opacity-100' : 'pointer-events-none opacity-0',
+                    visible && !dismissing ? 'opacity-100' : 'pointer-events-none opacity-0',
                 )}
             />
             <div

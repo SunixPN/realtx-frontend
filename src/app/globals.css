@@ -566,13 +566,15 @@ html.dark .map-pin--visited .map-pin__tail {
 
 .drawer-backdrop-enter        { opacity: 0; }
 .drawer-backdrop-enter-active { opacity: 1; transition: opacity 320ms ease-out; }
-.drawer-backdrop-exit         { opacity: 1; }
-.drawer-backdrop-exit-active  { opacity: 0; transition: opacity 320ms ease-out; }
+/* Exit phase: block hit-tests so a tap during the fade-out doesn't land on
+   the backdrop's onClick={onClose} (a no-op after close) and feel swallowed. */
+.drawer-backdrop-exit         { opacity: 1; pointer-events: none; }
+.drawer-backdrop-exit-active  { opacity: 0; pointer-events: none; transition: opacity 320ms ease-out; }
 
 .drawer-panel-enter        { transform: translateX(100%); }
 .drawer-panel-enter-active { transform: translateX(0);    transition: transform 320ms cubic-bezier(.25, 1, .5, 1); }
-.drawer-panel-exit         { transform: translateX(0); }
-.drawer-panel-exit-active  { transform: translateX(100%); transition: transform 320ms cubic-bezier(.25, 1, .5, 1); }
+.drawer-panel-exit         { transform: translateX(0); pointer-events: none; }
+.drawer-panel-exit-active  { transform: translateX(100%); pointer-events: none; transition: transform 320ms cubic-bezier(.25, 1, .5, 1); }
 
 /* ─── Map house (co-located cluster = квартиры в одном доме) ─────────── */
 /* Тот же контракт что и .map-cluster: root — якорь для Mapbox (transform им
