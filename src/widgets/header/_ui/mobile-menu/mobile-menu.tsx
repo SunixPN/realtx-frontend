@@ -83,7 +83,17 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
             dismissingRef.current = true;
             setDragX(panelWidth);
             onClose();
+            // Swallow the compat click Android/iOS dispatch right after
+            // pointerup — the CSSTransition backdrop fades out over DURATION
+            // but stays fully clickable, so the ghost click would land on it
+            // (onClose = no-op) and the user's next real tap feels dead.
+            const swallow = (ev: MouseEvent) => {
+                ev.stopPropagation();
+                ev.preventDefault();
+            };
+            window.addEventListener('click', swallow, { capture: true, once: true });
             window.setTimeout(() => {
+                window.removeEventListener('click', swallow, true);
                 dismissingRef.current = false;
                 setDragX(0);
                 setDragging(false);

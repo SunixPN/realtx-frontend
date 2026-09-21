@@ -202,7 +202,17 @@ export function UIBottomSheet({
         const panelHeight = panelHeightRef.current || window.innerHeight;
         setDragY(panelHeight);
         onClose();
+        // Swallow the compat click Android/iOS dispatch right after pointerup.
+        // Without this, it lands on the still-fading backdrop (whose
+        // pointer-events are gated by `visible`, which lags one render behind
+        // `dismissing`) and the user has to tap twice for anything to react.
+        const swallow = (ev: MouseEvent) => {
+            ev.stopPropagation();
+            ev.preventDefault();
+        };
+        window.addEventListener('click', swallow, { capture: true, once: true });
         window.setTimeout(() => {
+            window.removeEventListener('click', swallow, true);
             dismissingRef.current = false;
             setDismissing(false);
             setDragY(0);
@@ -309,7 +319,7 @@ export function UIBottomSheet({
                 className={cn(
                     'fixed inset-0 z-[80] bg-black/40 backdrop-blur-[2px]',
                     'transition-opacity duration-300 ease-out',
-                    visible ? 'opacity-100' : 'pointer-events-none opacity-0',
+                    visible && !dismissing ? 'opacity-100' : 'pointer-events-none opacity-0',
                 )}
             />
             <div
