@@ -29,10 +29,8 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
     const { currency } = useDisplayCurrency()
     const { mode, deferredMode, setMode } = useMapMode()
     const map = useMap()
-    const { data: points = [], isValidating: fetchingPoints } = useMapPoints(filters, currency, {
-        enabled: deferredMode === 'objects',
-    })
-    const { data: districts = [], isValidating: fetchingDistricts } = useDistrictProfitability(filters, currency, {
+    const { data: points = [], isFetching: fetchingPoints } = useMapPoints(filters, currency)
+    const { data: districts = [], isFetching: fetchingDistricts } = useDistrictProfitability(filters, currency, {
         enabled: deferredMode === 'heat',
     })
     const { data: geojson } = useDistrictsGeojson({ enabled: deferredMode === 'heat' })

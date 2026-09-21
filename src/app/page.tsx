@@ -1,4 +1,3 @@
-import { SWRConfig, unstable_serialize } from 'swr'
 import { MapProvider } from '@/shared/map'
 import MapWidget from '@/widgets/map-widget/map-widget'
 import {
@@ -13,6 +12,9 @@ import {
 } from '@/entities/estate'
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { serverFetch } from '@/shared/api/server-fetch'
+import { getQueryClient } from '@/shared/api/query'
+import { dehydrate, HydrationBoundary, noop } from '@tanstack/react-query'
+
 export default async function HomePage({
     searchParams,
 }: {
@@ -29,37 +31,53 @@ export default async function HomePage({
         if (Array.isArray(v)) v.forEach((item) => qs.append(k, String(item)))
         else qs.set(k, String(v))
     }
-    let fallback: Record<string, unknown> = {}
-    try {
-        if (mapMode === 'heat') {
-            const [districts, geojson] = await Promise.all([
-                serverFetch<DistrictProfitabilityType[]>(
-                    API_ROUTES.ESTATE.DISTRICT_PROFITABILITY,
-                    qs,
-                ),
-                serverFetch<DistrictGeoJSONType>(API_ROUTES.ESTATE.DISTRICTS_GEOJSON),
-            ])
-            fallback = {
-                [unstable_serialize(districtProfitabilityKey(filters, currency))]: districts,
-                [unstable_serialize(districtsGeojsonKey())]: geojson,
-            }
-        } else {
-            const points = await serverFetch<EstateMapPointType[]>(
-                API_ROUTES.ESTATE.MAP_POINTS,
-                qs,
-            )
-            fallback = {
-                [unstable_serialize(mapPointsKey(filters, currency))]: points,
-            }
-        }
-    } catch (e) {
-        console.error('[SSR map-points] prefetch failed:', e)
+
+    const isDefault = Object.keys(normFilters).length === 0 && currency === 'USD'
+    const fetchOptions = isDefault
+        ? { revalidate: 60 * 60 * 2, skipAuth: true }
+        : undefined
+
+    const queryClient = getQueryClient()
+
+    if (mapMode === 'heat') {
+        await Promise.all([
+            queryClient.query({
+                queryKey: mapPointsKey(filters, currency),
+                queryFn: () =>
+                    serverFetch<EstateMapPointType[]>(API_ROUTES.ESTATE.MAP_POINTS, qs, fetchOptions),
+            }).catch(noop),
+            queryClient.query({
+                queryKey: districtProfitabilityKey(filters, currency),
+                queryFn: () =>
+                    serverFetch<DistrictProfitabilityType[]>(
+                        API_ROUTES.ESTATE.DISTRICT_PROFITABILITY,
+                        qs,
+                        fetchOptions,
+                    ),
+            }).catch(noop),
+            queryClient.query({
+                queryKey: districtsGeojsonKey(),
+                queryFn: () =>
+                    serverFetch<DistrictGeoJSONType>(
+                        API_ROUTES.ESTATE.DISTRICTS_GEOJSON,
+                        undefined,
+                        { revalidate: 60 * 60 * 2, skipAuth: true },
+                    ),
+            }).catch(noop),
+        ])
+    } else {
+        await queryClient.query({
+            queryKey: mapPointsKey(filters, currency),
+            queryFn: () =>
+                serverFetch<EstateMapPointType[]>(API_ROUTES.ESTATE.MAP_POINTS, qs, fetchOptions),
+        }).catch(noop)
     }
+
     return (
-        <SWRConfig value={{ fallback }}>
+        <HydrationBoundary state={dehydrate(queryClient)}>
             <MapProvider>
                 <MapWidget />
             </MapProvider>
-        </SWRConfig>
+        </HydrationBoundary>
     )
 }
