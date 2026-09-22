@@ -12,8 +12,8 @@ import {
     type PointerEvent as ReactPointerEvent,
     type ReactNode,
 } from 'react';
-import { createPortal } from 'react-dom';
-import { cn } from '@/shared/helpers/cn';
+import {createPortal} from 'react-dom';
+import {cn} from '@/shared/helpers/cn';
 
 type UIBottomSheetProps = {
     open: boolean;
@@ -68,7 +68,7 @@ export function useBottomSheetDrag(): {
 } | null {
     const ctx = useContext(Ctx);
     if (!ctx) return null;
-    return { handlers: ctx.dragHandlers, style: ctx.dragStyle };
+    return {handlers: ctx.dragHandlers, style: ctx.dragStyle};
 }
 
 export function UIBottomSheet({
@@ -97,6 +97,7 @@ export function UIBottomSheet({
     const [dragging, setDragging] = useState(false);
     const startY = useRef<number | null>(null);
     const startTime = useRef(0);
+    const activePointerId = useRef<number | null>(null);
     const panelRef = useRef<HTMLDivElement>(null);
     const panelHeightRef = useRef(0);
     const dismissingRef = useRef(false);
@@ -178,25 +179,23 @@ export function UIBottomSheet({
         }
         startY.current = e.clientY;
         startTime.current = Date.now();
+        activePointerId.current = e.pointerId;
         setDragging(true);
-        try {
-            (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-        } catch {}
+        // Deliberately no setPointerCapture: on Android Chrome, capturing a
+        // pointer stream that ends in a fast fling triggers a ~250ms
+        // tap-suppression cooldown where the next touch never reaches even
+        // window-level listeners. We use window-scoped move/up listeners
+        // instead — see the effect below.
     }, [dismissible]);
 
     const onPointerMove = useCallback((e: ReactPointerEvent) => {
         if (startY.current === null) return;
+        if (activePointerId.current !== null && e.pointerId !== activePointerId.current) return;
         const dy = e.clientY - startY.current;
         setDragY(dy);
     }, []);
 
-    const dismissWithSwipe = useCallback(() => {
-        // Smooth swipe-exit: keep dragging offset animating to the panel
-        // bottom in parallel with `visible=false`. Prevents the panel from
-        // snapping back to base transform for a frame, and gives us a window
-        // to hard-suppress hit-tests so Android's synthetic click doesn't
-        // land on a detached element (which caused the "first tap dead"
-        // symptom after swipe-close).
+    const dismissWithSwipe = () => {
         dismissingRef.current = true;
         setDismissing(true);
         const panelHeight = panelHeightRef.current || window.innerHeight;
@@ -207,20 +206,16 @@ export function UIBottomSheet({
             setDismissing(false);
             setDragY(0);
         }, DURATION_MS + 20);
-    }, [onClose]);
+    }
 
     const onPointerUp = useCallback((e: ReactPointerEvent) => {
         if (startY.current === null) return;
+        if (activePointerId.current !== null && e.pointerId !== activePointerId.current) return;
         const dy = e.clientY - startY.current;
         const dt = Date.now() - startTime.current;
         const velocity = dy / Math.max(1, dt);
         startY.current = null;
-        // Release pointer capture BEFORE any state change so the synthetic
-        // click that follows on Android doesn't get dispatched to an element
-        // that's about to translate off-screen.
-        try {
-            (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-        } catch {}
+        activePointerId.current = null;
         setDragging(false);
 
         const panelHeight = panelHeightRef.current || window.innerHeight;
@@ -256,6 +251,63 @@ export function UIBottomSheet({
         setDragY(0);
     }, [autoHeight, autoMaxDvh, snapIdx, snapPoints, commitSnap, dismissWithSwipe]);
 
+    // While dragging, listen at window scope so the gesture keeps working
+    // even if the finger leaves the handle. This replaces setPointerCapture,
+    // which on Android Chrome causes a post-fling tap-suppression window
+    // (~250ms) where the next tap never reaches any listener.
+    useEffect(() => {
+        if (!dragging) return;
+        const handleMove = (e: PointerEvent) => {
+            if (startY.current === null) return;
+            if (activePointerId.current !== null && e.pointerId !== activePointerId.current) return;
+            const dy = e.clientY - startY.current;
+            setDragY(dy);
+        };
+        const handleUp = (e: PointerEvent) => {
+            if (startY.current === null) return;
+            if (activePointerId.current !== null && e.pointerId !== activePointerId.current) return;
+            const dy = e.clientY - startY.current;
+            const dt = Date.now() - startTime.current;
+            const velocity = dy / Math.max(1, dt);
+            startY.current = null;
+            activePointerId.current = null;
+            setDragging(false);
+
+            const panelHeight = panelHeightRef.current || window.innerHeight;
+            const maxFrac = autoHeight ? autoMaxDvh / 100 : snapPoints[snapPoints.length - 1] ?? 1;
+            const currentFrac = autoHeight ? autoMaxDvh / 100 : snapPoints[snapIdx] ?? maxFrac;
+            const visibleHeight = (currentFrac / maxFrac) * panelHeight;
+
+            if (velocity > 0.6 && dy > 30) {
+                dismissWithSwipe();
+                return;
+            }
+            if (!autoHeight && velocity < -0.6 && dy < -30) {
+                if (snapIdx < snapPoints.length - 1) commitSnap(snapIdx + 1);
+                setDragY(0);
+                return;
+            }
+            if (dy > visibleHeight * 0.32) {
+                if (autoHeight || snapIdx === 0) {
+                    dismissWithSwipe();
+                    return;
+                }
+                commitSnap(snapIdx - 1);
+            } else if (!autoHeight && dy < -visibleHeight * 0.2 && snapIdx < snapPoints.length - 1) {
+                commitSnap(snapIdx + 1);
+            }
+            setDragY(0);
+        };
+        window.addEventListener('pointermove', handleMove, {passive: true});
+        window.addEventListener('pointerup', handleUp, {passive: true});
+        window.addEventListener('pointercancel', handleUp, {passive: true});
+        return () => {
+            window.removeEventListener('pointermove', handleMove);
+            window.removeEventListener('pointerup', handleUp);
+            window.removeEventListener('pointercancel', handleUp);
+        };
+    }, [dragging, autoHeight, autoMaxDvh, snapIdx, snapPoints, commitSnap]);
+
     const dragHandlers: DragHandlers = useMemo(() => ({
         onPointerDown,
         onPointerMove,
@@ -263,7 +315,25 @@ export function UIBottomSheet({
         onPointerCancel: onPointerUp,
     }), [onPointerDown, onPointerMove, onPointerUp]);
 
-    const dragStyle: CSSProperties = useMemo(() => ({ touchAction: 'none' }), []);
+    // touch-action: pan-y (not `none`). On Android Chrome, `none` on a
+    // handle that ends in a fast fling triggers a ~250ms input-arbiter
+    // cooldown where subsequent taps aren't dispatched to anything —
+    // not even window listeners. `pan-y` lets Chrome treat the gesture
+    // as a (cancelled) scroll instead of a fling; the touchmove listener
+    // below preventDefaults to actually suppress scrolling.
+    const dragStyle: CSSProperties = useMemo(() => ({touchAction: 'pan-y'}), []);
+
+    // Native touchmove listener with passive:false so we can preventDefault
+    // and stop the browser from scrolling — React's synthetic onTouchMove
+    // is passive by default and can't cancel scroll.
+    useEffect(() => {
+        if (!dragging) return;
+        const onTouchMove = (e: TouchEvent) => {
+            if (startY.current !== null) e.preventDefault();
+        };
+        document.addEventListener('touchmove', onTouchMove, {passive: false});
+        return () => document.removeEventListener('touchmove', onTouchMove);
+    }, [dragging]);
 
     const ctxValue = useMemo<BottomSheetCtx>(() => ({
         dragHandlers,
@@ -291,8 +361,8 @@ export function UIBottomSheet({
     }
 
     const heightStyle: CSSProperties = autoHeight
-        ? { maxHeight: `${autoMaxDvh}dvh` }
-        : { height: `${maxFrac * 100}dvh` };
+        ? {maxHeight: `${autoMaxDvh}dvh`}
+        : {height: `${maxFrac * 100}dvh`};
 
     // Both hidden and shown transforms use the same translate3d + calc
     // syntax. iOS Safari refuses to interpolate between mixed forms
@@ -300,6 +370,7 @@ export function UIBottomSheet({
     // left the panel stuck off-screen while the backdrop faded in.
     const hiddenTransform = `translate3d(0, calc(${maxFrac * 100}dvh + 0px), 0)`;
     const shownTransform = `translate3d(0, calc(${baseOffsetDvh}dvh + ${effectiveDragY}px), 0)`;
+
 
     return createPortal(
         <Ctx.Provider value={ctxValue}>
@@ -342,7 +413,7 @@ export function UIBottomSheet({
                         style={dragStyle}
                         className="flex shrink-0 cursor-grab items-center justify-center py-2.5 active:cursor-grabbing"
                     >
-                        <span className="h-1 w-10 rounded-full bg-border-strong" />
+                        <span className="h-1 w-10 rounded-full bg-border-strong"/>
                     </div>
                 )}
                 <div className={cn('flex min-h-0 flex-1 flex-col', contentClassName)}>

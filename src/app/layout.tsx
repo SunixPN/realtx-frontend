@@ -9,6 +9,7 @@ import QueryProvider from "@/app/_providers/query-provider";
 import {ReactNode} from "react";
 import { ThemeInitScript, ThemeProvider } from "@/shared/theme";
 import NextTopLoader from "nextjs-toploader";
+import { ViewportMetricsProvider } from "@/app/_providers/viewport-metrics-provider";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -21,6 +22,7 @@ export const viewport: Viewport = {
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
+    viewportFit: "cover",
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -50,6 +52,7 @@ export default async function RootLayout({
                                 color={"var(--brand)"}
                                 height={4}
                             />
+                            <ViewportMetricsProvider />
                             <Header/>
                             {children}
                             <Toaster position="top-right" richColors closeButton />

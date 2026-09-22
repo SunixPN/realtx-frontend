@@ -1,7 +1,7 @@
 'use client'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { MapCanvas, useMap, useViewportHeight } from '@/shared/map'
+import { MapCanvas, useMap } from '@/shared/map'
 import {
     useMapPoints,
     useDistrictProfitability,
@@ -24,7 +24,6 @@ type MainMapFeatureProps = {
     drawerOpen?: boolean
 }
 export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }: MainMapFeatureProps) {
-    useViewportHeight()
     const searchParams = useSearchParams()
     const filters = parseFiltersFromSearchParams(searchParams)
     const { currency } = useDisplayCurrency()
@@ -53,6 +52,8 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
     useEffect(() => setMounted(true), [])
     return (
         <div className="map-container relative w-full" style={{ height: 'calc(var(--app-height, 100dvh) - var(--header-height))' }}>
+            {/* height биндится на --app-height из useViewportMetrics — стабильно,
+                не пересчитывается при появлении soft-keyboard iOS. */}
             {mapFilter && mapFilter({ total: points.length })}
             <div
                 className="absolute z-30 left-2 right-2 bottom-2 lg:left-4 lg:right-auto lg:top-20 lg:bottom-auto"

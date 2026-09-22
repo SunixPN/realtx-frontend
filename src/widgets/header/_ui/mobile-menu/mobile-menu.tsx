@@ -120,19 +120,28 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                 setDragging(true);
             }
             if (capturedRef.current) {
-                ev.preventDefault();
                 setDragX(Math.max(0, dx));
             }
+        };
+        // Native touchmove listener with passive:false. preventDefault on
+        // pointermove doesn't cancel scroll on Android Chrome — only touchmove
+        // does. Without this, a fast horizontal flick registers as a fling
+        // and Chrome's input arbiter suppresses subsequent taps for ~250ms,
+        // producing a dead zone where even window listeners don't fire.
+        const onWinTouchMove = (ev: TouchEvent) => {
+            if (capturedRef.current) ev.preventDefault();
         };
         const onWinUp = (ev: PointerEvent) => {
             if (activePointerId.current !== null && ev.pointerId !== activePointerId.current) return;
             finishDrag(ev.clientX);
         };
-        window.addEventListener('pointermove', onWinMove, { passive: false });
+        window.addEventListener('pointermove', onWinMove, { passive: true });
+        window.addEventListener('touchmove', onWinTouchMove, { passive: false });
         window.addEventListener('pointerup', onWinUp);
         window.addEventListener('pointercancel', onWinUp);
         cleanupPointerListeners.current = () => {
             window.removeEventListener('pointermove', onWinMove);
+            window.removeEventListener('touchmove', onWinTouchMove);
             window.removeEventListener('pointerup', onWinUp);
             window.removeEventListener('pointercancel', onWinUp);
         };

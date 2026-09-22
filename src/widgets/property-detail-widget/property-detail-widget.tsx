@@ -42,6 +42,8 @@ import { PriceDisplay, PricePerM2Display } from '@/features/estate-drawer-featur
 import { PriceChangeBadge } from '@/features/estate-drawer-feature/_ui/price-change-badge'
 import { formatStorey, formatNumber } from '@/features/estate-drawer-feature/_ui/format'
 import { cn } from '@/shared/helpers/cn'
+import { copyText } from '@/shared/lib/copy-text'
+import { UIBottomSheet, useBottomSheetDrag } from '@/shared/ui/ui-bottom-sheet'
 const PropertyMiniMap = dynamic(
     () => import('./property-mini-map').then((m) => m.PropertyMiniMap),
     { ssr: false },
@@ -59,6 +61,21 @@ export function PropertyDetailWidget({ id }: Props) {
     const t = useTranslations('estate')
     const { currency } = useDisplayCurrency()
     const { data: estate, error } = useEstateById(id, currency)
+    const [ctaHeight, setCtaHeight] = useState(0)
+    const ctaRef = useRef<HTMLDivElement>(null)
+    useEffect(() => {
+        const el = ctaRef.current
+        if (!el) return
+        const update = () => setCtaHeight(el.offsetHeight)
+        update()
+        const ro = new ResizeObserver(update)
+        ro.observe(el)
+        window.addEventListener('resize', update)
+        return () => {
+            ro.disconnect()
+            window.removeEventListener('resize', update)
+        }
+    }, [estate])
     const isError = !!error
     if (isError) {
         return (
@@ -71,39 +88,82 @@ export function PropertyDetailWidget({ id }: Props) {
     }
     if (!estate) {
         return (
-            <div className="mx-auto w-full max-w-[1520px] px-6 py-6">
-                <div className="grid grid-cols-12 gap-6">
-                    <div className="col-span-8 aspect-[4/3] animate-shimmer rounded-lg" />
-                    <div className="col-span-4 h-96 animate-shimmer rounded-lg" />
+            <div className="mx-auto w-full max-w-[1520px] px-3 py-3 sm:px-4 md:px-6 md:py-6">
+                <div className="flex flex-col gap-4 xl:grid xl:grid-cols-12 xl:gap-6">
+                    <div className="aspect-[4/3] animate-shimmer rounded-lg xl:col-span-8" />
+                    <div className="h-96 animate-shimmer rounded-lg xl:col-span-4" />
                 </div>
             </div>
         )
     }
     return (
-        <div className="mx-auto flex w-full max-w-[1520px] flex-col gap-8 px-6 py-6">
+        <div
+            className="mx-auto flex w-full max-w-[1520px] flex-col gap-5 px-3 pt-3 sm:px-4 md:gap-8 md:px-6 md:pt-6 xl:pb-6"
+            style={{ paddingBottom: ctaHeight > 0 ? `${ctaHeight + 24}px` : undefined }}
+        >
             <Breadcrumbs estate={estate} />
-            <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-8">
+            <div className="flex flex-col gap-5 md:gap-6 xl:grid xl:grid-cols-12">
+                <div className="flex flex-col gap-5 md:gap-6 xl:col-span-8">
                     <Gallery estate={estate} currency={currency} />
-                </div>
-                <div className="col-span-4">
-                    <PriceCard estate={estate} currency={currency} />
-                    <aside className="col-span-4 flex flex-col gap-6 mt-6">
-                        <SellerCard estate={estate} />
-                        <SafetyNote />
-                    </aside>
-                </div>
-            </div>
-            <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-8 flex flex-col gap-6">
                     <KeyFacts estate={estate} />
+                    {}
+                    <div className="xl:hidden">
+                        <PriceCard estate={estate} currency={currency} />
+                    </div>
                     <PriceHistoryBlock estate={estate} currency={currency} />
                     <Description estate={estate} />
                     <SpecsGrid estate={estate} />
                     <LocationSection estate={estate} currency={currency} />
+                    {}
+                    <div className="flex flex-col gap-5 md:gap-6 xl:hidden">
+                        <SellerCard estate={estate} />
+                        <SafetyNote />
+                    </div>
                 </div>
+                {}
+                <aside className="hidden flex-col gap-6 xl:col-span-4 xl:flex">
+                    <PriceCard estate={estate} currency={currency} />
+                    <SellerCard estate={estate} />
+                    <SafetyNote />
+                </aside>
             </div>
             <Disclaimer estate={estate} />
+            <MobileCTABar ref={ctaRef} estate={estate} currency={currency} />
+        </div>
+    )
+}
+function MobileCTABar({ ref, estate, currency }: { ref: React.Ref<HTMLDivElement>; estate: EstateType; currency: DisplayCurrency }) {
+    const t = useTranslations('estate')
+    const isAgency = estate.sellerType === 0 && !!estate.agencyName
+    const sellerLabel = isAgency ? t('seller_agency') : t('seller_owner_short')
+    const sellerName = isAgency ? (estate.agencyName ?? '') : t('seller_private')
+    return (
+        <div ref={ref} className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface-page/95 shadow-[0_-4px_16px_rgb(0_0_0/0.06)] backdrop-blur-md xl:hidden"
+             style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        >
+            <div className="mx-auto flex w-full max-w-[1520px] items-center gap-3 px-4 py-3 sm:px-5">
+                <div className="flex min-w-0 flex-1 flex-col">
+                    <PriceDisplay
+                        price={estate.price}
+                        currency={currency}
+                        className="text-lg font-semibold text-text-base tabular-nums"
+                    />
+                    <PricePerM2Display
+                        price={estate.pricePerM2}
+                        currency={currency}
+                        className="text-xs text-text-faint tabular-nums"
+                    />
+                </div>
+                <div className="shrink-0">
+                    <ContactButton
+                        phone={estate.phone ?? null}
+                        sourceUrl={estate.sourceUrl}
+                        sellerLabel={sellerLabel}
+                        sellerName={sellerName}
+                        size="md"
+                    />
+                </div>
+            </div>
         </div>
     )
 }
@@ -116,20 +176,29 @@ function Breadcrumbs({ estate }: { estate: EstateType }) {
         t('title_flat', { rooms: formatRooms(estate.rooms) }),
     ].filter(Boolean) as string[]
     return (
-        <nav aria-label={t('breadcrumbs_aria')} className="flex items-center gap-2 text-sm text-text-muted">
+        <nav aria-label={t('breadcrumbs_aria')} className="flex items-center gap-1.5 text-xs text-text-muted sm:gap-2 sm:text-sm">
             <Link
                 href="/"
                 aria-label={t('back_to_map_aria')}
-                className="flex size-8 items-center justify-center rounded-md text-text-muted hover:bg-surface-muted"
+                className="flex size-9 shrink-0 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-muted active:bg-surface-muted sm:size-8"
             >
                 <ArrowLeft className="size-4" />
             </Link>
-            {parts.map((p, i) => (
-                <span key={p} className="flex items-center gap-2">
-                    {i > 0 && <ChevronRight className="size-3.5 text-text-faint" aria-hidden />}
-                    <span className={i === parts.length - 1 ? 'text-text-base' : ''}>{p}</span>
-                </span>
-            ))}
+            {parts.map((p, i) => {
+                const isLast = i === parts.length - 1
+                return (
+                    <span
+                        key={p}
+                        className={cn(
+                            'flex min-w-0 items-center gap-1.5 sm:gap-2',
+                            !isLast && 'hidden sm:flex',
+                        )}
+                    >
+                        {i > 0 && <ChevronRight className="size-3.5 shrink-0 text-text-faint" aria-hidden />}
+                        <span className={cn('truncate', isLast && 'text-text-base')}>{p}</span>
+                    </span>
+                )
+            })}
         </nav>
     )
 }
@@ -146,9 +215,9 @@ function Gallery({ estate, currency }: { estate: EstateType; currency: DisplayCu
         (estate.priceChange.deltaEur ?? 0) < 0
     )
     return (
-        <div className="relative overflow-hidden rounded-lg">
+        <div className="relative -mx-3 overflow-hidden sm:mx-0 sm:rounded-lg">
             <PhotoSlider photos={estate.photos} />
-            <div className="pointer-events-none absolute top-3 left-3 z-10 flex gap-1.5">
+            <div className="pointer-events-none absolute top-2 left-2 z-10 flex flex-wrap gap-1.5 sm:top-3 sm:left-3">
                 {isNew(estate) && (
                     <span className="rounded-xs bg-brand px-2 py-0.5 text-xs font-semibold text-text-on-brand">
                         {t('badge_new')}
@@ -195,13 +264,13 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
     }
     const formatDays = (days: number) => t('days_n', { count: days })
     return (
-        <div className="flex flex-col gap-4 rounded-lg border border-border bg-surface-page p-5 shadow-lg">
+        <div className="flex flex-col gap-4 rounded-lg border border-border bg-surface-page p-4 shadow-sm md:p-5 xl:shadow-lg">
             <div>
                 <div className="flex items-baseline gap-3 flex-wrap">
                     <PriceDisplay
                         price={estate.price}
                         currency={currency}
-                        className="text-3xl font-semibold text-text-base tabular-nums"
+                        className="text-2xl font-semibold text-text-base tabular-nums sm:text-3xl"
                     />
                     {estate.priceChange && (
                         <PriceChangeBadge change={estate.priceChange} currency={currency} variant="compact" />
@@ -281,20 +350,25 @@ function ShareIconAction({ estate }: { estate: EstateType }) {
             rooms: formatRooms(estate.rooms),
             address: estate.address ?? t('default_town'),
         })
-        if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+        // navigator.share доступен только в secure context (https). На http/локалке
+        // сразу переходим к копированию, чтобы не падать с NotAllowedError.
+        const canShare = typeof navigator !== 'undefined'
+            && typeof navigator.share === 'function'
+            && (typeof window === 'undefined' || window.isSecureContext !== false)
+        if (canShare) {
             try {
                 await navigator.share({ title, url })
                 return
             } catch (err) {
                 if ((err as { name?: string })?.name === 'AbortError') return
+                // fall through to copy
             }
         }
-        try {
-            await navigator.clipboard.writeText(url)
-            showToast({ status: 'success', text: t('share_toast_copied') })
-        } catch {
-            showToast({ status: 'error', text: t('share_toast_error') })
-        }
+        const ok = await copyText(url)
+        showToast({
+            status: ok ? 'success' : 'error',
+            text: ok ? t('share_toast_copied') : t('share_toast_error'),
+        })
     }
     return (
         <IconAction
@@ -326,6 +400,19 @@ const CARD_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     exited:   { opacity: 0, transform: 'scale(0.96) translateY(8px)' },
     unmounted: { opacity: 0, transform: 'scale(0.96) translateY(8px)' },
 }
+function useIsMobile(): boolean {
+    const [isMobile, setIsMobile] = useState(() => {
+        if (typeof window === 'undefined') return false
+        return window.matchMedia('(max-width: 639px)').matches
+    })
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 639px)')
+        const update = () => setIsMobile(mq.matches)
+        mq.addEventListener('change', update)
+        return () => mq.removeEventListener('change', update)
+    }, [])
+    return isMobile
+}
 function ContactButton({
     phone,
     sourceUrl,
@@ -343,15 +430,16 @@ function ContactButton({
     const [open, setOpen] = useState(false)
     const nodeRef = useRef<HTMLDivElement>(null)
     const close = useCallback(() => setOpen(false), [])
+    const isMobile = useIsMobile()
     const h = size === 'lg' ? 'h-11' : 'h-10'
     const text = size === 'lg' ? 'text-sm font-semibold' : 'text-sm font-medium'
     const iconSize = size === 'lg' ? 'size-5' : 'size-4'
     useEffect(() => {
-        if (!open) return
+        if (!open || isMobile) return
         const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
         window.addEventListener('keydown', handler)
         return () => window.removeEventListener('keydown', handler)
-    }, [open, close])
+    }, [open, close, isMobile])
     return (
         <>
             <button
@@ -361,19 +449,37 @@ function ContactButton({
             >
                 <Phone className={iconSize} /> {t('contact_show')}
             </button>
-            <Transition nodeRef={nodeRef} in={open} timeout={220} unmountOnExit mountOnEnter>
-                {(state) => (
-                    <ContactModal
-                        nodeRef={nodeRef}
-                        transitionState={state}
+            {isMobile ? (
+                <UIBottomSheet
+                    open={open}
+                    onClose={close}
+                    autoHeight
+                    ariaLabel={t('contact_modal_title')}
+                    contentClassName="px-5 pb-5"
+                >
+                    <ContactContent
                         phone={phone}
                         sourceUrl={sourceUrl}
                         sellerLabel={sellerLabel}
                         sellerName={sellerName}
                         onClose={close}
                     />
-                )}
-            </Transition>
+                </UIBottomSheet>
+            ) : (
+                <Transition nodeRef={nodeRef} in={open} timeout={220} unmountOnExit mountOnEnter>
+                    {(state) => (
+                        <ContactModal
+                            nodeRef={nodeRef}
+                            transitionState={state}
+                            phone={phone}
+                            sourceUrl={sourceUrl}
+                            sellerLabel={sellerLabel}
+                            sellerName={sellerName}
+                            onClose={close}
+                        />
+                    )}
+                </Transition>
+            )}
         </>
     )
 }
@@ -395,15 +501,11 @@ function ContactModal({
     onClose: () => void
 }) {
     const t = useTranslations('estate')
-    const [copied, setCopied] = useState(false)
-    const handleCopy = (text: string) => {
-        navigator.clipboard.writeText(text)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
-    }
-    const agencyLabel = t('seller_agency')
     return createPortal(
-        <div ref={nodeRef} className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+            ref={nodeRef}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
             <div
                 style={{ ...BACKDROP_STYLE[transitionState], transition: 'opacity 220ms ease-out' }}
                 className="absolute inset-0 bg-surface-overlay backdrop-blur-sm"
@@ -423,7 +525,68 @@ function ContactModal({
                         <X className="size-4" />
                     </button>
                 </div>
-                <div className="flex items-center gap-3 border-b border-border pb-4">
+                <ContactContent
+                    phone={phone}
+                    sourceUrl={sourceUrl}
+                    sellerLabel={sellerLabel}
+                    sellerName={sellerName}
+                    onClose={onClose}
+                    hideHeader
+                />
+            </div>
+        </div>,
+        document.body,
+    )
+}
+function ContactSheetHeader({ title, onClose }: { title: string; onClose: () => void }) {
+    const drag = useBottomSheetDrag()
+    return (
+        <div
+            {...(drag?.handlers ?? {})}
+            style={drag?.style}
+            className="-mx-5 mb-4 flex items-center justify-between px-5 py-3 select-none"
+        >
+            <h2 className="text-base font-semibold leading-none text-text-base">{title}</h2>
+            <button
+                type="button"
+                onClick={onClose}
+                className="flex size-8 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-muted"
+            >
+                <X className="size-4" />
+            </button>
+        </div>
+    )
+}
+function ContactContent({
+    phone,
+    sourceUrl,
+    sellerLabel,
+    sellerName,
+    onClose,
+    hideHeader = false,
+}: {
+    phone: string | null
+    sourceUrl: string | null
+    sellerLabel: string
+    sellerName: string
+    onClose: () => void
+    hideHeader?: boolean
+}) {
+    const t = useTranslations('estate')
+    const [copied, setCopied] = useState(false)
+    const handleCopy = async (text: string) => {
+        const ok = await copyText(text)
+        if (!ok) return
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+    }
+    const agencyLabel = t('seller_agency')
+    return (
+        <>
+            {!hideHeader && (
+                <ContactSheetHeader title={t('contact_modal_title')} onClose={onClose} />
+            )}
+            <div className="flex items-center gap-3 border-b border-border pb-4">
                     <div className={cn(
                         'flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-semibold',
                         sellerLabel === agencyLabel
@@ -503,12 +666,10 @@ function ContactModal({
                         </div>
                     )}
                 </div>
-                <p className="mt-5 text-xs text-text-faint">
-                    {t('contact_safety_note')}
-                </p>
-            </div>
-        </div>,
-        document.body,
+            <p className="mt-5 text-xs text-text-faint">
+                {t('contact_safety_note')}
+            </p>
+        </>
     )
 }
 function KeyFacts({ estate }: { estate: EstateType }) {
@@ -523,20 +684,37 @@ function KeyFacts({ estate }: { estate: EstateType }) {
     ]
     return (
         <section>
-            <h1 className="text-2xl font-semibold text-text-base">
+            <h1 className="text-xl font-semibold text-text-base sm:text-2xl">
                 {t('title_flat', { rooms: formatRooms(estate.rooms) })}
                 {estate.areaTotal ? `, ${formatArea(estate.areaTotal)}` : ''}
             </h1>
             {estate.address && (
-                <div className="mt-1 text-base text-text-muted">{estate.address}</div>
+                <div className="mt-1 text-sm text-text-muted sm:text-base">{estate.address}</div>
             )}
-            <dl className="mt-4 grid grid-cols-4 divide-x divide-border overflow-hidden rounded-lg border border-border bg-surface-page">
-                {items.map((i) => (
-                    <div key={i.label} className="flex flex-col gap-1 px-4 py-3">
-                        <dt className="text-xs text-text-faint">{i.label}</dt>
-                        <dd className="text-lg font-semibold text-text-base tabular-nums">{i.value}</dd>
-                    </div>
-                ))}
+            {}
+            <dl className="mt-4 grid grid-cols-2 overflow-hidden rounded-lg border border-border bg-surface-page sm:grid-cols-4">
+                {items.map((i, idx) => {
+                    // mobile 2x2
+                    const rightMobile = idx % 2 === 0
+                    const bottomMobile = idx < 2
+                    // sm 1x4: right border for first three
+                    const rightSm = idx < 3
+                    return (
+                        <div
+                            key={i.label}
+                            className={cn(
+                                'flex flex-col gap-1 px-3 py-3 sm:px-4',
+                                rightMobile ? 'border-r border-border' : '',
+                                bottomMobile ? 'border-b border-border' : '',
+                                rightSm ? 'sm:border-r sm:border-border' : 'sm:border-r-0',
+                                'sm:border-b-0',
+                            )}
+                        >
+                            <dt className="text-xs text-text-faint">{i.label}</dt>
+                            <dd className="text-base font-semibold text-text-base tabular-nums sm:text-lg">{i.value}</dd>
+                        </div>
+                    )
+                })}
             </dl>
         </section>
     )
@@ -550,22 +728,22 @@ function PriceHistoryBlock({ estate, currency }: { estate: EstateType; currency:
         ? new Date(firstDate).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
         : ''
     return (
-        <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface-page p-5">
-            <div className="flex items-center justify-between gap-4">
+        <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface-page p-4 md:p-5">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div>
-                    <h2 className="text-lg font-semibold text-text-base">{t('price_history_title')}</h2>
+                    <h2 className="text-base font-semibold text-text-base sm:text-lg">{t('price_history_title')}</h2>
                     <p className="mt-0.5 text-xs text-text-faint">
                         {t('price_history_records', { count: estate.priceHistory.length, date: formattedDate })}
                     </p>
                 </div>
                 {estate.priceChange && (
-                    <div className="shrink-0">
+                    <div className="shrink-0 self-start">
                         <PriceChangeBadge change={estate.priceChange} currency={currency} variant="full" />
                     </div>
                 )}
             </div>
             <PriceHistoryChart history={estate.priceHistory} currency={currency} />
-            <div className="mt-2 grid max-h-40 grid-cols-2 gap-x-6 gap-y-1.5 overflow-y-auto pr-2">
+            <div className="mt-2 grid max-h-52 grid-cols-1 gap-x-6 gap-y-1.5 overflow-y-auto pr-2 sm:max-h-40 sm:grid-cols-2">
                 {[...estate.priceHistory]
                     .reverse()
                     .slice(0, 8)
@@ -681,9 +859,9 @@ function Description({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     if (!estate.description) return null
     return (
-        <section className="rounded-lg border border-border bg-surface-page p-5">
-            <h2 className="mb-3 text-lg font-semibold text-text-base">{t('description_title')}</h2>
-            <p className="whitespace-pre-line text-base leading-relaxed text-text-muted">
+        <section className="rounded-lg border border-border bg-surface-page p-4 md:p-5">
+            <h2 className="mb-3 text-base font-semibold text-text-base sm:text-lg">{t('description_title')}</h2>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-text-muted sm:text-base">
                 {estate.description}
             </p>
         </section>
@@ -732,20 +910,20 @@ function SpecsGrid({ estate }: { estate: EstateType }) {
         },
     ]
     return (
-        <section className="rounded-lg border border-border bg-surface-page p-6">
-            <div className="mb-5 flex items-center gap-2">
+        <section className="rounded-lg border border-border bg-surface-page p-4 md:p-6">
+            <div className="mb-4 flex items-center gap-2 md:mb-5">
                 <Ruler className="size-4 text-text-faint" aria-hidden />
-                <h2 className="text-lg font-semibold text-text-base">{t('specs_title')}</h2>
+                <h2 className="text-base font-semibold text-text-base sm:text-lg">{t('specs_title')}</h2>
             </div>
-            <div className="grid grid-cols-3 gap-x-8 gap-y-8">
+            <div className="flex flex-col gap-y-6 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-8 lg:grid-cols-3">
                 {groups.map((g) => (
                     <div key={g.title}>
-                        <div className="mb-3 text-xs font-medium tracking-wide text-text-faint uppercase">
+                        <div className="mb-2 text-xs font-medium tracking-wide text-text-faint uppercase md:mb-3">
                             {g.title}
                         </div>
                         <dl className="flex flex-col divide-y divide-border">
                             {g.rows.map(([label, value]) => (
-                                <div key={label} className="flex items-baseline justify-between gap-3 py-3">
+                                <div key={label} className="flex items-baseline justify-between gap-3 py-2.5 md:py-3">
                                     <dt className="shrink-0 text-sm text-text-faint">{label}</dt>
                                     <dd className="min-w-0 text-right text-sm text-text-base tabular-nums">{value}</dd>
                                 </div>
@@ -754,7 +932,7 @@ function SpecsGrid({ estate }: { estate: EstateType }) {
                     </div>
                 ))}
             </div>
-            <p className="mt-5 text-xs text-text-faint">
+            <p className="mt-4 text-xs text-text-faint md:mt-5">
                 {t('specs_null_note')}
             </p>
         </section>
@@ -763,17 +941,17 @@ function SpecsGrid({ estate }: { estate: EstateType }) {
 function LocationSection({ estate, currency: _currency }: { estate: EstateType; currency: DisplayCurrency }) {
     const t = useTranslations('estate')
     return (
-        <section className="rounded-lg border border-border bg-surface-page p-5">
+        <section className="rounded-lg border border-border bg-surface-page p-4 md:p-5">
             <div className="mb-3 flex items-center gap-2">
                 <Building2 className="size-4 text-text-faint" aria-hidden />
-                <h2 className="text-lg font-semibold text-text-base">{t('location_title')}</h2>
+                <h2 className="text-base font-semibold text-text-base sm:text-lg">{t('location_title')}</h2>
             </div>
-            {estate.address && <div className="text-base text-text-base">{estate.address}</div>}
+            {estate.address && <div className="text-sm text-text-base sm:text-base">{estate.address}</div>}
             {estate.districtName && (
                 <div className="mt-0.5 text-sm text-text-muted">{t('district_suffix', { name: estate.districtName })}</div>
             )}
             {estate.lat != null && estate.lng != null && (
-                <div className="relative mt-4 aspect-[16/6] overflow-hidden rounded-md border border-border">
+                <div className="relative mt-4 aspect-[4/3] overflow-hidden rounded-md border border-border sm:aspect-[16/9] lg:aspect-[16/6]">
                     <PropertyMiniMap lat={estate.lat} lng={estate.lng} />
                 </div>
             )}
@@ -806,11 +984,11 @@ function SellerCard({ estate }: { estate: EstateType }) {
     const sellerLabel = isAgency ? t('seller_agency') : t('seller_owner_short')
     const sellerName = isAgency ? (estate.agencyName ?? '') : t('seller_private')
     return (
-        <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-page p-5">
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-page p-4 md:p-5">
             <div className="flex items-center gap-3">
                 <div
                     className={cn(
-                        'flex size-12 items-center justify-center rounded-xl text-base font-semibold',
+                        'flex size-10 shrink-0 items-center justify-center rounded-xl text-base font-semibold sm:size-12',
                         isAgency
                             ? 'bg-brand-bg text-brand'
                             : 'bg-[var(--success-bg,#f0fdf4)] text-[var(--success-700,#15803d)]',
@@ -820,16 +998,18 @@ function SellerCard({ estate }: { estate: EstateType }) {
                 </div>
                 <div className="min-w-0">
                     <div className="text-xs text-text-faint">{sellerLabel}</div>
-                    <div className="truncate text-base font-medium text-text-base">{sellerName}</div>
+                    <div className="truncate text-sm font-medium text-text-base sm:text-base">{sellerName}</div>
                 </div>
             </div>
-            <ContactButton
-                phone={estate.phone ?? null}
-                sourceUrl={estate.sourceUrl}
-                sellerLabel={sellerLabel}
-                sellerName={sellerName}
-                size="md"
-            />
+            <div className="hidden xl:block">
+                <ContactButton
+                    phone={estate.phone ?? null}
+                    sourceUrl={estate.sourceUrl}
+                    sellerLabel={sellerLabel}
+                    sellerName={sellerName}
+                    size="md"
+                />
+            </div>
             <p className="text-xs text-text-faint">
                 {t('seller_contacts_note_full')}
             </p>
@@ -848,7 +1028,7 @@ function SafetyNote() {
 function Disclaimer({ estate }: { estate: EstateType }) {
     const t = useTranslations('estate')
     return (
-        <footer className="border-t border-border pt-4 text-xs leading-relaxed text-text-faint">
+        <footer className="border-t border-border pt-4 text-xs leading-relaxed break-words text-text-faint">
             {t('disclaimer', { id: estate.id })}
         </footer>
     )

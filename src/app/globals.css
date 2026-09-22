@@ -370,6 +370,17 @@ html.dark {
   }
 }
 
+/* iOS Safari: пока soft-keyboard открыт (класс ставится хук-ом
+ * useViewportMetrics), фиксируем документ по visualViewport и запрещаем
+ * скролл. Иначе layout viewport остаётся во весь экран, а Safari позволяет
+ * скроллить в пустоту ниже футера (rubber-band). Фокусный инпут Safari сам
+ * поднимает над клавой, поэтому формы остаются доступны. */
+html.kb-open,
+html.kb-open body {
+  overflow: hidden;
+  height: var(--app-height, 100dvh);
+}
+
 /* iOS Safari zooms on focus if input font-size < 16px. Правило вне
  * @layer base намеренно — иначе оно проигрывает утилите text-sm (14px)
  * от Tailwind, и Safari продолжает зумить. !important чтобы гарантированно
@@ -377,6 +388,38 @@ html.dark {
 @media (max-width: 1023px) {
   input, select, textarea {
     font-size: 16px !important;
+  }
+}
+
+/* ─── Photo slider (swiper) ─────────────────────────────────────────── */
+.photo-slider .swiper-pagination {
+  bottom: 8px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+.photo-slider .swiper-pagination-bullet {
+  width: 6px;
+  height: 6px;
+  background: rgb(255 255 255 / 0.55);
+  opacity: 1;
+  margin: 0 !important;
+  transition: background 150ms, transform 150ms;
+  pointer-events: auto;
+}
+.photo-slider .swiper-pagination-bullet-active {
+  background: #ffffff;
+}
+.photo-slider .swiper-pagination-bullets-dynamic {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.4);
+}
+@media (min-width: 640px) {
+  .photo-slider .swiper-pagination {
+    display: none;
   }
 }
 

@@ -39,19 +39,9 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
         })
         mapRef.current = instance
     }, [])
-    useEffect(() => {
-        if (!map) return
-        const instance = mapRef.current
-        if (!instance) return
-        const resize = () => instance.resize()
-        const vv = window.visualViewport
-        vv?.addEventListener('resize', resize)
-        window.addEventListener('orientationchange', resize)
-        return () => {
-            vv?.removeEventListener('resize', resize)
-            window.removeEventListener('orientationchange', resize)
-        }
-    }, [map])
+    // Ресайз карты вешаем в MapCanvas через ResizeObserver — он ловит реальные
+    // изменения размеров контейнера, а не события viewport'а. Это работает
+    // одинаково в Safari и Chrome iOS и не дёргает canvas на closing клавиатуры.
     useEffect(() => {
         const instance = mapRef.current
         if (!instance || !map) return

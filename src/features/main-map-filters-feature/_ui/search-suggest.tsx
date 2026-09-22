@@ -25,9 +25,11 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
     const [isMobile, setIsMobile] = useState(false)
     const wrapperRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
+
     useEffect(() => {
         setInput(value ?? '')
     }, [value])
+
     useEffect(() => {
         const mq = window.matchMedia('(max-width: 1023px)')
         const update = () => setIsMobile(mq.matches)
@@ -35,6 +37,7 @@ export function SearchSuggest({ value, onChange }: SearchSuggestProps) {
         mq.addEventListener('change', update)
         return () => mq.removeEventListener('change', update)
     }, [])
+
     const debounced = useDebounced(input.trim(), 250)
     const { data: suggestions = [], isValidating: isFetching } = useSuggest(debounced, 10, { enabled: open })
     const pos = usePopoverPosition(wrapperRef, open)
