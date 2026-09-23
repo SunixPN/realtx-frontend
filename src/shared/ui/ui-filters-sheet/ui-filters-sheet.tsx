@@ -15,6 +15,13 @@ type UIFiltersSheetProps = {
     ariaLabel?: string;
     children: ReactNode;
     className?: string;
+    /**
+     * Высота зафиксированного футера внутри панели (кнопки «Сбросить» /
+     * «Показать»). Учитывается при автоскролле сфокусированного инпута
+     * из-под клавиатуры — иначе инпут дотягивается ровно к футеру и
+     * остаётся им перекрыт.
+     */
+    bottomInset?: number;
 };
 
 const DURATION_MS = 280;
@@ -39,6 +46,7 @@ export function UIFiltersSheet({
     ariaLabel,
     children,
     className,
+    bottomInset = 0,
 }: UIFiltersSheetProps) {
     const [mounted, setMounted] = useState(false);
     const [rendered, setRendered] = useState(open);
@@ -50,69 +58,53 @@ export function UIFiltersSheet({
     });
     const scrollYRef = useRef(0);
     const panelRef = useRef<HTMLDivElement>(null);
-    const focusedInputRef = useRef<HTMLElement | null>(null);
-    // Previous visualViewport.height — so we can detect the moment the
-    // keyboard opens (height shrinks) and trigger scrollIntoView only then.
-    const prevVvHeightRef = useRef<number | null>(null);
+    const bottomInsetRef = useRef(bottomInset);
+    bottomInsetRef.current = bottomInset;
 
     useLayoutEffect(() => setMounted(true), []);
 
-    // Track visualViewport whenever the sheet is rendered. We update
-    // via a rAF loop-once pattern to coalesce back-to-back resize events
-    // Chrome fires during keyboard animation.
-    // On each shrink (keyboard opening) we also nudge the currently
-    // focused input into view — Chrome on Android/iOS otherwise leaves
-    // an input at the bottom of the sheet hidden behind the keyboard.
+    // Backdrop/panel positioning: следим за visualViewport, чтобы top
+    // соответствовал видимой части экрана. Только setGeom — никакой
+    // логики скролла здесь.
     useEffect(() => {
         if (!rendered) return;
         const vv = window.visualViewport;
-        let raf = 0;
         const update = () => {
-            raf = 0;
-            const nextH = vv ? vv.height : window.innerHeight;
-            const nextTop = vv ? vv.offsetTop : 0;
-            const prevH = prevVvHeightRef.current;
-            setGeom({ top: nextTop, height: nextH });
-            // Detect the "keyboard just opened" moment: viewport shrunk
-            // by a meaningful amount (>100px filters out URL-bar hides).
-            const shrunk = prevH !== null && nextH < prevH - 100;
-            prevVvHeightRef.current = nextH;
-            if (shrunk && focusedInputRef.current) {
-                // Wait for the panel to have laid out at its new height
-                // before scrolling — otherwise scrollIntoView aims for a
-                // position that's about to change.
-                requestAnimationFrame(() => {
-                    focusedInputRef.current?.scrollIntoView({
-                        block: 'nearest',
-                        inline: 'nearest',
-                        behavior: 'smooth',
-                    });
-                });
-            }
-        };
-        const schedule = () => {
-            if (raf) return;
-            raf = requestAnimationFrame(update);
+            setGeom({
+                top: vv ? vv.offsetTop : 0,
+                height: vv ? vv.height : window.innerHeight,
+            });
         };
         update();
-        window.addEventListener('resize', schedule);
-        window.addEventListener('orientationchange', schedule);
-        vv?.addEventListener('resize', schedule);
-        vv?.addEventListener('scroll', schedule);
+        window.addEventListener('resize', update);
+        window.addEventListener('orientationchange', update);
+        vv?.addEventListener('resize', update);
+        vv?.addEventListener('scroll', update);
         return () => {
-            if (raf) cancelAnimationFrame(raf);
-            window.removeEventListener('resize', schedule);
-            window.removeEventListener('orientationchange', schedule);
-            vv?.removeEventListener('resize', schedule);
-            vv?.removeEventListener('scroll', schedule);
-            prevVvHeightRef.current = null;
+            window.removeEventListener('resize', update);
+            window.removeEventListener('orientationchange', update);
+            vv?.removeEventListener('resize', update);
+            vv?.removeEventListener('scroll', update);
         };
     }, [rendered]);
 
-    // Track the currently focused text input *inside* the panel. Stored
-    // in a ref so the visualViewport effect can read it without re-subscribing.
+    // Автоскролл к сфокусированному инпуту.
+    //
+    // Логика простая и одноразовая:
+    //   focusin (текстовый инпут внутри панели) →
+    //   ждём FOCUS_SETTLE_MS (клавиатура успевает открыться и viewport
+    //   стабилизируется) →
+    //   один раз измеряем позицию инпута и, если он перекрыт клавиатурой
+    //   и/или футером, докручиваем ближайший скролл-контейнер ровно на
+    //   нужную дельту.
+    //
+    // Никаких visualViewport-слушателей, никаких burst-событий, никакого
+    // риска двойного скролла. Если фокус переходит на другой инпут —
+    // pending-таймер отменяется и заводится новый.
     useEffect(() => {
         if (!rendered) return;
+        const FOCUS_SETTLE_MS = 350;
+        let timer = 0;
         const isTextInput = (el: Element | null): el is HTMLElement => {
             if (!el) return false;
             if (el instanceof HTMLTextAreaElement) return true;
@@ -122,22 +114,47 @@ export function UIFiltersSheet({
             }
             return (el as HTMLElement).isContentEditable === true;
         };
+        const findScrollableAncestor = (el: HTMLElement): HTMLElement | null => {
+            let node: HTMLElement | null = el.parentElement;
+            while (node) {
+                const cs = getComputedStyle(node);
+                if ((cs.overflowY === 'auto' || cs.overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
+                    return node;
+                }
+                node = node.parentElement;
+            }
+            return null;
+        };
+        const scheduleScroll = (input: HTMLElement) => {
+            window.clearTimeout(timer);
+            timer = window.setTimeout(() => {
+                const vv = window.visualViewport;
+                const rect = input.getBoundingClientRect();
+                const vvBottom = (vv?.offsetTop ?? 0) + (vv?.height ?? window.innerHeight);
+                const SAFE_MARGIN = 16;
+                const usableBottom = vvBottom - bottomInsetRef.current - SAFE_MARGIN;
+                const overflow = rect.bottom - usableBottom;
+                if (overflow <= 0) return;
+                const scroller = findScrollableAncestor(input) ?? document.scrollingElement as HTMLElement | null;
+                scroller?.scrollBy({ top: overflow, behavior: 'smooth' });
+            }, FOCUS_SETTLE_MS);
+        };
         const onFocusIn = (e: FocusEvent) => {
             const target = e.target as Element | null;
             if (!panelRef.current || !target) return;
             if (!panelRef.current.contains(target)) return;
             if (!isTextInput(target)) return;
-            focusedInputRef.current = target;
+            scheduleScroll(target as HTMLElement);
         };
         const onFocusOut = () => {
-            focusedInputRef.current = null;
+            window.clearTimeout(timer);
         };
         document.addEventListener('focusin', onFocusIn, true);
         document.addEventListener('focusout', onFocusOut, true);
         return () => {
+            window.clearTimeout(timer);
             document.removeEventListener('focusin', onFocusIn, true);
             document.removeEventListener('focusout', onFocusOut, true);
-            focusedInputRef.current = null;
         };
     }, [rendered]);
 
@@ -238,7 +255,7 @@ export function UIFiltersSheet({
                     top: `${top}px`,
                     left: 0,
                     width: '100%',
-                    height: `${height}px`,
+                    height: `100dvh`,
                     transform: visible ? 'translate3d(0,0,0)' : 'translate3d(0,100%,0)',
                     transition: `transform ${DURATION_MS}ms cubic-bezier(.32,.72,0,1)`,
                     willChange: 'transform',

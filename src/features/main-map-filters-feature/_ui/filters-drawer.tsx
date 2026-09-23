@@ -24,6 +24,7 @@ import {
 import type { DisplayCurrency } from '../_hooks/use-display-currency'
 const ROOM_OPTIONS = [1, 2, 3, 4, 5] as const
 const DURATION = 320
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-4 border-b border-border px-4 py-4 sm:px-5 sm:py-5">
@@ -294,6 +295,7 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                     open={isOpen}
                     onClose={onClose}
                     ariaLabel={t('all_filters_aria')}
+                    bottomInset={72}
                 >
                     {body}
                 </UIFiltersSheet>

@@ -2,16 +2,17 @@
 import { useEffect, useState } from 'react';
 
 /**
- * True — iOS Chrome (WebKit-обёртка Chrome под iOS). UA содержит `CriOS`.
- * Android Chrome и десктоп Chrome сюда НЕ попадают.
+ * True on iOS Chrome (CriOS) and iOS Firefox (FxiOS) — both use WKWebView
+ * and share the same virtualViewport jitter behaviour with the virtual keyboard.
+ * Android Chrome and desktop browsers return false.
  *
- * До монтирования — false, чтобы SSR-разметка совпадала с первым client-рендером.
+ * Starts as false so SSR markup matches the first client render.
  */
 export function useIsIOSChrome(): boolean {
     const [is, setIs] = useState(false);
     useEffect(() => {
         if (typeof navigator === 'undefined') return;
-        setIs(/CriOS/i.test(navigator.userAgent));
+        setIs(/CriOS|FxiOS/i.test(navigator.userAgent));
     }, []);
     return is;
 }

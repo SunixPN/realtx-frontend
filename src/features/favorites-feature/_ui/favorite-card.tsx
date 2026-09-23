@@ -119,9 +119,11 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                             {item.metroTime != null && <span>· {tEstate('metro_min', { time: item.metroTime })}</span>}
                         </div>
                     )}
-                    <div className="mt-1 border-t border-border pt-2 text-xs text-text-faint">
-                        {(item.sellerType === 0 && item.agencyName) ? tEstate('seller_agency') : tEstate('seller_owner_short')}
-                    </div>
+                    {(item.sellerType === 0 && item.agencyName) && (
+                        <div className="mt-1 border-t border-border pt-2 text-xs text-text-faint">
+                            {tEstate('seller_agency')}
+                        </div>
+                    )}
                 </div>
             </Link>
             {}

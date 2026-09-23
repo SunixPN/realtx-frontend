@@ -308,6 +308,7 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
                         open={isOpen}
                         onClose={onClose}
                         ariaLabel={t('drawer_aria')}
+                        bottomInset={72}
                     >
                         {headerNode}
                         {contentNode}
