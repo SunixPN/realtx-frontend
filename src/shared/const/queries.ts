@@ -11,6 +11,8 @@ export const QUERIES = {
     CURRENCY_RATES:          "currency-rates",
     FAVORITES:               "favorites",
     FAVORITE_IDS:            "favorite-ids",
+    VIEWED:                  "viewed",
+    VIEWED_IDS:              "viewed-ids",
     SUBSCRIPTIONS:           "subscriptions",
 } as const;
 export type QueryType = typeof QUERIES[keyof typeof QUERIES];

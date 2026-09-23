@@ -25,6 +25,7 @@
         "country_ua": "Ukraine",
         "country_pl": "Poland",
         "page_title_favorites": "Favorites — RealtX",
+        "page_title_viewed": "Viewed — RealtX",
         "page_title_subscriptions": "Search Subscriptions — RealtX",
         "page_title_register": "Register — RealtX"
     },
@@ -209,6 +210,20 @@
         "remove_aria": "Remove from favorites",
         "add_aria": "Add to favorites"
     },
+    "viewed": {
+        "subtitle": "History",
+        "title": "Viewed",
+        "count": "{count, plural, one {# item} other {# items}}",
+        "clear_all": "Clear history",
+        "clear_confirm": "Clear the entire viewing history?",
+        "group_today": "Today",
+        "group_yesterday": "Yesterday",
+        "group_earlier": "Earlier",
+        "empty_title": "Nothing here yet",
+        "empty_body": "Items you open will appear here so you can jump back to what you've already seen.",
+        "go_to_search": "Go to search",
+        "remove_aria": "Remove from history"
+    },
     "estate": {
         "rooms_n": "{count} rm",
         "rooms_5plus": "5+ rm",
@@ -265,6 +280,7 @@
         "price_history_since": " · since {date}",
         "price_history_records": "{count} records since {date}",
         "badge_new": "New",
+        "viewed_badge": "Already viewed",
         "badge_agency": "Agency",
         "badge_owner": "Owner",
         "action_compare": "Compare",

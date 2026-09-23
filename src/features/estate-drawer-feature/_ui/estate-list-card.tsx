@@ -1,5 +1,5 @@
 'use client'
-import { ImageOff, Train } from 'lucide-react'
+import { Eye, ImageOff, Train } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { getThumbPhoto, type EstateShortType, useFormatRooms, useFormatArea } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
@@ -36,6 +36,15 @@ export function EstateListCard({ item, onClick }: Props) {
                     isFavorite={item.isFavorite}
                     className="absolute top-1 right-1 !size-7 rounded-sm shadow-none"
                 />
+                {item.isViewed && (
+                    <span
+                        aria-label={t('viewed_badge')}
+                        title={t('viewed_badge')}
+                        className="absolute bottom-1 left-1 flex size-6 items-center justify-center rounded-sm bg-neutral-900/70 text-white backdrop-blur-sm"
+                    >
+                        <Eye className="size-3.5" aria-hidden />
+                    </span>
+                )}
             </div>
             <div className="flex min-w-0 flex-1 flex-col">
                 <PriceDisplay

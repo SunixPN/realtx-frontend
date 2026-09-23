@@ -296,10 +296,11 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                                     label={tUserMenu('profile')}
                                     onClose={onClose}
                                 />
-                                <MenuButton
+                                <MenuLink
+                                    href={ROUTES.VIEWED}
                                     icon={<IconClock size={18} />}
                                     label={tUserMenu('viewed')}
-                                    onClick={onClose}
+                                    onClose={onClose}
                                 />
                             </nav>
                         )}

@@ -25,6 +25,7 @@
         "country_ua": "Украина",
         "country_pl": "Польша",
         "page_title_favorites": "Избранное — RealtX",
+        "page_title_viewed": "Просмотренные — RealtX",
         "page_title_subscriptions": "Подписки на поиск — RealtX",
         "page_title_register": "Регистрация — RealtX"
     },
@@ -209,6 +210,20 @@
         "remove_aria": "Убрать из избранного",
         "add_aria": "Добавить в избранное"
     },
+    "viewed": {
+        "subtitle": "История",
+        "title": "Просмотренные",
+        "count": "{count, plural, one {# объект} few {# объекта} many {# объектов} other {# объектов}}",
+        "clear_all": "Очистить историю",
+        "clear_confirm": "Очистить всю историю просмотров?",
+        "group_today": "Сегодня",
+        "group_yesterday": "Вчера",
+        "group_earlier": "Ранее",
+        "empty_title": "История пуста",
+        "empty_body": "Здесь появятся объекты, детали которых вы открывали. Так проще вернуться к тому, что уже видели.",
+        "go_to_search": "К поиску",
+        "remove_aria": "Убрать из истории"
+    },
     "estate": {
         "rooms_n": "{count} комн",
         "rooms_5plus": "5+ комн",
@@ -267,6 +282,7 @@
         "badge_new": "Новое",
         "badge_agency": "Агентство",
         "badge_owner": "Собственник",
+        "viewed_badge": "Уже смотрели",
         "action_compare": "Сравнить",
         "action_share": "Поделиться",
         "share_toast_copied": "Ссылка скопирована",

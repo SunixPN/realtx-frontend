@@ -5,6 +5,8 @@ import { cn } from '@/shared/helpers/cn';
 import { AuthUserType } from '@/entities/me/types/me-type';
 import { IconClock, IconLogOut, IconUser } from '@/shared/ui/ui-icons';
 import { useLogout } from '@/features/logout-feature/_hooks/use-logout';
+import {ROUTES} from "@/shared/const/routes";
+import useRouter from '@/shared/lib/use-router';
 const CLOSE_MS = 120;
 type UserMenuProps = {
     user: AuthUserType;
@@ -20,6 +22,7 @@ function getInitials(user: AuthUserType): string {
 }
 export function UserMenu({ user }: UserMenuProps) {
     const t = useTranslations('user_menu');
+    const router = useRouter()
     const [open, setOpen] = useState(false);
     const [closing, setClosing] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -91,7 +94,7 @@ export function UserMenu({ user }: UserMenuProps) {
                     </div>
                     <div className="flex flex-col py-1">
                         <MenuItem icon={<IconUser size={16} />} label={t('profile')} />
-                        <MenuItem icon={<IconClock size={16} />} label={t('viewed')} />
+                        <MenuItem onClick={() => router.push(ROUTES.VIEWED)} icon={<IconClock size={16} />} label={t('viewed')} />
                     </div>
                     <div className="border-t border-border">
                         <MenuItem

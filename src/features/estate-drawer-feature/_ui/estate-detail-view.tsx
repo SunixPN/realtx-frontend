@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Heart, Maximize2, Train, X } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Eye, Heart, Maximize2, Train, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEstateById, useWallMaterialLabels, useRepairStateLabels, useFormatRooms, useFormatArea } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
@@ -93,6 +93,12 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                         currency={currency}
                                         variant="compact"
                                     />
+                                )}
+                                {estate.isViewed && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-[var(--surface-muted)] px-2 py-0.5 text-xs font-medium text-[var(--text-muted)]">
+                                        <Eye className="size-3.5" aria-hidden />
+                                        {t('viewed_badge')}
+                                    </span>
                                 )}
                             </div>
                             <div className="mt-1">

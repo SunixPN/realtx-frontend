@@ -7,6 +7,7 @@ export type EstateMapPointType = {
     originalPrice: number | null
     originalCurrency: number | null
     rooms: number | null
+    isViewed?: boolean
 }
 export type PriceHistoryPoint = {
     date: string
@@ -26,6 +27,7 @@ export type PriceChange = {
 export type EstateType = {
     id: number
     isFavorite: boolean
+    isViewed: boolean
     sourceUuid: string
     sourceUrl: string | null
     headline: string | null
@@ -65,6 +67,7 @@ export type EstateType = {
 export type EstateShortType = {
     id: number
     isFavorite: boolean
+    isViewed: boolean
     price: number | null
     pricePerM2: number | null
     priceCurrency: number | null

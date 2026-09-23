@@ -26,14 +26,15 @@ function clusterSizeClass(count: number): 'sm' | 'md' | 'lg' {
     return 'sm'
 }
 const HEART_PIN_SVG = `<svg class="map-pin__fav" viewBox="0 0 24 24" aria-hidden="true" width="10" height="10"><path fill="currentColor" d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>`
+const EYE_PIN_SVG = `<svg class="map-pin__viewed" viewBox="0 0 24 24" aria-hidden="true" width="10" height="10"><path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>`
 const HEART_HOUSE_SVG = `<svg class="map-house__fav" viewBox="0 0 24 24" aria-hidden="true" width="10" height="10"><path fill="currentColor" d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>`
 function createPinElement(point: EstateMapPointType, isFavorite: boolean, formatK: (n: number) => string): HTMLDivElement {
     const el = document.createElement('div')
-    el.className = 'map-pin'
+    el.className = point.isViewed ? 'map-pin map-pin--viewed' : 'map-pin'
     el.innerHTML =
         `<div class="map-pin__inner">` +
         `<span class="map-pin__label">` +
-        (isFavorite ? HEART_PIN_SVG : '') +
+        (isFavorite ? HEART_PIN_SVG : (point.isViewed ? EYE_PIN_SVG : '')) +
         formatPrice(point.price, point.priceCurrency, formatK) +
         `</span>` +
         `<span class="map-pin__tail"></span>` +

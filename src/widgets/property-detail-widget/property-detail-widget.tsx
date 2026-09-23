@@ -14,6 +14,7 @@ import {
     ChevronRight,
     Copy,
     ExternalLink,
+    Eye,
     GitCompare,
     Heart,
     Phone,
@@ -274,6 +275,12 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
                     />
                     {estate.priceChange && (
                         <PriceChangeBadge change={estate.priceChange} currency={currency} variant="compact" />
+                    )}
+                    {estate.isViewed && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-text-muted">
+                            <Eye className="size-3.5" aria-hidden />
+                            {t('viewed_badge')}
+                        </span>
                     )}
                 </div>
                 <div className="mt-1 flex items-center gap-2 text-sm text-text-muted">
