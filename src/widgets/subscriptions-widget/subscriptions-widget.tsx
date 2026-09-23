@@ -23,14 +23,14 @@ export function SubscriptionsWidget() {
     const openEdit = (s: SearchSubscriptionType) => setMode({ kind: 'edit', subscription: s })
 
     return (
-        <div className="mx-auto flex w-full max-w-[1520px] flex-col gap-6 px-6 py-6">
-            <header className="flex items-end justify-between gap-6 border-b border-border pb-5">
+        <div className="mx-auto flex w-full max-w-[1520px] flex-col gap-4 px-3 py-3 sm:px-4 md:gap-6 md:px-6 md:py-6">
+            <header className="flex flex-col items-stretch gap-3 border-b border-border pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6 md:pb-5">
                 <SubscriptionsHeader items={items} onCreate={openCreate} />
             </header>
             {items.length === 0 && !isLoading ? (
                 <SubscriptionsEmpty />
             ) : (
-                <ul className="flex flex-col gap-3">
+                <ul className="flex flex-col gap-2 sm:gap-3">
                     {items.map(s => (
                         <li key={s.id}>
                             <SubscriptionRow subscription={s} onEdit={openEdit} />
@@ -38,7 +38,7 @@ export function SubscriptionsWidget() {
                     ))}
                 </ul>
             )}
-            <footer className="rounded-lg border border-border bg-surface-subtle p-4 text-xs leading-relaxed text-text-muted">
+            <footer className="rounded-lg border border-border bg-surface-subtle p-3 text-xs leading-relaxed text-text-muted sm:p-4">
                 {t('footer_disclaimer')}
             </footer>
             <EditSubscriptionDrawer

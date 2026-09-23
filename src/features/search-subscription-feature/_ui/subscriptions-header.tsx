@@ -13,9 +13,9 @@ export function SubscriptionsHeader({ items, onCreate }: Props) {
     const totalFresh = items.reduce((sum, s) => sum + s.fresh, 0)
     return (
         <>
-            <div>
-                <div className="text-sm text-text-muted">{t('notifications_label')}</div>
-                <h1 className="mt-1 text-2xl font-semibold text-text-base">{t('title')}</h1>
+            <div className="min-w-0">
+                <div className="hidden text-sm text-text-muted sm:block">{t('notifications_label')}</div>
+                <h1 className="text-xl font-semibold text-text-base sm:mt-1 sm:text-2xl">{t('title')}</h1>
                 <p className="mt-1.5 max-w-2xl text-sm text-text-muted">
                     {t('active_status', { active, total: items.length })}
                     {totalFresh > 0 && (
@@ -25,9 +25,16 @@ export function SubscriptionsHeader({ items, onCreate }: Props) {
                     )}
                 </p>
             </div>
-            <UIButton size="md" iconLeft={<Plus className="size-4" />} onClick={onCreate}>
-                {t('new_button')}
-            </UIButton>
+            <div className="sm:shrink-0">
+                <UIButton
+                    size="md"
+                    iconLeft={<Plus className="size-4" />}
+                    onClick={onCreate}
+                    className="w-full sm:w-auto"
+                >
+                    {t('new_button')}
+                </UIButton>
+            </div>
         </>
     )
 }

@@ -1,43 +1,39 @@
 'use client'
-import useSWRMutation from 'swr/mutation'
-import { useSWRConfig } from 'swr'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { mutate as swrMutate } from 'swr'
 import { api } from '@/shared/api/api'
 import { API_ROUTES } from '@/shared/const/api-routes'
-import { MUTATIONS } from '@/shared/const/mutations'
+import { QUERIES } from '@/shared/const/queries'
 import { authKey } from '@/entities/me/api/auth-query'
-import {
-    favoriteIdsKey,
-    isFavoritesKey,
-    isAnyFavoriteKey,
-} from './favorite-keys'
+import { favoriteIdsKey } from './favorite-keys'
 import type { FavoriteIdsType, FavoriteItemType } from './favorite-types'
+
 export function useBulkRemoveFavorites() {
-    const { mutate } = useSWRConfig()
-    return useSWRMutation<void, Error, string, number[]>(
-        MUTATIONS.BULK_REMOVE_FAVORITES,
-        async (_key, { arg: ids }) => {
-            mutate(
-                isFavoritesKey,
-                (old?: FavoriteItemType[]) => old?.filter(item => !ids.includes(item.id)) ?? [],
-                { revalidate: false },
+    const queryClient = useQueryClient()
+    const mutation = useMutation({
+        mutationFn: async (ids: number[]) => {
+            await api.delete(API_ROUTES.FAVORITES.BULK_REMOVE, { data: { ids } })
+            return ids
+        },
+        onMutate: (ids) => {
+            queryClient.setQueriesData<FavoriteItemType[]>(
+                { queryKey: [QUERIES.FAVORITES] },
+                (old) => old?.filter(item => !ids.includes(item.id)),
             )
-            mutate(
+            swrMutate(
                 favoriteIdsKey(),
                 (old?: FavoriteIdsType) =>
                     old ? { ids: old.ids.filter(id => !ids.includes(id)) } : { ids: [] },
                 { revalidate: false },
             )
-            await api.delete(API_ROUTES.FAVORITES.BULK_REMOVE, { data: { ids } })
         },
-        {
-            onSuccess: () => {
-                mutate(isAnyFavoriteKey)
-                mutate(authKey)
-            },
-            onError: () => {
-                mutate(isAnyFavoriteKey)
-                mutate(authKey)
-            },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: [QUERIES.FAVORITES] })
+            swrMutate(authKey)
         },
-    )
+    })
+    return {
+        trigger: mutation.mutateAsync,
+        isMutating: mutation.isPending,
+    }
 }

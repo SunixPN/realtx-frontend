@@ -35,6 +35,7 @@ export const UIInput = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             disabled={disabled}
             aria-invalid={hasError || undefined}
+            suppressHydrationWarning
             className="min-w-0 flex-1 bg-transparent text-sm text-text-base placeholder:text-text-faint outline-none disabled:cursor-not-allowed"
             {...props}
           />

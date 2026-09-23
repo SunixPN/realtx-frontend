@@ -71,7 +71,7 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                     <X className="size-5" />
                 </button>
             </header>
-            <div className="flex-1 overflow-y-auto">
+            <div data-kb-freeze className="flex-1 overflow-y-auto">
                 {isError && (
                     <div className="m-4 rounded-md bg-[var(--error-bg)] p-3 text-sm text-[var(--error)]">
                         {t('error_load')}

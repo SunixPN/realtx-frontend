@@ -35,7 +35,7 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
     const { trigger: markSeen } = useMarkSeenSubscription()
     const handlePauseToggle = async () => {
         try {
-            await togglePause({ id: s.id, paused: !s.paused }, { throwOnError: true })
+            await togglePause({ id: s.id, paused: !s.paused })
             showToast({ status: 'success', text: s.paused ? t('toast_resumed') : t('toast_paused') })
         } catch {
             showToast({ status: 'error', text: t('toast_pause_error') })
@@ -43,7 +43,7 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
     }
     const handleDelete = async () => {
         try {
-            await remove(s.id, { throwOnError: true })
+            await remove(s.id)
             showToast({ status: 'success', text: t('toast_deleted') })
         } catch {
             showToast({ status: 'error', text: t('toast_delete_error') })
@@ -54,20 +54,37 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
         const qs = serializeFiltersToSearchParams(fromBackendFilters(s.filters)).toString()
         return qs ? `${ROUTES.ROOT}?${qs}` : ROUTES.ROOT
     })()
+    const actionButtons = (
+        <>
+            <IconButton label={t('row_edit_aria')} onClick={() => onEdit(s)}>
+                <Pencil className="size-4" />
+            </IconButton>
+            <IconButton
+                label={s.paused ? t('row_resume_aria') : t('row_pause_aria')}
+                onClick={handlePauseToggle}
+                disabled={busy}
+            >
+                {s.paused ? <Bell className="size-4" /> : <BellOff className="size-4" />}
+            </IconButton>
+            <IconButton label={t('row_delete_aria')} onClick={handleDelete} disabled={busy}>
+                <Trash2 className="size-4" />
+            </IconButton>
+        </>
+    )
     return (
         <article
             className={cn(
-                'flex flex-col gap-3 rounded-lg border p-4 transition-colors',
+                'flex flex-col gap-3 rounded-lg border p-3 transition-colors sm:p-4',
                 s.paused ? 'border-border bg-surface-subtle' : 'border-border bg-surface-raised',
                 busy && 'opacity-60',
             )}
         >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-3 sm:gap-4">
                 <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <h2
                             className={cn(
-                                'truncate text-base font-semibold',
+                                'min-w-0 truncate text-sm font-semibold sm:text-base',
                                 s.paused ? 'text-text-muted' : 'text-text-base',
                             )}
                         >
@@ -99,21 +116,14 @@ export function SubscriptionRow({ subscription: s, onEdit }: Props) {
                         </div>
                     )}
                 </div>
-                <div className="flex shrink-0 items-center gap-1">
-                    <IconButton label={t('row_edit_aria')} onClick={() => onEdit(s)}>
-                        <Pencil className="size-4" />
-                    </IconButton>
-                    <IconButton
-                        label={s.paused ? t('row_resume_aria') : t('row_pause_aria')}
-                        onClick={handlePauseToggle}
-                        disabled={busy}
-                    >
-                        {s.paused ? <Bell className="size-4" /> : <BellOff className="size-4" />}
-                    </IconButton>
-                    <IconButton label={t('row_delete_aria')} onClick={handleDelete} disabled={busy}>
-                        <Trash2 className="size-4" />
-                    </IconButton>
+                {}
+                <div className="hidden shrink-0 items-center gap-1 sm:flex">
+                    {actionButtons}
                 </div>
+            </div>
+            {}
+            <div className="flex items-center gap-1 border-t border-border pt-2 sm:hidden">
+                {actionButtons}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-border pt-3 text-xs text-text-muted">
                 <span className="tabular-nums">{t('row_total', { count: s.total })}</span>
@@ -157,7 +167,7 @@ function IconButton({
             title={label}
             onClick={onClick}
             disabled={disabled}
-            className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-subtle hover:text-text-base disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 cursor-pointer items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-subtle hover:text-text-base active:bg-surface-subtle disabled:cursor-not-allowed disabled:opacity-50 sm:size-9"
         >
             {children}
         </button>

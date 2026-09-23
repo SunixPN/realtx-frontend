@@ -52,7 +52,7 @@ export function UISelect({
   const [open, setOpen] = useState(false);
   const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue);
   const isControlled = controlledValue !== undefined;
-  const value = isControlled ? controlledValue : internalValue;
+  const value = controlledValue;
   const selected = options.find((o) => o.value === value);
   const hasError = !!error;
   const pos = usePopoverPosition(triggerRef, open);

@@ -17,7 +17,7 @@ export default function ResetRequestForm({ onSent }: ResetRequestFormProps) {
                     {t('subtitle')}
                 </p>
             </header>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate suppressHydrationWarning>
                 <UIInput
                     label="Email"
                     type="email"

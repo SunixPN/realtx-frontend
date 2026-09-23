@@ -56,7 +56,7 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
                 не пересчитывается при появлении soft-keyboard iOS. */}
             {mapFilter && mapFilter({ total: points.length })}
             <div
-                className="absolute z-30 left-2 right-2 bottom-2 lg:left-4 lg:right-auto lg:top-20 lg:bottom-auto"
+                className="absolute map-type z-30 left-2 right-2 bottom-2 lg:left-4 lg:right-auto lg:top-20 lg:bottom-auto"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
             >
                 <MapModeToggle mode={mode} onChange={setMode} />

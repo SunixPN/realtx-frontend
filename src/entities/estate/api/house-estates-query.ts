@@ -26,10 +26,23 @@ export const houseEstatesKey = (
     displayCurrency: 'USD' | 'BYN' | 'EUR' = 'USD',
 ) => [QUERIES.HOUSE_ESTATES, displayCurrency, bboxKeyParts(bbox), normalizeFilters(filters)] as const
 type Key = ReturnType<typeof houseEstatesKey>
+
+// Небольшой отступ чтобы точечный bbox (min=max, когда все квартиры на одной точке)
+// не давал пустой результат из-за float-погрешности хранения координат в БД.
+// 1e-5° ≈ 1 м — достаточно для одного здания, слишком мало чтобы захватить соседнее.
+const BBOX_EPS = 1e-5
+
 const fetcher = async ([, displayCurrency, bboxParts, normFilters]: Key): Promise<HouseEstatesResponseType> => {
     const [minLat, maxLat, minLng, maxLng] = bboxParts
     const r = await api.get<HouseEstatesResponseType>(API_ROUTES.ESTATE.HOUSE, {
-        params: { minLat, maxLat, minLng, maxLng, ...normFilters, displayCurrency },
+        params: {
+            minLat: +(minLat - BBOX_EPS).toFixed(8),
+            maxLat: +(maxLat + BBOX_EPS).toFixed(8),
+            minLng: +(minLng - BBOX_EPS).toFixed(8),
+            maxLng: +(maxLng + BBOX_EPS).toFixed(8),
+            ...normFilters,
+            displayCurrency,
+        },
     })
     return r.data
 }

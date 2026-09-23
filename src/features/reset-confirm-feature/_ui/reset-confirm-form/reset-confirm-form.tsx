@@ -26,7 +26,7 @@ export default function ResetConfirmForm({ token, onSuccess }: ResetConfirmFormP
                     {t('subtitle')}
                 </p>
             </div>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate suppressHydrationWarning>
                 <div>
                     <UIInputPassword
                         label={t('password_label')}

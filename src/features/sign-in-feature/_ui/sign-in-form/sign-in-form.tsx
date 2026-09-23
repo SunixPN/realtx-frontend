@@ -14,6 +14,7 @@ export default function SignInForm() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
             noValidate
+            suppressHydrationWarning
         >
             <UIInput
                 label="Email"

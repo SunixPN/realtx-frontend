@@ -370,15 +370,29 @@ html.dark {
   }
 }
 
-/* iOS Safari: пока soft-keyboard открыт (класс ставится хук-ом
+/* iOS Safari: пока soft-keyboard открыт (класс `kb-open` ставится хук-ом
  * useViewportMetrics), фиксируем документ по visualViewport и запрещаем
  * скролл. Иначе layout viewport остаётся во весь экран, а Safari позволяет
- * скроллить в пустоту ниже футера (rubber-band). Фокусный инпут Safari сам
- * поднимает над клавой, поэтому формы остаются доступны. */
+ * скроллить в пустоту ниже футера (rubber-band). Плюс — если Safari уже
+ * успел проскроллить html при фокусе инпута, эта позиция «зависает» после
+ * закрытия клавиатуры, пока пользователь не тапнет. С overflow:hidden Safari
+ * не может скроллить html/body и вынужден шифтить visual viewport, а он сам
+ * возвращается в норму при закрытии клавиатуры.
+ *
+ * Тот же принцип для внутренних scrollable-контейнеров (BottomSheet, drawer):
+ * они помечены [data-kb-freeze] и получают overflow:hidden на время открытой
+ * клавы. Safari сам поднимает инпут через visual viewport. */
 html.kb-open,
 html.kb-open body {
   overflow: hidden;
   height: var(--app-height, 100dvh);
+}
+/* Safari-only: iOS Chrome/Firefox/Edge на iOS ведут себя иначе с
+ * визуальной клавиатурой (kb-inset у них = 0, класс kb-open не активируется),
+ * а на macOS Chrome правило и без того не нужно. Класс is-safari ставится
+ * useViewportMetrics. */
+html.is-safari.kb-open [data-kb-freeze] {
+  overflow: hidden !important;
 }
 
 /* iOS Safari zooms on focus if input font-size < 16px. Правило вне
@@ -567,8 +581,18 @@ html.dark .map-pin--visited .map-pin__tail {
   will-change: transform;
 }
 
+@media (max-width: 1421px) {
+  .map-type {
+    top: 120px
+  }
+}
+
 /* Mobile/tablet: enlarge marker tap targets */
 @media (max-width: 1023px) {
+  .map-type {
+    top: inherit;
+  }
+
   .map-pin__label {
     padding: 6px 10px;
     font-size: 12px;
@@ -731,3 +755,4 @@ html.dark .map-pin--visited .map-pin__tail {
   from { opacity: 0; transform: scale(0.85); }
   to   { opacity: 1; transform: scale(1); }
 }
+

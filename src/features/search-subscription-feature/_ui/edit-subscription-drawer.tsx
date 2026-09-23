@@ -8,6 +8,10 @@ import { ROUTES } from '@/shared/const/routes'
 import { UIButton } from '@/shared/ui/ui-button'
 import { UIInput } from '@/shared/ui/ui-input'
 import { UISwitch } from '@/shared/ui/ui-switch'
+import { UIBottomSheet, useBottomSheetDrag } from '@/shared/ui/ui-bottom-sheet'
+import { UIFiltersSheet } from '@/shared/ui/ui-filters-sheet'
+import { useIsMobile } from '@/shared/hooks/use-is-mobile'
+import { useIsIOSChrome } from '@/shared/hooks/use-is-ios-chrome'
 import { cn } from '@/shared/helpers/cn'
 import { showToast } from '@/shared/helpers/show-toast'
 import {
@@ -50,6 +54,8 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
     ]
     const backdropRef = useRef<HTMLDivElement>(null)
     const panelRef = useRef<HTMLElement>(null)
+    const isMobile = useIsMobile(640)
+    const isIOSChrome = useIsIOSChrome()
     const { data: auth } = useAuth()
     const [name, setName] = useState('')
     const [filters, setFilters] = useState<MapFiltersType>({})
@@ -88,9 +94,10 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
         return () => window.removeEventListener('keydown', handler)
     }, [isOpen, filtersDrawerOpen, onClose])
     useEffect(() => {
+        if (isMobile) return // UIBottomSheet locks body scroll internally
         document.body.style.overflow = isOpen ? 'hidden' : ''
         return () => { document.body.style.overflow = '' }
-    }, [isOpen])
+    }, [isOpen, isMobile])
     const { trigger: create, isMutating: isCreating } = useCreateSubscription()
     const { trigger: update, isMutating: isUpdating } = useUpdateSubscription()
     const { trigger: remove, isMutating: isRemoving } = useDeleteSubscription()
@@ -116,7 +123,6 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
             if (mode?.kind === 'create') {
                 const created = await create(
                     { name: trimmed, filters, frequency, triggers, channels, quietHours },
-                    { throwOnError: true },
                 )
                 showToast({ status: 'success', text: t('toast_created') })
                 onSaved?.(created)
@@ -126,7 +132,6 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
                         id: mode.subscription.id,
                         patch: { name: trimmed, filters, frequency, triggers, channels, quietHours },
                     },
-                    { throwOnError: true },
                 )
                 showToast({ status: 'success', text: t('toast_updated') })
                 onSaved?.(updated)
@@ -139,7 +144,7 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
     const handleDelete = async () => {
         if (mode?.kind !== 'edit') return
         try {
-            await remove(mode.subscription.id, { throwOnError: true })
+            await remove(mode.subscription.id)
             showToast({ status: 'success', text: t('toast_deleted') })
             onDeleted?.(mode.subscription.id)
             onClose()
@@ -147,65 +152,51 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
             showToast({ status: 'error', text: t('toast_delete_error') })
         }
     }
-    return (
-        <>
-            {}
-            <CSSTransition
-                nodeRef={backdropRef}
-                in={isOpen}
-                timeout={DURATION}
-                classNames="drawer-backdrop"
-                unmountOnExit
-            >
-                <div
-                    ref={backdropRef}
-                    onClick={onClose}
-                    className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-[2px]"
-                />
-            </CSSTransition>
-            {}
-            <CSSTransition
-                nodeRef={panelRef}
-                in={isOpen}
-                timeout={DURATION}
-                classNames="drawer-panel"
-                unmountOnExit
-            >
-                <aside
-                    ref={panelRef}
-                    aria-label={t('drawer_aria')}
-                    className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-[460px] flex-col border-l border-border bg-surface-page shadow-[0_12px_32px_-8px_rgb(15_23_42/0.16)]"
+    const headerTitle = mode?.kind === 'edit' ? mode.subscription.name : t('drawer_new_title')
+    const headerNode = (
+        <DrawerHeader
+            title={headerTitle}
+            summary={summary}
+            onClose={onClose}
+            closeAria={t('drawer_close_aria')}
+        />
+    )
+    const footerNode = (
+        <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-border bg-surface-page px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-5 sm:py-4">
+            {mode?.kind === 'edit' ? (
+                <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={busy}
+                    className="hidden cursor-pointer items-center gap-1.5 text-sm font-medium text-error transition-opacity hover:opacity-80 disabled:opacity-50 sm:flex"
                 >
-                    {}
-                    <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3.5">
-                        <div className="min-w-0">
-                            <h2 className="truncate text-[0.9375rem] font-semibold text-text-base">
-                                {mode?.kind === 'edit' ? mode.subscription.name : t('drawer_new_title')}
-                            </h2>
-                            {summary && (
-                                <p className="mt-0.5 truncate text-xs text-text-muted">{summary}</p>
-                            )}
-                        </div>
-                        <button
-                            type="button"
-                            aria-label={t('drawer_close_aria')}
-                            onClick={onClose}
-                            className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-subtle"
-                        >
-                            <X className="size-5" />
-                        </button>
-                    </div>
-                    {}
-                    <div className="flex-1 overflow-y-auto">
-                        <Section title={t('form_name_title')}>
-                            <UIInput
-                                value={name}
-                                onChange={e => setName(e.target.value)}
-                                maxLength={120}
-                                placeholder={t('form_name_placeholder')}
-                                hint={t('form_name_hint')}
-                            />
-                        </Section>
+                    <Trash2 className="size-4" />
+                    {t('delete_button')}
+                </button>
+            ) : (
+                <span className="hidden sm:block" />
+            )}
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
+                <UIButton variant="secondary" size="md" onClick={onClose} disabled={busy} className="w-full sm:w-auto">
+                    {t('cancel_button')}
+                </UIButton>
+                <UIButton size="md" onClick={handleSave} loading={busy} className="w-full sm:w-auto">
+                    {t('save_button')}
+                </UIButton>
+            </div>
+        </div>
+    )
+    const contentNode = (
+        <div data-kb-freeze className="flex-1 overflow-y-auto">
+            <Section title={t('form_name_title')}>
+                <UIInput
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    maxLength={120}
+                    placeholder={t('form_name_placeholder')}
+                    hint={t('form_name_hint')}
+                />
+            </Section>
                         <Section title={t('form_criteria_title')}>
                             <div className="flex items-start gap-3 rounded-sm border border-border bg-surface-subtle p-3">
                                 <MapPin className="mt-0.5 size-4 shrink-0 text-text-muted" aria-hidden />
@@ -293,35 +284,85 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
                                 <UISwitch checked={quietHours} onChange={e => setQuietHours(e.target.checked)} />
                             </div>
                         </Section>
-                    </div>
-                    {}
-                    <div className="flex shrink-0 items-center justify-between gap-3 border-t border-border bg-surface-page px-5 py-4">
-                        {mode?.kind === 'edit' ? (
-                            <button
-                                type="button"
-                                onClick={handleDelete}
-                                disabled={busy}
-                                className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-error transition-opacity hover:opacity-80 disabled:opacity-50"
-                            >
-                                <Trash2 className="size-4" />
-                                {t('delete_button')}
-                            </button>
-                        ) : (
-                            <span />
+                        {}
+                        {mode?.kind === 'edit' && (
+                            <section className="border-b border-border px-4 py-4 sm:hidden">
+                                <button
+                                    type="button"
+                                    onClick={handleDelete}
+                                    disabled={busy}
+                                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-error/30 bg-error-bg py-2.5 text-sm font-medium text-error transition-colors active:bg-error/15 disabled:opacity-50"
+                                >
+                                    <Trash2 className="size-4" />
+                                    {t('delete_button')}
+                                </button>
+                            </section>
                         )}
-                        <div className="flex gap-2">
-                            <UIButton variant="secondary" size="md" onClick={onClose} disabled={busy}>
-                                {t('cancel_button')}
-                            </UIButton>
-                            <UIButton size="md" onClick={handleSave} loading={busy}>
-                                {t('save_button')}
-                            </UIButton>
-                        </div>
                     </div>
-                </aside>
-            </CSSTransition>
-            {
-}
+    )
+    return (
+        <>
+            {isMobile ? (
+                isIOSChrome ? (
+                    <UIFiltersSheet
+                        open={isOpen}
+                        onClose={onClose}
+                        ariaLabel={t('drawer_aria')}
+                    >
+                        {headerNode}
+                        {contentNode}
+                        {footerNode}
+                    </UIFiltersSheet>
+                ) : (
+                    <UIBottomSheet
+                        open={isOpen}
+                        onClose={onClose}
+                        snapPoints={[0.95]}
+                        ariaLabel={t('drawer_aria')}
+                        showHandle={false}
+                        contentClassName="flex min-h-0 flex-1 flex-col"
+                    >
+                        {headerNode}
+                        {contentNode}
+                        {footerNode}
+                    </UIBottomSheet>
+                )
+            ) : (
+                <>
+                    {}
+                    <CSSTransition
+                        nodeRef={backdropRef}
+                        in={isOpen}
+                        timeout={DURATION}
+                        classNames="drawer-backdrop"
+                        unmountOnExit
+                    >
+                        <div
+                            ref={backdropRef}
+                            onClick={onClose}
+                            className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-[2px]"
+                        />
+                    </CSSTransition>
+                    {}
+                    <CSSTransition
+                        nodeRef={panelRef}
+                        in={isOpen}
+                        timeout={DURATION}
+                        classNames="drawer-panel"
+                        unmountOnExit
+                    >
+                        <aside
+                            ref={panelRef}
+                            aria-label={t('drawer_aria')}
+                            className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-[460px] flex-col border-l border-border bg-surface-page shadow-[0_12px_32px_-8px_rgb(15_23_42/0.16)]"
+                        >
+                            {headerNode}
+                            {contentNode}
+                            {footerNode}
+                        </aside>
+                    </CSSTransition>
+                </>
+            )}
             <FiltersDrawer
                 isOpen={filtersDrawerOpen}
                 filters={filters}
@@ -337,9 +378,48 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
         </>
     )
 }
+function DrawerHeader({
+    title,
+    summary,
+    onClose,
+    closeAria,
+}: {
+    title: string
+    summary: string
+    onClose: () => void
+    closeAria: string
+}) {
+    // useBottomSheetDrag возвращает null вне UIBottomSheet — в desktop-варианте
+    // (внутри aside через CSSTransition) drag просто не применяется.
+    const drag = useBottomSheetDrag()
+    return (
+        <div
+            {...(drag?.handlers ?? {})}
+            style={drag?.style}
+            className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3 sm:px-5 sm:py-3.5"
+        >
+            <div className="min-w-0">
+                <h2 className="truncate text-[0.9375rem] font-semibold text-text-base">
+                    {title}
+                </h2>
+                {summary && (
+                    <p className="mt-0.5 truncate text-xs text-text-muted">{summary}</p>
+                )}
+            </div>
+            <button
+                type="button"
+                aria-label={closeAria}
+                onClick={onClose}
+                className="ml-2 flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-subtle active:bg-surface-subtle"
+            >
+                <X className="size-5" />
+            </button>
+        </div>
+    )
+}
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
-        <section className="flex flex-col gap-3 border-b border-border px-5 py-5">
+        <section className="flex flex-col gap-3 border-b border-border px-4 py-4 sm:px-5 sm:py-5">
             <h3 className="text-base font-semibold text-text-base">{title}</h3>
             {children}
         </section>

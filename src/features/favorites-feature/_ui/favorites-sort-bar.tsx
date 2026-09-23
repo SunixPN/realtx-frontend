@@ -15,22 +15,23 @@ export function FavoritesSortBar({ value, onChange }: FavoritesSortBarProps) {
         { key: 'price-asc',  label: t('sort_price_asc'),  icon: <ArrowDownAZ className="size-4" /> },
     ]
     return (
-        <div className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-raised p-1">
+        <div className="grid w-full grid-cols-3 items-center gap-1 rounded-md border border-border bg-surface-raised p-1 sm:inline-flex sm:w-auto">
             {OPTIONS.map((o) => (
                 <button
                     key={o.key}
                     type="button"
                     aria-pressed={value === o.key}
+                    aria-label={o.label}
                     onClick={() => onChange(o.key)}
                     className={cn(
-                        'flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer',
+                        'flex items-center justify-center gap-1.5 rounded-sm px-2 py-2 text-sm font-medium transition-colors cursor-pointer sm:px-3 sm:py-1.5',
                         value === o.key
                             ? 'bg-brand text-white'
-                            : 'text-text-muted hover:bg-surface-muted',
+                            : 'text-text-muted hover:bg-surface-muted active:bg-surface-muted',
                     )}
                 >
                     {o.icon}
-                    {o.label}
+                    <span className="hidden truncate xs:inline">{o.label}</span>
                 </button>
             ))}
         </div>

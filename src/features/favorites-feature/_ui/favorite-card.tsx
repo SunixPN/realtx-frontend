@@ -50,13 +50,16 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                 )}
             >
                 {}
-                <div className="relative h-[220px] shrink-0 bg-surface-muted">
+                <div className="relative aspect-[4/3] w-full shrink-0 bg-surface-muted sm:aspect-auto sm:h-[220px]">
                     {photo ? (
                         <img
                             src={photo}
                             alt=""
                             loading="lazy"
-                            className="size-full object-cover"
+                            decoding="async"
+                            width={640}
+                            height={480}
+                            className="absolute inset-0 size-full object-cover"
                         />
                     ) : (
                         <div className="flex size-full flex-col items-center justify-center gap-1.5 text-text-faint">
@@ -66,8 +69,8 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                     )}
                     {}
                     {!item.isActive && (
-                        <div className="absolute inset-x-3 top-3 z-10">
-                            <span className="inline-flex items-center gap-1.5 rounded-xs bg-neutral-900/85 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                        <div className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 sm:left-auto sm:right-3 sm:top-3 sm:translate-x-0">
+                            <span className="inline-flex items-center gap-1 rounded-xs bg-neutral-900/85 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm sm:gap-1.5 sm:text-xs">
                                 <X className="size-3" />
                                 {t('delisted')}
                             </span>
@@ -94,9 +97,9 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                     )}
                 </div>
                 {}
-                <div className="flex flex-1 flex-col gap-2 p-4">
+                <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-4">
                     <div className="flex items-baseline justify-between gap-3">
-                        <span className="text-lg font-semibold text-text-base tabular-nums">
+                        <span className="text-base font-semibold text-text-base tabular-nums sm:text-lg">
                             {formatPrice(item.price, item.priceCurrency)}
                         </span>
                         <span className="text-xs text-text-faint tabular-nums">
@@ -117,14 +120,14 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                         </div>
                     )}
                     <div className="mt-1 border-t border-border pt-2 text-xs text-text-faint">
-                        {item.sellerType === 1 ? tEstate('seller_owner_short') : tEstate('seller_agency')}
+                        {(item.sellerType === 0 && item.agencyName) ? tEstate('seller_agency') : tEstate('seller_owner_short')}
                     </div>
                 </div>
             </Link>
             {}
             <label
                 className={cn(
-                    'absolute top-3 left-3 z-10 flex size-6 cursor-pointer items-center justify-center rounded-sm border-2 shadow-sm transition-colors',
+                    'absolute top-2 left-2 z-10 flex size-7 cursor-pointer items-center justify-center rounded-sm border-2 shadow-sm transition-colors sm:top-3 sm:left-3 sm:size-6',
                     selected
                         ? 'border-brand bg-brand text-white'
                         : 'border-white bg-surface-raised/90 text-transparent hover:text-text-muted',
@@ -132,14 +135,14 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                 onClick={(e) => { e.preventDefault(); onToggleSelect(item.id) }}
                 aria-label={selected ? t('deselect_aria') : t('select_aria')}
             >
-                <Check className="size-3.5" strokeWidth={3} aria-hidden />
+                <Check className="size-4 sm:size-3.5" strokeWidth={3} aria-hidden />
             </label>
             {}
             <button
                 type="button"
                 aria-label={t('remove_aria')}
                 onClick={(e) => { e.preventDefault(); remove(item.id) }}
-                className="absolute top-3 right-3 z-10 flex size-8 cursor-pointer items-center justify-center rounded-md bg-surface-raised/90 text-error shadow-sm backdrop-blur-sm hover:bg-surface-raised hover:scale-110 transition-transform"
+                className="absolute top-2 right-2 z-10 flex size-9 cursor-pointer items-center justify-center rounded-md bg-surface-raised/90 text-error shadow-sm backdrop-blur-sm transition-transform hover:bg-surface-raised hover:scale-110 active:scale-90 sm:top-3 sm:right-3 sm:size-8"
             >
                 <svg viewBox="0 0 24 24" className="size-5 fill-error text-error" aria-hidden>
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />

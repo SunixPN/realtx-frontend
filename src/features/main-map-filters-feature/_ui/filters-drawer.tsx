@@ -9,9 +9,11 @@ import { UISwitch } from '@/shared/ui/ui-switch'
 import { UISelect } from '@/shared/ui/ui-select'
 import { UIButton } from '@/shared/ui/ui-button'
 import { UIBottomSheet, useBottomSheetDrag } from '@/shared/ui/ui-bottom-sheet'
+import { UIFiltersSheet } from '@/shared/ui/ui-filters-sheet'
 import { BynSign } from '@/shared/ui/byn-sign/byn-sign'
 import { cn } from '@/shared/helpers/cn'
 import { useIsMobile } from '@/shared/hooks/use-is-mobile'
+import { useIsIOSChrome } from '@/shared/hooks/use-is-ios-chrome'
 import {
     useWallMaterialLabels,
     useRepairStateLabels,
@@ -78,6 +80,9 @@ function FiltersBody({
     const districtOptions = useMinskDistrictOptions()
     const wallMaterialOptions = Object.entries(wallLabels).map(([v, l]) => ({ value: v, label: l }))
     const repairStateOptions = Object.entries(repairLabels).map(([v, l]) => ({ value: v, label: l }))
+
+    console.log(filters, "FILTERS!!!")
+
     return (
         <>
             <Section title={t('section_price')}>
@@ -232,31 +237,34 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
     const t = useTranslations('filters')
     const tCommon = useTranslations('common')
     const isMobile = useIsMobile()
+    const isIOSChrome = useIsIOSChrome()
     const backdropZ = 40 + zIndexOffset
     const panelZ = 50 + zIndexOffset
     const nested = zIndexOffset > 0
     const positionClass = nested ? 'fixed' : 'absolute'
     const backdropRef = useRef<HTMLDivElement>(null)
     const panelRef = useRef<HTMLElement>(null)
+
     useEffect(() => {
         if (!isOpen) return
         const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
         window.addEventListener('keydown', handler)
         return () => window.removeEventListener('keydown', handler)
     }, [isOpen, onClose])
+
     useEffect(() => {
         if (nested || isMobile) return
         document.body.style.overflow = isOpen ? 'hidden' : ''
         return () => { document.body.style.overflow = '' }
     }, [isOpen, nested, isMobile])
+
     if (isMobile) {
-        return (
-            <UIBottomSheet
-                open={isOpen}
-                onClose={onClose}
-                snapPoints={[0.95]}
-                ariaLabel={t('all_filters_aria')}
-            >
+        // По умолчанию — UIBottomSheet: корректно отрабатывает Safari и
+        // Android Chrome. Только iOS Chrome (CriOS) получает UIFiltersSheet,
+        // где проблема с прыгающим bottom-sheet при появлении виртуальной
+        // клавиатуры решается через visualViewport-трекинг.
+        const body = (
+            <>
                 <FiltersDrawerHeader title={t('all_filters')} closeLabel={tCommon('close')} onClose={onClose} />
                 <div className="flex-1 overflow-y-auto overscroll-contain">
                     <FiltersBody
@@ -278,6 +286,27 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                         {applyLabel ?? t('show_results', { count: total })}
                     </UIButton>
                 </div>
+            </>
+        )
+        if (isIOSChrome) {
+            return (
+                <UIFiltersSheet
+                    open={isOpen}
+                    onClose={onClose}
+                    ariaLabel={t('all_filters_aria')}
+                >
+                    {body}
+                </UIFiltersSheet>
+            )
+        }
+        return (
+            <UIBottomSheet
+                open={isOpen}
+                onClose={onClose}
+                snapPoints={[0.95]}
+                ariaLabel={t('all_filters_aria')}
+            >
+                {body}
             </UIBottomSheet>
         )
     }

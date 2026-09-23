@@ -16,6 +16,7 @@ export default function RegisterForm() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
             noValidate
+            suppressHydrationWarning
         >
             <UIInput
                 label={t('name_label')}

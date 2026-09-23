@@ -28,12 +28,12 @@ export function useToggleFavorite(estateId: number, serverIsFavorite: boolean) {
         setOverride({ id: estateId, value: next })
         try {
             if (next) {
-                await add(estateId, { throwOnError: true })
+                await add(estateId)
             } else {
-                await remove(estateId, { throwOnError: true })
+                await remove(estateId)
             }
         } catch {
-            setOverride(null) 
+            setOverride(null)
         }
     }
     return { isFavorite, toggle, isPending: isAdding || isRemoving }

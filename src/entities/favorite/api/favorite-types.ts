@@ -16,6 +16,7 @@ export type FavoriteItemType = {
     metroStation: string | null
     metroTime: number | null
     sellerType: number | null
+    agencyName: string | null
     isActive: boolean
     publishedAt: string | null
     sourceUrl: string | null
