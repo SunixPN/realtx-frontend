@@ -452,7 +452,7 @@ function ContactButton({
             <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className={`flex ${h} cursor-pointer items-center justify-center gap-2 rounded-md bg-brand px-4 ${text} text-text-on-brand hover:bg-[var(--brand-hover)]`}
+                className={`flex ${h} cursor-pointer items-center justify-center gap-2 rounded-md bg-brand w-full px-4 ${text} text-text-on-brand hover:bg-[var(--brand-hover)]`}
             >
                 <Phone className={iconSize} /> {t('contact_show')}
             </button>

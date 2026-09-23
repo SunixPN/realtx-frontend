@@ -79,6 +79,20 @@ export const proxy: NextProxy = async (request) => {
 
     const accessToken = request.cookies.get(TOKENS.ACCESS_TOKEN)?.value;
     const hasAccess = Boolean(request.cookies.get(TOKENS.ACCESS_TOKEN))
+    const domain = env.COOKIE_DOMAIN || undefined
+
+    function clearAccessCookie(response: NextResponse) {
+        // На проде кука ставится с Domain=.realtx.online (COOKIE_DOMAIN),
+        // так что удалять надо с теми же атрибутами — иначе браузер игнорит
+        // Set-Cookie и возникает бесконечный редирект-луп при битом токене.
+        response.cookies.set(TOKENS.ACCESS_TOKEN, '', {
+            httpOnly: true,
+            path: '/',
+            sameSite: 'lax',
+            maxAge: 0,
+            ...(domain ? { domain } : {}),
+        })
+    }
 
     if (hasAccess && isInvalidOrExpired(accessToken)) {
         try {
@@ -91,13 +105,21 @@ export const proxy: NextProxy = async (request) => {
 
             if (!res.ok) {
                 const response = NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url))
-                response.cookies.delete(TOKENS.ACCESS_TOKEN)
+                clearAccessCookie(response)
+                const setCookie = res.headers.get("set-cookie");
+                if (setCookie) response.headers.append("set-cookie", setCookie);
                 return response
             }
 
             const data = (await res.json()) as { accessToken: string };
             const response = authRoutesProtection(request, true)
-            response.cookies.set(TOKENS.ACCESS_TOKEN, data.accessToken)
+            response.cookies.set(TOKENS.ACCESS_TOKEN, data.accessToken, {
+                httpOnly: true,
+                path: '/',
+                sameSite: 'lax',
+                maxAge: 15 * 60,
+                ...(domain ? { domain } : {}),
+            })
 
             const setCookie = res.headers.get("set-cookie");
             if (setCookie) response.headers.append("set-cookie", setCookie);
@@ -106,7 +128,7 @@ export const proxy: NextProxy = async (request) => {
 
         } catch {
             const response = NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url))
-            response.cookies.delete(TOKENS.ACCESS_TOKEN)
+            clearAccessCookie(response)
             return response
         }
     }
