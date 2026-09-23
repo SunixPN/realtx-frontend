@@ -1,6 +1,11 @@
 import { PRICE_CURRENCY_LABELS } from '@/entities/estate'
+// Фиксируем локаль, чтобы SSR (Node ICU-default обычно en-US → "211,000")
+// и клиент (браузерная локаль → "211 000") не расходились и не вызывали
+// hydration mismatch. ru-RU даёт пробел-разделитель — совпадает с ожидаемым
+// SI-форматом и во всех локалях приложения.
+const NUMBER_FORMATTER = new Intl.NumberFormat('ru-RU')
 export function formatNumber(n: number): string {
-    return Math.round(n).toLocaleString()
+    return NUMBER_FORMATTER.format(Math.round(n))
 }
 export function formatPriceNum(price: number | null): string {
     if (price == null) return '—'

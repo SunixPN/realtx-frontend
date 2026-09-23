@@ -25,7 +25,7 @@ function formatPricePerM2(price: number | null, currency: number): React.ReactNo
 }
 function formatPriceDeltaUsd(delta: number): string {
     const sign = delta < 0 ? '−' : '+'
-    return `${sign}${Math.abs(delta).toLocaleString()} $`
+    return `${sign}${formatNumber(Math.abs(delta))} $`
 }
 export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardProps) {
     const t = useTranslations('favorites')

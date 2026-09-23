@@ -2,8 +2,9 @@
 import { useTranslations } from 'next-intl'
 import type { MapFiltersType } from '@/entities/estate'
 import { useWallMaterialLabels, useRepairStateLabels } from '@/entities/estate'
+const NUMBER_FORMATTER = new Intl.NumberFormat('ru-RU')
 function fmt(n: number): string {
-    return n.toLocaleString()
+    return NUMBER_FORMATTER.format(n)
 }
 
 export function useDescribeFiltersClient(): (filters: MapFiltersType) => { summary: string; chips: string[] } {
