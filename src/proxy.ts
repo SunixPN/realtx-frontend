@@ -78,7 +78,8 @@ export const proxy: NextProxy = async (request) => {
     const { pathname } = request.nextUrl;
 
     const accessToken = request.cookies.get(TOKENS.ACCESS_TOKEN)?.value;
-    const hasAccess = Boolean(request.cookies.get(TOKENS.ACCESS_TOKEN))
+    const hasAccess = Boolean(accessToken)
+    const hasRefresh = Boolean(request.cookies.get(TOKENS.REFRESH_TOKEN))
     const domain = env.COOKIE_DOMAIN || undefined
 
     function clearAccessCookie(response: NextResponse) {
@@ -94,7 +95,14 @@ export const proxy: NextProxy = async (request) => {
         })
     }
 
-    if (hasAccess && isInvalidOrExpired(accessToken)) {
+    // Рефрешим и когда access протух/битый, и когда его вообще нет,
+    // но refresh_token ещё жив. Иначе после 15 минут неактивности
+    // (particularly на мобильных, где вкладка бэкграундится) access
+    // естественным путём удаляется браузером — и мы без попытки refresh
+    // выбрасывали юзера на /sign-in, хотя refresh был бы успешным.
+    const needsRefresh = hasRefresh && (!hasAccess || isInvalidOrExpired(accessToken));
+
+    if (needsRefresh) {
         try {
             const base = env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
             const cookieHeader = request.headers.get("cookie") ?? "";
