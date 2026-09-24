@@ -21,6 +21,14 @@ import { UserMenu } from '@/widgets/header/_ui/user-menu/user-menu';
 import { LocaleSwitcher } from '@/widgets/header/_ui/locale-switcher/locale-switcher';
 import { MobileMenu } from '@/widgets/header/_ui/mobile-menu/mobile-menu';
 import { useAuth } from '@/entities/me/api/auth-query';
+import type { Theme } from "@/shared/theme/theme-provider"
+
+
+function isTheme(attr: string | null): attr is Theme {
+    if (!attr) return false;
+    return ["light", "dark", "system"].includes(attr)
+}
+
 export function Header() {
     const t = useTranslations('header');
     const { theme, resolvedTheme, setTheme } = useTheme();
@@ -42,7 +50,10 @@ export function Header() {
         console.log(el.getAttribute(attr), 'THEME INIT')
 
         const observer = new MutationObserver(() => {
-            setTheme(el.getAttribute(attr))
+            const element = el.getAttribute(attr)
+            if (isTheme(element)) {
+                setTheme(element)
+            }
         })
 
         observer.observe(el, {
