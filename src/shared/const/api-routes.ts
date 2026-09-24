@@ -36,6 +36,7 @@ export const API_ROUTES = {
   VIEWED: {
     LIST:   '/viewed',
     IDS:    '/viewed/ids',
+    LOG:    (id: number) => `/viewed/${id}`,
     REMOVE: (id: number) => `/viewed/${id}`,
     CLEAR:  '/viewed',
   },

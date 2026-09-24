@@ -3,4 +3,5 @@ export { viewedKey, viewedIdsKey, isViewedKey, isViewedIdsKey, isAnyViewedKey } 
 export { useViewed } from './api/use-viewed'
 export { useViewedIds } from './api/use-viewed-ids'
 export { useRemoveViewed } from './api/use-remove-viewed'
+export { useLogView } from './api/use-log-view'
 export { useClearViewed } from './api/use-clear-viewed'

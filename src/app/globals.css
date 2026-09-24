@@ -688,6 +688,14 @@ html.dark .map-pin--visited .map-pin__tail {
   line-height: 1;
 }
 
+.map-pin__viewed {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  margin-right: 4px;
+  line-height: 1;
+}
+
 .map-house__fav {
   display: inline-flex;
   align-items: center;

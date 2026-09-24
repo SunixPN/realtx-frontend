@@ -34,6 +34,7 @@ import {
     type PriceHistoryPoint,
 } from '@/entities/estate'
 import { useAuth } from '@/entities/me/api/auth-query'
+import { useLogView } from '@/entities/viewed'
 import { useToggleFavorite } from '@/features/favorite-toggle-feature'
 import { IconLoader } from '@/shared/ui/ui-icons'
 import { showToast } from '@/shared/helpers/show-toast'
@@ -62,6 +63,8 @@ export function PropertyDetailWidget({ id }: Props) {
     const t = useTranslations('estate')
     const { currency } = useDisplayCurrency()
     const { data: estate, error } = useEstateById(id, currency)
+    const { data: auth } = useAuth()
+    useLogView(id, !!auth?.user)
     const [ctaHeight, setCtaHeight] = useState(0)
     const ctaRef = useRef<HTMLDivElement>(null)
     useEffect(() => {
