@@ -27,6 +27,7 @@ export type PriceChange = {
 export type EstateType = {
     id: number
     isFavorite: boolean
+    isInCompare: boolean
     isViewed: boolean
     sourceUuid: string
     sourceUrl: string | null
@@ -67,6 +68,7 @@ export type EstateType = {
 export type EstateShortType = {
     id: number
     isFavorite: boolean
+    isInCompare: boolean
     isViewed: boolean
     price: number | null
     pricePerM2: number | null

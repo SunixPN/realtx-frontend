@@ -1,10 +1,11 @@
 'use client'
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Eye, Heart, Maximize2, Train, X } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Eye, GitCompare, Heart, Maximize2, Train, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEstateById, useWallMaterialLabels, useRepairStateLabels, useFormatRooms, useFormatArea } from '@/entities/estate'
 import { useDisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { useToggleFavorite } from '@/features/favorite-toggle-feature'
+import { useToggleCompare } from '@/features/compare-toggle-feature'
 import { PhotoSlider } from './photo-slider'
 import { PriceDisplay, PricePerM2Display } from './price-display'
 import { PriceChangeBadge } from './price-change-badge'
@@ -35,6 +36,13 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
     const isError = !!error
     const { data, isLoading } = useAuth()
     const { isFavorite, toggle, isPending: favPending } = useToggleFavorite(id, estate?.isFavorite ?? false)
+    const tCompare = useTranslations('compare')
+    const {
+        isInCompare,
+        add: addToCompare,
+        goToCompare,
+        isPending: comparePending,
+    } = useToggleCompare(id, estate?.isInCompare ?? false)
     const wallLabels = useWallMaterialLabels()
     const repairLabels = useRepairStateLabels()
     const formatRooms = useFormatRooms()
@@ -121,24 +129,48 @@ export function EstateDetailView({ id, onBack, onClose, showBack }: Props) {
                                 ) : (
                                     <>
                                         {data?.user ? (
-                                            <button
-                                                type="button"
-                                                disabled={favPending}
-                                                onClick={toggle}
-                                                className={cn(
-                                                    'flex h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium transition-colors disabled:opacity-70 cursor-pointer',
-                                                    isFavorite
-                                                        ? 'border border-[var(--border-default)] text-[var(--text-base)] hover:bg-[var(--surface-muted)]'
-                                                        : 'bg-[var(--brand)] text-[var(--text-on-brand)] hover:bg-[var(--brand-hover)]',
-                                                )}
-                                            >
-                                                {favPending ? (
-                                                    <IconLoader size={18} className="animate-spin" />
-                                                ) : (
-                                                    <Heart className={cn('size-5 shrink-0', isFavorite && 'fill-current')} aria-hidden />
-                                                )}
-                                                {favPending ? t('fav_saving') : isFavorite ? t('fav_in') : t('fav_add')}
-                                            </button>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <button
+                                                    type="button"
+                                                    disabled={favPending}
+                                                    onClick={toggle}
+                                                    className={cn(
+                                                        'flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-medium transition-colors disabled:opacity-70 cursor-pointer',
+                                                        isFavorite
+                                                            ? 'border border-[var(--border-default)] text-[var(--text-base)] hover:bg-[var(--surface-muted)]'
+                                                            : 'bg-[var(--brand)] text-[var(--text-on-brand)] hover:bg-[var(--brand-hover)]',
+                                                    )}
+                                                >
+                                                    {favPending ? (
+                                                        <IconLoader size={18} className="animate-spin" />
+                                                    ) : (
+                                                        <Heart className={cn('size-5 shrink-0', isFavorite && 'fill-current')} aria-hidden />
+                                                    )}
+                                                    <span className="truncate">
+                                                        {favPending ? t('fav_saving') : isFavorite ? t('fav_in') : t('fav_add')}
+                                                    </span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    disabled={comparePending}
+                                                    onClick={isInCompare ? goToCompare : addToCompare}
+                                                    className={cn(
+                                                        'flex h-11 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition-colors hover:bg-[var(--surface-muted)] disabled:opacity-70 cursor-pointer',
+                                                        isInCompare
+                                                            ? 'border-[var(--brand)] text-[var(--brand)]'
+                                                            : 'border-[var(--border-default)] text-[var(--text-base)]',
+                                                    )}
+                                                >
+                                                    {comparePending ? (
+                                                        <IconLoader size={18} className="animate-spin" />
+                                                    ) : (
+                                                        <GitCompare className="size-5 shrink-0" aria-hidden />
+                                                    )}
+                                                    <span className="truncate">
+                                                        {isInCompare ? tCompare('go_to_compare_short') : tCompare('add_short')}
+                                                    </span>
+                                                </button>
+                                            </div>
                                         ) : <></>}
                                     </>
                                 )

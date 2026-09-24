@@ -36,6 +36,7 @@ import {
 import { useAuth } from '@/entities/me/api/auth-query'
 import { useLogView } from '@/entities/viewed'
 import { useToggleFavorite } from '@/features/favorite-toggle-feature'
+import { useToggleCompare } from '@/features/compare-toggle-feature'
 import { IconLoader } from '@/shared/ui/ui-icons'
 import { showToast } from '@/shared/helpers/show-toast'
 import { useDisplayCurrency, type DisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
@@ -237,6 +238,26 @@ function Gallery({ estate, currency }: { estate: EstateType; currency: DisplayCu
         </div>
     )
 }
+function CompareIconAction({ estateId, serverIsInCompare }: { estateId: number; serverIsInCompare: boolean }) {
+    const t = useTranslations('compare')
+    const { isInCompare, add, goToCompare, isPending } = useToggleCompare(estateId, serverIsInCompare)
+    return (
+        <button
+            type="button"
+            disabled={isPending}
+            onClick={(e) => { e.preventDefault(); isInCompare ? goToCompare() : add() }}
+            className="flex cursor-pointer flex-col items-center gap-1 rounded-md border border-border bg-surface-page py-2.5 text-xs font-medium transition-colors hover:bg-surface-muted disabled:opacity-70"
+        >
+            {isPending
+                ? <IconLoader size={20} className="animate-spin text-text-muted" />
+                : <GitCompare className={cn('size-5', isInCompare ? 'text-brand' : 'text-text-muted')} />
+            }
+            <span className={isInCompare && !isPending ? 'text-brand' : 'text-text-muted'}>
+                {isInCompare ? t('go_to_compare_short') : t('add_short')}
+            </span>
+        </button>
+    )
+}
 function FavoriteIconAction({ estateId, serverIsFavorite }: { estateId: number; serverIsFavorite: boolean }) {
     const t = useTranslations('estate')
     const { isFavorite, toggle, isPending } = useToggleFavorite(estateId, serverIsFavorite)
@@ -302,7 +323,7 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
                         {isAuthed && (
                             <>
                                 <FavoriteIconAction estateId={estate.id} serverIsFavorite={estate.isFavorite} />
-                                <IconAction label={t('action_compare')} icon={<GitCompare className="size-5" />} />
+                                <CompareIconAction estateId={estate.id} serverIsInCompare={estate.isInCompare} />
                             </>
                         )}
                         <ShareIconAction estate={estate} />

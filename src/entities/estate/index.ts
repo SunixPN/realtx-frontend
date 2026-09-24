@@ -11,6 +11,8 @@ export type {
 } from './api/estate-types'
 export {
     PRICE_CURRENCY_LABELS,
+    WALL_MATERIAL_LABELS,
+    REPAIR_STATE_LABELS,
     MINSK_DISTRICTS,
 } from './api/estate-types'
 export {

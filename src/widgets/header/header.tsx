@@ -21,6 +21,7 @@ import { UserMenu } from '@/widgets/header/_ui/user-menu/user-menu';
 import { LocaleSwitcher } from '@/widgets/header/_ui/locale-switcher/locale-switcher';
 import { MobileMenu } from '@/widgets/header/_ui/mobile-menu/mobile-menu';
 import { useAuth } from '@/entities/me/api/auth-query';
+import { useCompareIds } from '@/entities/compare';
 import type { Theme } from "@/shared/theme/theme-provider"
 
 
@@ -35,12 +36,14 @@ export function Header() {
     const { isLoading: isPending, data } = useAuth();
     const favCount = data?.user?.favoritesCount ?? 0;
     const freshCount = data?.user?.subscriptionsFreshCount ?? 0;
+    const { data: compareData } = useCompareIds({ enabled: !!data?.user });
+    const compareCount = compareData?.ids.length ?? 0;
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const cycleTheme = () => {
         setTheme(theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light');
     };
     const ThemeIcon = theme === 'system' ? IconMonitor : resolvedTheme === 'dark' ? IconSun : IconMoon;
-    const totalBadge = favCount + freshCount;
+    const totalBadge = favCount + freshCount + compareCount;
 
     useEffect(() => {
         const el = document.documentElement
@@ -113,13 +116,18 @@ export function Header() {
                                     </span>
                                 )}
                             </Link>
-                            <button
-                                type="button"
-                                aria-label={t('compare_aria')}
-                                className="flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
+                            <Link
+                                href={ROUTES.COMPARE}
+                                aria-label={compareCount ? t('compare_aria_count', { count: compareCount }) : t('compare_aria')}
+                                className="relative flex size-9 cursor-pointer items-center justify-center rounded-md text-text-muted hover:bg-surface-subtle hover:text-text-base"
                             >
                                 <IconGitCompare size={20} />
-                            </button>
+                                {compareCount > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white leading-4">
+                                        {compareCount}
+                                    </span>
+                                )}
+                            </Link>
                             <span className="mx-1.5 h-6 w-px bg-border" />
                         </>
                     )}
@@ -189,6 +197,7 @@ export function Header() {
                 user={data?.user ?? null}
                 favCount={favCount}
                 freshCount={freshCount}
+                compareCount={compareCount}
             />
         </>
     );

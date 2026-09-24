@@ -2,6 +2,7 @@ export type FavoriteSort = 'recent' | 'price-drop' | 'price-asc'
 export type FavoriteItemType = {
     id: number
     favoritedAt: string
+    isInCompare: boolean
     price: number | null
     pricePerM2: number | null
     priceCurrency: number

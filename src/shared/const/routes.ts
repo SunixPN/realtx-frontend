@@ -8,6 +8,7 @@ export const ROUTES = {
     VERIFY_EMAIL: "/verify-email",
     PROFILE: "/profile",
     FAVORITES: "/favorites",
+    COMPARE: "/compare",
     VIEWED: "/viewed",
     SUBSCRIPTIONS: "/subscriptions",
     PROPERTY: "/property",

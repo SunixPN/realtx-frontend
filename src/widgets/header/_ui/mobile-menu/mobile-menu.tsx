@@ -32,6 +32,7 @@ type MobileMenuProps = {
     user: AuthUserType | null | undefined;
     favCount: number;
     freshCount: number;
+    compareCount: number;
 };
 function getInitials(user: AuthUserType): string {
     const source = user.name ?? user.email ?? '?';
@@ -44,7 +45,7 @@ function getInitials(user: AuthUserType): string {
             .join('') || '?'
     );
 }
-export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: MobileMenuProps) {
+export function MobileMenu({ isOpen, onClose, user, favCount, freshCount, compareCount }: MobileMenuProps) {
     const t = useTranslations('header');
     const tUserMenu = useTranslations('user_menu');
     const { theme, setTheme } = useTheme();
@@ -285,10 +286,12 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount }: Mobi
                                     badge={freshCount}
                                     onClose={onClose}
                                 />
-                                <MenuButton
+                                <MenuLink
+                                    href={ROUTES.COMPARE}
                                     icon={<IconGitCompare size={18} />}
                                     label={t('menu_compare')}
-                                    onClick={onClose}
+                                    badge={compareCount}
+                                    onClose={onClose}
                                 />
                                 <MenuLink
                                     href={ROUTES.PROFILE}

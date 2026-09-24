@@ -33,6 +33,14 @@ export const API_ROUTES = {
     REMOVE:       (id: number) => `/favorites/${id}`,
     BULK_REMOVE:  '/favorites/bulk',
   },
+  COMPARE: {
+    LIST:        '/compare',
+    IDS:         '/compare/ids',
+    ADD:         (id: number) => `/compare/${id}`,
+    REMOVE:      (id: number) => `/compare/${id}`,
+    CLEAR:       '/compare',
+    PREFERENCES: '/compare/preferences',
+  },
   VIEWED: {
     LIST:   '/viewed',
     IDS:    '/viewed/ids',

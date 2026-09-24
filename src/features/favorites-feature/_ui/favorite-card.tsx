@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/shared/helpers/cn'
 import { useRemoveFavorite, type FavoriteItemType } from '@/entities/favorite'
+import { CompareButton } from '@/features/compare-toggle-feature'
 import { useFormatRooms, useFormatArea } from '@/entities/estate'
 import { formatNumber, formatStorey } from '../../estate-drawer-feature/_ui/format'
 import { BynSign } from '@/shared/ui/byn-sign/byn-sign'
@@ -124,6 +125,13 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                             {tEstate('seller_agency')}
                         </div>
                     )}
+                    <div className="mt-auto pt-2">
+                        <CompareButton
+                            estateId={item.id}
+                            isInCompare={item.isInCompare}
+                            fullWidth
+                        />
+                    </div>
                 </div>
             </Link>
             {}
