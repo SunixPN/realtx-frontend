@@ -9,13 +9,16 @@ import CodeBoxesInput from '@/features/phone-signin-feature/_ui/code-boxes-input
 type CodeStepFormProps = {
     resetVerifier: () => RecaptchaVerifier | null;
     onChangeNumber: () => void;
+    onVerified?: (idToken: string) => Promise<boolean>;
+    submitLabel?: string;
 };
-export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStepFormProps) {
+export default function CodeStepForm({ resetVerifier, onChangeNumber, onVerified, submitLabel }: CodeStepFormProps) {
     const t = useTranslations('auth.phone');
     const cooldown = useResendCooldown(45);
     const { form, onSubmit, isSubmitting, isResending, resend } = useCodeStepForm({
         resetVerifier,
         onResendDone: cooldown.restart,
+        onVerified,
     });
     const codeError = form.formState.errors.code?.message;
     return (
@@ -39,7 +42,7 @@ export default function CodeStepForm({ resetVerifier, onChangeNumber }: CodeStep
                 {codeError && <p className="text-center text-xs text-error">{codeError}</p>}
             </div>
             <UIButton type="submit" size="lg" fullWidth loading={isSubmitting}>
-                {t('submit')}
+                {submitLabel ?? t('submit')}
             </UIButton>
             <div className="flex flex-col items-center gap-2">
                 {cooldown.canResend ? (

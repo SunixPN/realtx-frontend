@@ -12,8 +12,9 @@ type PhoneStepFormProps = {
     getVerifier:   () => RecaptchaVerifier | null;
     resetVerifier: () => RecaptchaVerifier | null;
     onSuccess:     (phone: string) => void;
+    submitLabel?:  string;
 };
-export default function PhoneStepForm({ getVerifier, resetVerifier, onSuccess }: PhoneStepFormProps) {
+export default function PhoneStepForm({ getVerifier, resetVerifier, onSuccess, submitLabel }: PhoneStepFormProps) {
     const t = useTranslations('auth.phone');
     const { form, onSubmit, isSubmitting } = usePhoneStepForm({ getVerifier, resetVerifier, onSuccess });
     const countryCode = form.watch('countryCode') as CountryCode;
@@ -55,7 +56,7 @@ export default function PhoneStepForm({ getVerifier, resetVerifier, onSuccess }:
                 </div>
             </div>
             <UIButton type="submit" size="lg" fullWidth loading={isSubmitting}>
-                {t('send_code')}
+                {submitLabel ?? t('send_code')}
             </UIButton>
         </form>
     );

@@ -55,20 +55,22 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
             {/* height биндится на --app-height из useViewportMetrics — стабильно,
                 не пересчитывается при появлении soft-keyboard iOS. */}
             {mapFilter && mapFilter({ total: points.length })}
+            {/* Mobile: общий контейнер внизу — рейтинг районов стоит над переключателем
+                и не налезает, даже если подпись переключателя переносится.
+                Desktop (lg:contents): каждый блок позиционируется сам. */}
             <div
-                className="absolute map-type z-30 left-2 right-2 bottom-2 lg:left-4 lg:right-auto lg:top-20 lg:bottom-auto"
+                className="absolute z-30 left-2 right-2 bottom-2 flex flex-col gap-2 lg:contents"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
             >
-                <MapModeToggle mode={mode} onChange={setMode} />
-            </div>
-            {deferredMode === 'heat' && districts.length > 0 && (
-                <div
-                    className="absolute z-30 left-2 right-2 bottom-16 lg:left-4 lg:right-auto lg:bottom-6"
-                    style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-                >
-                    <DistrictRanking districts={districts} />
+                {deferredMode === 'heat' && districts.length > 0 && (
+                    <div className="lg:absolute lg:z-30 lg:left-4 lg:bottom-6">
+                        <DistrictRanking districts={districts} />
+                    </div>
+                )}
+                <div className="map-type lg:absolute lg:z-30 lg:left-4 lg:top-20">
+                    <MapModeToggle mode={mode} onChange={setMode} />
                 </div>
-            )}
+            </div>
             <MapCanvas className="w-full h-full" />
             {mounted && isFetching && <MapLoadingBadge drawerOpen={drawerOpen} />}
             {drawer}

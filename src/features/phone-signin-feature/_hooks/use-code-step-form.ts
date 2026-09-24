@@ -16,9 +16,14 @@ import { ROUTES } from '@/shared/const/routes';
 type UseCodeStepFormArgs = {
     resetVerifier: () => RecaptchaVerifier | null;
     onResendDone:  () => void;
+    /**
+     * Что делать с Firebase ID токеном после верного кода. По умолчанию — вход.
+     * Вернуть true, если всё прошло успешно (ошибки показывает сам колбэк).
+     */
+    onVerified?:   (idToken: string) => Promise<boolean>;
 };
 
-export const useCodeStepForm = ({ resetVerifier, onResendDone }: UseCodeStepFormArgs) => {
+export const useCodeStepForm = ({ resetVerifier, onResendDone, onVerified }: UseCodeStepFormArgs) => {
     const router = useRouter();
     const [isConfirming, setIsConfirming] = useState(false);
     const [isResending, setIsResending] = useState(false);
@@ -40,16 +45,25 @@ export const useCodeStepForm = ({ resetVerifier, onResendDone }: UseCodeStepForm
             return;
         }
         setIsConfirming(true);
+        let idToken: string;
         try {
             const result = await confirmation.confirm(values.code);
-            const idToken = await result.user.getIdToken();
+            idToken = await result.user.getIdToken();
+        } catch {
+            form.setError('code', { message: tPhone('error_invalid_code') });
+            setIsConfirming(false);
+            return;
+        }
+        try {
+            if (onVerified) {
+                if (await onVerified(idToken)) phoneConfirmationStore.clear();
+                return;
+            }
             const auth = await login({ idToken });
             if (auth) {
                 phoneConfirmationStore.clear();
                 router.push(ROUTES.ROOT);
             }
-        } catch {
-            form.setError('code', { message: tPhone('error_invalid_code') });
         } finally {
             setIsConfirming(false);
         }

@@ -93,7 +93,7 @@ export function UserMenu({ user }: UserMenuProps) {
                         </div>
                     </div>
                     <div className="flex flex-col py-1">
-                        <MenuItem icon={<IconUser size={16} />} label={t('profile')} />
+                        <MenuItem onClick={() => { startClose(); router.push(ROUTES.PROFILE); }} icon={<IconUser size={16} />} label={t('profile')} />
                         <MenuItem onClick={() => router.push(ROUTES.VIEWED)} icon={<IconClock size={16} />} label={t('viewed')} />
                     </div>
                     <div className="border-t border-border">

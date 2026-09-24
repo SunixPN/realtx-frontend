@@ -18,10 +18,14 @@ function processPending(token: string | null, err?: unknown) {
     pendingQueue = []
 }
 
+type ApiErrorBody = { error?: { message?: string[]; code?: string; retryAfter?: number } }
+
 function buildApiError(error: AxiosError): ApiError | Error {
-    const msg = (error.response?.data as { error?: { message?: string[] } })?.error?.message
-    if (msg) return new ApiError(msg.join(','), error.response?.status ?? 500)
-    return new ApiError(error.message, error.response?.status ?? 500)
+    const body = (error.response?.data as ApiErrorBody | undefined)?.error
+    const status = error.response?.status ?? 500
+    const details = { code: body?.code, retryAfter: body?.retryAfter }
+    if (body?.message) return new ApiError(body.message.join(','), status, details)
+    return new ApiError(error.message, status, details)
 }
 
 api.interceptors.request.use(async (config) => {

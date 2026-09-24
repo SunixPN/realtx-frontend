@@ -1,8 +1,17 @@
 import axios from 'axios';
 import { env } from '@/shared/config/env';
+// Машиночитаемые поля ошибки бека (error.code, error.retryAfter)
+export type ApiErrorDetails = {
+    code?: string;
+    retryAfter?: number;
+};
 export class ApiError extends Error {
-    constructor(message: string, private readonly status: number) {
+    readonly code?: string;
+    readonly retryAfter?: number;
+    constructor(message: string, readonly status: number, details: ApiErrorDetails = {}) {
         super(message);
+        this.code = details.code;
+        this.retryAfter = details.retryAfter;
     }
 }
 

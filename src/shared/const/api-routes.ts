@@ -8,6 +8,10 @@ export const API_ROUTES = {
     GOOGLE_LOGIN:   '/auth/google/login',
     PHONE_LOGIN:    '/auth/phone/login',
     VERIFY_EMAIL:   '/auth/verify-email',
+    RESEND_VERIFICATION: '/auth/verify-email/resend',
+    ADD_EMAIL:      '/auth/email',
+    PHONE_CONFIRM:  '/auth/phone/confirm',
+    DELETE_ACCOUNT: '/auth/account',
     PASSWORD_RESET: {
       REQUEST: '/auth/password-reset/request',
       VERIFY:  '/auth/password-reset/verify',

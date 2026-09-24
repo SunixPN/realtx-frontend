@@ -16,7 +16,7 @@ export function MapModeToggle({ mode, onChange }: MapModeToggleProps) {
     return (
         <div
             className={cn(
-                'flex w-full items-center gap-1 rounded-md border border-border bg-surface-raised/95 p-1 shadow-md backdrop-blur-sm',
+                'flex w-full items-stretch gap-1 rounded-md lg:items-center border border-border bg-surface-raised/95 p-1 shadow-md backdrop-blur-sm',
                 'lg:inline-flex lg:w-auto lg:bg-surface-raised',
             )}
         >
@@ -28,7 +28,7 @@ export function MapModeToggle({ mode, onChange }: MapModeToggleProps) {
                     aria-pressed={mode === item.key}
                     onClick={() => onChange(item.key)}
                     className={cn(
-                        'flex-1 cursor-pointer rounded-sm px-3 py-2.5 text-sm font-medium transition-colors lg:flex-initial lg:py-1.5',
+                        'flex flex-1 cursor-pointer items-center justify-center rounded-sm px-3 py-2.5 text-center text-sm font-medium transition-colors lg:flex-initial lg:py-1.5',
                         mode === item.key
                             ? 'bg-brand text-white'
                             : 'text-text-muted hover:bg-surface-muted active:bg-surface-muted',

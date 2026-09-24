@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, ImageOff } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ImageOff, Maximize2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Keyboard, Navigation, Pagination, Thumbs } from 'swiper/modules'
@@ -10,6 +10,7 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/thumbs'
 import { getMainPhoto, getThumbPhoto } from '@/entities/estate'
+import { PhotoLightbox } from './photo-lightbox'
 type Props = {
     photos: string[]
     loading?: boolean
@@ -18,6 +19,8 @@ export function PhotoSlider({ photos, loading }: Props) {
     const t = useTranslations('estate')
     const [idx, setIdx] = useState(0)
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
+    const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null)
+    const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
     const prevRef = useRef<HTMLButtonElement>(null)
     const nextRef = useRef<HTMLButtonElement>(null)
     const count = photos.length
@@ -60,6 +63,8 @@ export function PhotoSlider({ photos, loading }: Props) {
                     }}
                     thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
                     onSlideChange={(s) => setIdx(s.activeIndex)}
+                    onSwiper={setMainSwiper}
+                    onClick={(s) => setLightboxIndex(s.activeIndex)}
                     className="size-full"
                 >
                     {photos.map((src, i) => (
@@ -70,7 +75,7 @@ export function PhotoSlider({ photos, loading }: Props) {
                                 loading={i === 0 ? 'eager' : 'lazy'}
                                 decoding="async"
                                 draggable={false}
-                                className="size-full object-cover"
+                                className="size-full cursor-zoom-in object-cover"
                             />
                         </SwiperSlide>
                     ))}
@@ -78,6 +83,14 @@ export function PhotoSlider({ photos, loading }: Props) {
                 <div className="pointer-events-none absolute right-2 bottom-2 z-10 rounded-full bg-black/50 px-2 py-0.5 text-xs tabular-nums text-white">
                     {idx + 1} / {count}
                 </div>
+                <button
+                    type="button"
+                    aria-label={t('photo_open_aria')}
+                    onClick={() => setLightboxIndex(idx)}
+                    className="absolute top-2 right-2 z-10 flex size-9 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white transition-colors hover:bg-black/60"
+                >
+                    <Maximize2 className="size-4" />
+                </button>
                 {count > 1 && (
                     <>
                         <button
@@ -135,6 +148,16 @@ export function PhotoSlider({ photos, loading }: Props) {
                         ))}
                     </Swiper>
                 </div>
+            )}
+            {lightboxIndex !== null && (
+                <PhotoLightbox
+                    photos={photos}
+                    initialIndex={lightboxIndex}
+                    onClose={(i) => {
+                        setLightboxIndex(null)
+                        mainSwiper?.slideTo(i, 0)
+                    }}
+                />
             )}
         </div>
     )

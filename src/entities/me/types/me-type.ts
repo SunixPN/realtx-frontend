@@ -28,5 +28,8 @@ export type AuthUserType = {
     updatedAt: string;
     lastLoginAt: string | null;
     favoritesCount: number;
+    subscriptionsCount: number;
+    compareCount: number;
+    viewedCount: number;
     subscriptionsFreshCount: number;
 }
