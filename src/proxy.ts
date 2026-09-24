@@ -100,7 +100,27 @@ export const proxy: NextProxy = async (request) => {
     // (particularly на мобильных, где вкладка бэкграундится) access
     // естественным путём удаляется браузером — и мы без попытки refresh
     // выбрасывали юзера на /sign-in, хотя refresh был бы успешным.
-    const needsRefresh = hasRefresh && (!hasAccess || isInvalidOrExpired(accessToken));
+    //
+    // Server actions (POST с заголовком next-action) не рефрешим: они ничего не рендерят,
+    // а сразу после логина фронт шлёт их пачкой (saveAccessToken, readCookie на каждый
+    // API-запрос) — с одним и тем же свежим refresh_token. Параллельные refresh'и
+    // ротируют токен наперегонки, проигравшие получают 401, и пользователь
+    // остаётся без сессии. Токен для API-запросов обновляет клиентский интерцептор
+    // (у него single-flight очередь).
+    const isServerAction = request.method === "POST" && request.headers.has("next-action");
+    const needsRefresh = !isServerAction && hasRefresh && (!hasAccess || isInvalidOrExpired(accessToken));
+    const isProtected = PROTECTED_ROUTES.includes(pathname);
+
+    // Refresh не удался: с защищённой страницы — на вход, с публичной — просто
+    // продолжаем гостем. Редирект с публичных (в т.ч. с самого /sign-in) давал луп.
+    function onRefreshFailed(setCookie?: string | null) {
+        const response = isProtected
+            ? NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url))
+            : NextResponse.next()
+        clearAccessCookie(response)
+        if (setCookie) response.headers.append("set-cookie", setCookie);
+        return response
+    }
 
     if (needsRefresh) {
         try {
@@ -112,11 +132,7 @@ export const proxy: NextProxy = async (request) => {
             });
 
             if (!res.ok) {
-                const response = NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url))
-                clearAccessCookie(response)
-                const setCookie = res.headers.get("set-cookie");
-                if (setCookie) response.headers.append("set-cookie", setCookie);
-                return response
+                return onRefreshFailed(res.headers.get("set-cookie"))
             }
 
             const data = (await res.json()) as { accessToken: string };
@@ -135,13 +151,11 @@ export const proxy: NextProxy = async (request) => {
             return response
 
         } catch {
-            const response = NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url))
-            clearAccessCookie(response)
-            return response
+            return onRefreshFailed()
         }
     }
 
-    if (PROTECTED_ROUTES.includes(pathname) && !hasAccess) {
+    if (isProtected && !hasAccess) {
         const url = request.nextUrl.clone();
         url.pathname = PROTECTED_REDIRECT_ROUTE;
         return NextResponse.redirect(url);
