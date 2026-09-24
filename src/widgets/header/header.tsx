@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -33,6 +33,27 @@ export function Header() {
     };
     const ThemeIcon = theme === 'system' ? IconMonitor : resolvedTheme === 'dark' ? IconSun : IconMoon;
     const totalBadge = favCount + freshCount;
+
+    useEffect(() => {
+        const el = document.documentElement
+        const attr = 'data-immersive-translate-page-theme'
+
+        // Начальное значение
+        console.log(el.getAttribute(attr), 'THEME INIT')
+
+        const observer = new MutationObserver(() => {
+            setTheme(el.getAttribute(attr))
+        })
+
+        observer.observe(el, {
+            attributes: true,
+            attributeFilter: [attr], // следим только за этим атрибутом
+        })
+
+        return () => observer.disconnect() // отписка при размонтировании
+    }, [])
+
+
     return (
         <>
             <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center justify-between gap-4 border-b border-border bg-surface-raised px-3 sm:px-4">

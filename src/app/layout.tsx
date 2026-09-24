@@ -30,15 +30,9 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
         title: t("meta_title"),
         description: t("app_description"),
-        // media-query фавикон: при тёмной теме браузер подхватит logo-dark,
-        // иначе на dark UI показывался белый логотип на белом фоне вкладки.
-        // Явные <link rel=icon> заодно снимают 404 от автозапроса /favicon.ico.
-        icons: {
-            icon: [
-                { url: "/logo.png", media: "(prefers-color-scheme: light)" },
-                { url: "/logo-dark.png", media: "(prefers-color-scheme: dark)" },
-            ],
-        },
+        // Фавикон дефолтный — Next сам подхватывает src/app/icon.png через
+        // файловую конвенцию. Никакой привязки к теме приложения нет,
+        // одна иконка на все случаи.
     };
 }
 

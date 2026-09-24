@@ -518,5 +518,15 @@
         "privacy_4_body": "You can request an export or deletion of your data at any time by writing to us or using the profile settings.",
         "privacy_5_title": "5. Cookies",
         "privacy_5_body": "We use cookies only to maintain sessions and don't use advertising trackers."
+    },
+    "errors": {
+        "not_found_title": "Page not found",
+        "not_found_description": "Double-check the address — it may have changed, or the listing has been removed. Below are the things that definitely work.",
+        "crash_title": "Something went wrong",
+        "crash_description": "We already know about the problem and are looking into it. Try refreshing the page — usually that's all it takes.",
+        "to_home": "Go to home",
+        "go_back": "Go back",
+        "retry": "Refresh the page",
+        "digest_label": "Error code"
     }
 }

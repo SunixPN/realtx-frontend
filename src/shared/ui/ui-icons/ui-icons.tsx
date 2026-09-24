@@ -191,3 +191,30 @@ export function IconKey({ size = 16, ...props }: IconProps) {
     </svg>
   );
 }
+export function IconHome({ size = 20, ...props }: IconProps) {
+  return (
+    <svg {...baseProps(size, props)}>
+      <path d="M3 12 12 3l9 9" />
+      <path d="M5 10v10h14V10" />
+      <path d="M10 20v-6h4v6" />
+    </svg>
+  );
+}
+export function IconCompass({ size = 20, ...props }: IconProps) {
+  return (
+    <svg {...baseProps(size, props)}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z" />
+    </svg>
+  );
+}
+export function IconRefreshCw({ size = 20, ...props }: IconProps) {
+  return (
+    <svg {...baseProps(size, props)}>
+      <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+      <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M3 21v-5h5" />
+    </svg>
+  );
+}
