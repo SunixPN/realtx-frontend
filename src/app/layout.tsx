@@ -1,6 +1,7 @@
 import type {Metadata, Viewport} from "next";
 import {Inter} from "next/font/google";
 import {Toaster} from "sonner";
+import { PendingToast } from "@/shared/ui/ui-toast";
 import {NextIntlClientProvider} from "next-intl";
 import {getLocale, getMessages, getTranslations} from "next-intl/server";
 import {Header} from "@/widgets/header";
@@ -59,6 +60,7 @@ export default async function RootLayout({
                             <Header/>
                             {children}
                             <Toaster position="top-right" richColors closeButton />
+                            <PendingToast />
                         </NextIntlClientProvider>
                     </ThemeProvider>
                 </body>
