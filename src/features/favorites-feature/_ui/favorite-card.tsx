@@ -39,16 +39,18 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
     const hasDelta = delta !== null && delta !== 0
     const isDrop = hasDelta && delta! < 0
     return (
-        <div className={cn('relative h-full', isPending && 'opacity-50 pointer-events-none transition-opacity')}>
+        <div
+            className={cn(
+                'relative flex h-full flex-col overflow-hidden rounded-lg border transition-shadow',
+                selected
+                    ? 'border-brand ring-2 ring-brand/20 shadow-md'
+                    : 'border-border bg-surface-raised hover:shadow-md',
+                isPending && 'opacity-50 pointer-events-none transition-opacity',
+            )}
+        >
             <Link
                 href={`/property/${item.id}`}
-                className={cn(
-                    'flex h-full flex-col overflow-hidden rounded-lg border transition-shadow',
-                    selected
-                        ? 'border-brand ring-2 ring-brand/20 shadow-md'
-                        : 'border-border bg-surface-raised hover:shadow-md',
-                    !item.isActive && 'opacity-60',
-                )}
+                className={cn('flex flex-1 flex-col', !item.isActive && 'opacity-60')}
             >
                 {}
                 <div className="relative aspect-[4/3] w-full shrink-0 bg-surface-muted sm:aspect-auto sm:h-[220px]">
@@ -98,7 +100,7 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                     )}
                 </div>
                 {}
-                <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-4">
+                <div className="flex flex-1 flex-col gap-1.5 p-3 pb-2 sm:gap-2 sm:p-4 sm:pb-2">
                     <div className="flex items-baseline justify-between gap-3">
                         <span className="text-base font-semibold text-text-base tabular-nums sm:text-lg">
                             {formatPrice(item.price, item.priceCurrency)}
@@ -125,15 +127,17 @@ export function FavoriteCard({ item, selected, onToggleSelect }: FavoriteCardPro
                             {tEstate('seller_agency')}
                         </div>
                     )}
-                    <div className="mt-auto pt-2">
-                        <CompareButton
-                            estateId={item.id}
-                            isInCompare={item.isInCompare}
-                            fullWidth
-                        />
-                    </div>
                 </div>
             </Link>
+            {/* Кнопка — сосед ссылки, а не потомок: клик внутри <a> ловит top-loader
+                и запускает полосу загрузки, даже если переход отменён preventDefault */}
+            <div className={cn('px-3 pb-3 sm:px-4 sm:pb-4', !item.isActive && 'opacity-60')}>
+                <CompareButton
+                    estateId={item.id}
+                    isInCompare={item.isInCompare}
+                    fullWidth
+                />
+            </div>
             {}
             <label
                 className={cn(
