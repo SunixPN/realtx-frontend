@@ -67,6 +67,7 @@ api.interceptors.response.use(
 
         originalRequest._retry = true
         isRefreshing = true
+        const sentToken = originalRequest.headers.get('Authorization')?.toString().replace(/^Bearer /, '')
 
         try {
             const { data } = await refreshRequest()
@@ -78,6 +79,15 @@ api.interceptors.response.use(
             originalRequest.headers.set('Authorization', `Bearer ${newToken}`)
             return api(originalRequest)
         } catch (refreshError) {
+            // Refresh мог проиграть гонку proxy (он рефрешит при загрузке страниц) —
+            // тогда свежий access уже лежит в куке, и сессия жива
+            const token = await readCookieAction(TOKENS.ACCESS_TOKEN)
+            if (token && token !== sentToken) {
+                processPending(token)
+                originalRequest.headers.set('Authorization', `Bearer ${token}`)
+                return api(originalRequest)
+            }
+            processPending(null, refreshError)
             await clearTokensAction()
             await signInRedirectAction(window.location.pathname)
         } finally {

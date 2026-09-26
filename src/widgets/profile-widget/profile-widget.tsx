@@ -1,5 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { ROUTES } from '@/shared/const/routes'
+import { showToast } from '@/shared/helpers/show-toast'
 import { useAuth } from '@/entities/me/api/auth-query'
 import { DeleteAccountDialog, EmailDialog, PhoneDialog, type EmailDialogMode } from '@/features/profile-feature'
 import { ActivityTiles, MissingEmailBanner, ProfileHeader, UnverifiedEmailBanner } from './_ui/profile-overview'
@@ -19,6 +23,18 @@ export function ProfileWidget() {
     // Режим держим отдельно от open, чтобы контент не мигал во время анимации закрытия
     const [emailMode, setEmailMode] = useState<EmailDialogMode>('add')
     const user = auth?.user
+    const t = useTranslations('profile')
+    const router = useRouter()
+    const justVerified = useSearchParams().has('email-verified')
+    const toastShown = useRef(false)
+
+    // Пришли со страницы подтверждения email — сообщаем и убираем флаг из URL
+    useEffect(() => {
+        if (!justVerified || toastShown.current) return
+        toastShown.current = true
+        showToast({ status: 'success', text: t('email_verified_toast') })
+        router.replace(ROUTES.PROFILE, { scroll: false })
+    }, [justVerified, router, t])
 
     if (!user) {
         return isLoading || auth === undefined ? <ProfileSkeleton /> : null

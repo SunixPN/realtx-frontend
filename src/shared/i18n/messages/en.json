@@ -684,6 +684,7 @@
         "error_email_already_verified": "Email is already verified",
         "error_phone_taken": "This number is already linked to another account",
         "error_resend_cooldown": "Email already sent. You can resend in {seconds}s.",
-        "error_generic": "Something went wrong. Please try again."
+        "error_generic": "Something went wrong. Please try again.",
+        "email_verified_toast": "Email confirmed"
     }
 }

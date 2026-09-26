@@ -684,6 +684,7 @@
         "error_email_already_verified": "Email уже подтверждён",
         "error_phone_taken": "Этот номер уже привязан к другому аккаунту",
         "error_resend_cooldown": "Письмо уже отправлено. Повторить можно через {seconds} сек.",
-        "error_generic": "Что-то пошло не так. Попробуйте ещё раз."
+        "error_generic": "Что-то пошло не так. Попробуйте ещё раз.",
+        "email_verified_toast": "Email подтверждён"
     }
 }

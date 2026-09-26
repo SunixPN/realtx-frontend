@@ -108,7 +108,12 @@ export const proxy: NextProxy = async (request) => {
     // остаётся без сессии. Токен для API-запросов обновляет клиентский интерцептор
     // (у него single-flight очередь).
     const isServerAction = request.method === "POST" && request.headers.has("next-action");
-    const needsRefresh = !isServerAction && hasRefresh && (!hasAccess || isInvalidOrExpired(accessToken));
+    // И не редиректим: server action шлётся POST'ом на URL текущей страницы, и 307 на /sign-in
+    // Next применяет как результат экшена — рендерит страницу входа, не меняя URL в адресной строке.
+    // Авторизацию экшены проверяют сами (читают куки), а API-запросы — бэкенд.
+    if (isServerAction) return NextResponse.next();
+
+    const needsRefresh = hasRefresh && (!hasAccess || isInvalidOrExpired(accessToken));
     const isProtected = PROTECTED_ROUTES.includes(pathname);
 
     // Refresh не удался: с защищённой страницы — на вход, с публичной — просто

@@ -1,6 +1,8 @@
 'use client';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { mutate } from 'swr';
+import { authKey } from '@/entities/me/api/auth-query';
 import { useTranslations } from 'next-intl';
 import { UILinkChecker } from '@/shared/ui/ui-link-checker';
 import { UIExpiredLink } from '@/shared/ui/ui-expired-link';
@@ -16,7 +18,10 @@ export default function VerifyEmailFeature() {
     const isSuccess = !!data;
     const isError = !!error;
     useEffect(() => {
-        if (isSuccess) router.replace(`${ROUTES.PROFILE}?email-verified=1`);
+        if (!isSuccess) return;
+        // /auth/me в кэше SWR ещё с emailVerified: false — обновляем до перехода,
+        // иначе профиль покажет плашку «подтвердите email»
+        mutate(authKey).finally(() => router.replace(`${ROUTES.PROFILE}?email-verified=1`));
     }, [isSuccess, router]);
     const renderContent = () => {
         if (!token || isError) {
