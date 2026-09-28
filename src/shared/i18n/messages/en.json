@@ -95,7 +95,7 @@
             "help_suffix": "— we'll help recover access using your favorites data.",
             "sent_title": "Check your mail",
             "sent_body_prefix": "We sent a reset link to",
-            "sent_body_suffix": ". It's valid for one hour.",
+            "sent_body_suffix": ". It's valid for 15 minutes.",
             "open_mail": "Open mail client",
             "resend": "Resend",
             "resend_pending": "Sending...",

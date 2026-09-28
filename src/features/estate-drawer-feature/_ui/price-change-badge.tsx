@@ -91,7 +91,7 @@ export function PriceChangeBadge({ change, currency, variant = 'compact' }: Prop
                     )}
                 </div>
                 <div className="text-xs text-[var(--text-faint)]">
-                    {t('price_changes_count', { count: change.changes })}
+                    {/* {t('price_changes_count', { count: change.changes })} */}
                 </div>
             </div>
         </div>
