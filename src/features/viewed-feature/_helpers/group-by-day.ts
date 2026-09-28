@@ -1,29 +1,32 @@
 import type { ViewedItemType } from '@/entities/viewed'
+import { APP_TIME_ZONE } from '@/shared/const/time-zone'
 
 export type ViewedGroupKey = 'today' | 'yesterday' | 'earlier'
 export type ViewedGroup = { key: ViewedGroupKey; items: ViewedItemType[] }
 
-function startOfDay(d: Date): number {
-    const c = new Date(d)
-    c.setHours(0, 0, 0, 0)
-    return c.getTime()
-}
+// 'YYYY-MM-DD' в APP_TIME_ZONE — одинаково на сервере (UTC) и в браузере,
+// иначе SSR и клиент раскладывают ночные просмотры в разные группы.
+const DAY_KEY = new Intl.DateTimeFormat('en-CA', {
+    timeZone: APP_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+})
 
-// Границы по локальному времени пользователя. today = >= 00:00 сегодня,
-// yesterday = вчера 00:00..сегодня 00:00, earlier = всё старше.
+// today = сегодняшний день, yesterday = вчерашний, earlier = всё старше.
 export function groupByDay(items: ViewedItemType[]): ViewedGroup[] {
-    const now = new Date()
-    const todayStart = startOfDay(now)
-    const yesterdayStart = todayStart - 24 * 60 * 60 * 1000
+    const now = Date.now()
+    const todayKey = DAY_KEY.format(now)
+    const yesterdayKey = DAY_KEY.format(now - 24 * 60 * 60 * 1000)
 
     const today: ViewedItemType[] = []
     const yesterday: ViewedItemType[] = []
     const earlier: ViewedItemType[] = []
 
     for (const item of items) {
-        const t = new Date(item.viewedAt).getTime()
-        if (t >= todayStart) today.push(item)
-        else if (t >= yesterdayStart) yesterday.push(item)
+        const key = DAY_KEY.format(new Date(item.viewedAt))
+        if (key >= todayKey) today.push(item)
+        else if (key >= yesterdayKey) yesterday.push(item)
         else earlier.push(item)
     }
 

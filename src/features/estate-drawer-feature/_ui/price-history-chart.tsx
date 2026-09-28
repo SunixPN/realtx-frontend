@@ -2,6 +2,7 @@
 import { useTranslations } from 'next-intl'
 import type { PriceHistoryPoint } from '@/entities/estate'
 import type { DisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
+import { APP_TIME_ZONE } from '@/shared/const/time-zone'
 const PAD = { l: 44, r: 10, t: 10, b: 22 }
 const W = 600
 const H = 160
@@ -12,7 +13,7 @@ function formatAxisValue(v: number, suffix: string): string {
     return `${Math.round(v / 1000)}${suffix}`
 }
 function formatDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' })
+    return new Date(iso).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', timeZone: APP_TIME_ZONE })
 }
 type Props = {
     history: PriceHistoryPoint[]

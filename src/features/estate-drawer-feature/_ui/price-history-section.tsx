@@ -4,6 +4,7 @@ import type { PriceChange, PriceHistoryPoint } from '@/entities/estate'
 import type { DisplayCurrency } from '@/features/main-map-filters-feature/_hooks/use-display-currency'
 import { PriceChangeBadge } from './price-change-badge'
 import { PriceHistoryChart } from './price-history-chart'
+import { APP_TIME_ZONE } from '@/shared/const/time-zone'
 type Props = {
     history: PriceHistoryPoint[]
     priceChange: PriceChange | null
@@ -15,7 +16,7 @@ export function PriceHistorySection({ history, priceChange, currency }: Props) {
     if (history.length < 2) return null
     const firstDate = history[0]?.date
     const formattedDate = firstDate
-        ? new Date(firstDate).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
+        ? new Date(firstDate).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: APP_TIME_ZONE })
         : null
     return (
         <section className="flex flex-col gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--surface-base)] p-4">

@@ -3,6 +3,7 @@ import type { CompareItemType } from '@/entities/compare'
 import { WALL_MATERIAL_LABELS, REPAIR_STATE_LABELS } from '@/entities/estate'
 import { BynSign } from '@/shared/ui/byn-sign/byn-sign'
 import { formatNumber, formatStorey } from '../../estate-drawer-feature/_ui/format'
+import { APP_TIME_ZONE } from '@/shared/const/time-zone'
 
 export type Row = {
     labelKey: string
@@ -57,7 +58,7 @@ function formatDate(iso: string | null): string {
     if (!iso) return '—'
     try {
         const d = new Date(iso)
-        return new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' }).format(d)
+        return new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'long', year: 'numeric', timeZone: APP_TIME_ZONE }).format(d)
     } catch { return '—' }
 }
 

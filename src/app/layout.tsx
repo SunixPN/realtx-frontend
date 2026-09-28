@@ -11,6 +11,7 @@ import {ReactNode} from "react";
 import { ThemeInitScript, ThemeProvider } from "@/shared/theme";
 import NextTopLoader from "nextjs-toploader";
 import { ViewportMetricsProvider } from "@/app/_providers/viewport-metrics-provider";
+import { APP_TIME_ZONE } from "@/shared/const/time-zone";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -51,7 +52,7 @@ export default async function RootLayout({
             <QueryProvider>
                 <body className="min-h-dvh bg-surface-page text-text-base antialiased">
                     <ThemeProvider>
-                        <NextIntlClientProvider locale={locale} messages={messages}>
+                        <NextIntlClientProvider locale={locale} messages={messages} timeZone={APP_TIME_ZONE}>
                             <NextTopLoader
                                 color={"var(--brand)"}
                                 height={4}

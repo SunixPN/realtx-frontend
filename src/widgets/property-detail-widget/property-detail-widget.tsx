@@ -47,6 +47,7 @@ import { formatStorey, formatNumber } from '@/features/estate-drawer-feature/_ui
 import { cn } from '@/shared/helpers/cn'
 import { copyText } from '@/shared/lib/copy-text'
 import { UIBottomSheet, useBottomSheetDrag } from '@/shared/ui/ui-bottom-sheet'
+import { APP_TIME_ZONE } from '@/shared/const/time-zone'
 const PropertyMiniMap = dynamic(
     () => import('./property-mini-map').then((m) => m.PropertyMiniMap),
     { ssr: false },
@@ -285,7 +286,7 @@ function PriceCard({ estate, currency }: { estate: EstateType; currency: Display
     const isAuthed = !!auth?.user
     const formatDate = (iso: string | null) => {
         if (!iso) return '—'
-        return new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
+        return new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: APP_TIME_ZONE })
     }
     const formatDays = (days: number) => t('days_n', { count: days })
     return (
@@ -756,7 +757,7 @@ function PriceHistoryBlock({ estate, currency }: { estate: EstateType; currency:
     if (estate.priceHistory.length < 2) return null
     const firstDate = estate.priceHistory[0]?.date
     const formattedDate = firstDate
-        ? new Date(firstDate).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
+        ? new Date(firstDate).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: APP_TIME_ZONE })
         : ''
     return (
         <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface-page p-4 md:p-5">
@@ -788,7 +789,7 @@ function PriceHistoryBlock({ estate, currency }: { estate: EstateType; currency:
                                 className="flex items-baseline justify-between border-b border-border pb-1.5 text-sm"
                             >
                                 <span className="text-text-faint tabular-nums">
-                                    {new Date(h.date).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                    {new Date(h.date).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: APP_TIME_ZONE })}
                                 </span>
                                 <span className="flex items-baseline gap-2">
                                     <PriceDisplay price={cur} currency={currency} className="text-text-base tabular-nums" />
@@ -842,7 +843,7 @@ function PriceHistoryChart({ history, currency }: { history: PriceHistoryPoint[]
     const midIdx = Math.floor(points.length / 2)
     const suffix = t('chart_thousands_suffix')
     const formatChartDate = (iso: string) =>
-        new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
+        new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: APP_TIME_ZONE })
     return (
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full" role="img" aria-label={t('chart_aria')}>
             {[0, 0.5, 1].map((tVal) => {
@@ -906,7 +907,7 @@ function SpecsGrid({ estate }: { estate: EstateType }) {
     const formatArea = useFormatArea()
     const formatDate = (iso: string | null) => {
         if (!iso) return '—'
-        return new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })
+        return new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: APP_TIME_ZONE })
     }
     const formatDays = (days: number) => t('days_n', { count: days })
     const groups: { title: string; rows: [string, string][] }[] = [

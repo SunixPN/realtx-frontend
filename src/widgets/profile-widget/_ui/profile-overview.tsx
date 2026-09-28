@@ -8,6 +8,7 @@ import { ROUTES } from '@/shared/const/routes'
 import { UIButton } from '@/shared/ui/ui-button'
 import type { AuthUserType } from '@/entities/me/types/me-type'
 import { formatPhone } from '@/shared/helpers/format-phone'
+import { APP_TIME_ZONE } from '@/shared/const/time-zone'
 
 function initials(name: string): string {
     return name
@@ -23,7 +24,7 @@ export function ProfileHeader({ user }: { user: AuthUserType }) {
     const locale = useLocale()
     // Контакты уже есть строкой ниже — в заголовок их не дублируем
     const name = user.name?.trim()
-    const since = new Date(user.createdAt).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+    const since = new Date(user.createdAt).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: APP_TIME_ZONE })
     return (
         <div className="flex items-center gap-4 border-b border-border pb-5 sm:gap-5 sm:pb-6">
             <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-bg text-lg font-semibold text-brand sm:size-16 sm:text-xl">
