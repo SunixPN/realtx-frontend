@@ -1,10 +1,14 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import packageJson from "./package.json";
 
 const withNextIntl = createNextIntlPlugin("./src/shared/i18n/request.ts");
 
 const nextConfig: NextConfig = {
     allowedDevOrigins: ["10.55.60.88", "10.183.8.33"],
+    env: {
+        NEXT_PUBLIC_APP_VERSION: packageJson.version,
+    },
     webpack: (config) => {
         config.resolve.alias = {
             ...config.resolve.alias,

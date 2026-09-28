@@ -71,7 +71,7 @@ export function Header() {
     return (
         <>
             <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center justify-between gap-4 border-b border-border bg-surface-raised px-3 sm:px-4">
-                <Link href={ROUTES.ROOT} className="flex items-center hover:opacity-80" aria-label={t('logo_alt')}>
+                <Link href={ROUTES.ROOT} className="flex items-center gap-1.5 hover:opacity-80" aria-label={t('logo_alt')}>
                     <Image
                         src="/logo.png"
                         alt={t('logo_alt')}
@@ -88,6 +88,9 @@ export function Header() {
                         priority
                         className="hidden h-7 w-auto sm:h-8 dark:block"
                     />
+                    <span className="self-end mb-0.5 rounded border border-border px-1 text-[10px] leading-4 text-text-muted opacity-70 select-none">
+                        v{process.env.NEXT_PUBLIC_APP_VERSION}
+                    </span>
                 </Link>
                 <div className="hidden items-center gap-1 md:flex">
                     {data?.user && (
