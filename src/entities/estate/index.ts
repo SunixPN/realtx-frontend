@@ -13,6 +13,8 @@ export {
     PRICE_CURRENCY_LABELS,
     WALL_MATERIAL_LABELS,
     REPAIR_STATE_LABELS,
+    WALL_MATERIAL_CODES,
+    REPAIR_STATE_CODES,
     MINSK_DISTRICTS,
 } from './api/estate-types'
 export {
@@ -35,6 +37,7 @@ export { useSuggest, suggestKey, type SuggestItemType } from './api/suggest-quer
 export { getMainPhoto, getThumbPhoto } from './model/photo-url'
 export type { MapFiltersType } from './model/estate-filters'
 export {
+    FILTER_LIMITS,
     normalizeFilters,
     parseFiltersFromSearchParams,
     serializeFiltersToSearchParams,

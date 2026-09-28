@@ -14,6 +14,7 @@ import {
     useMetroTimeOptions,
     useMinskDistrictOptions,
     countActiveFilters,
+    FILTER_LIMITS,
     type MapFiltersType,
 } from '@/entities/estate'
 import type { DisplayCurrency } from '../_hooks/use-display-currency'
@@ -59,7 +60,7 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
     }
     const formatRoomsLabel = (): string | undefined => {
         if (!filters.rooms?.length) return undefined
-        return filters.rooms.map(r => r >= 5 ? '5+' : String(r)).join('–')
+        return [...filters.rooms].sort((a, b) => a - b).map(r => r >= 5 ? '5+' : String(r)).join(', ')
     }
     const formatAreaLabel = (): string | undefined => {
         if (filters.areaMin && filters.areaMax) return t('area_range', { min: filters.areaMin, max: filters.areaMax })
@@ -99,6 +100,7 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                 </div>
                 <UIRangeField
                     unit={currencySymbol(currency)}
+                    max={FILTER_LIMITS.price[currency]}
                     fromValue={filters.priceMin ?? ''}
                     toValue={filters.priceMax ?? ''}
                     onFromChange={v => onChange(f => ({ ...f, priceMin: v ? Number(v) : undefined }))}
@@ -123,7 +125,7 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                             key={r}
                             onClick={() => onChange(f => {
                                 const cur = f.rooms ?? []
-                                return { ...f, rooms: active ? cur.filter(x => x !== r) : [...cur, r] }
+                                return { ...f, rooms: active ? cur.filter(x => x !== r) : [...cur, r].sort((a, b) => a - b) }
                             })}
                             className={cn(
                                 'w-10 h-10 rounded-full text-sm border transition-colors',
@@ -149,6 +151,7 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
             <div className="w-64">
                 <UIRangeField
                     unit="м²"
+                    max={FILTER_LIMITS.area}
                     fromValue={filters.areaMin ?? ''}
                     toValue={filters.areaMax ?? ''}
                     onFromChange={v => onChange(f => ({ ...f, areaMin: v ? Number(v) : undefined }))}

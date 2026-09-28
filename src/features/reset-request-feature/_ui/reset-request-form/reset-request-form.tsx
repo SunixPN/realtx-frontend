@@ -2,6 +2,7 @@
 import { useTranslations } from 'next-intl';
 import { UIInput } from '@/shared/ui/ui-input';
 import { UIButton } from '@/shared/ui/ui-button';
+import { SUPPORT_EMAIL } from '@/shared/const/contacts';
 import { useResetRequestForm } from '@/features/reset-request-feature/_hooks/use-reset-request-form';
 type ResetRequestFormProps = {
     onSent: (email: string) => void;
@@ -32,8 +33,8 @@ export default function ResetRequestForm({ onSent }: ResetRequestFormProps) {
             </form>
             <div className="rounded-md border border-border bg-surface-subtle p-3 text-xs leading-relaxed text-text-faint">
                 {t('help_prefix')}{' '}
-                <a href="mailto:help@realtx.local" className="font-medium text-brand hover:underline">
-                    help@realtx.local
+                <a href={`mailto:${SUPPORT_EMAIL}`} className="font-medium text-brand hover:underline">
+                    {SUPPORT_EMAIL}
                 </a>
                 {' '}{t('help_suffix')}
             </div>

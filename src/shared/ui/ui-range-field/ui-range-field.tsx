@@ -16,11 +16,14 @@ export interface RangeFieldProps {
   disabled?:     boolean;
   className?:    string;
   debounceMs?:  number;
+  /** Верхняя граница: больше ввести нельзя, значение обрезается до max */
+  max?:         number;
 }
 function useDebouncedInput(
   externalValue: string | number | undefined,
   onChange: ((v: string) => void) | undefined,
   debounceMs: number | undefined,
+  max: number | undefined,
 ) {
   const [local, setLocal] = useState(String(externalValue ?? ''))
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -30,7 +33,10 @@ function useDebouncedInput(
       setLocal(String(externalValue ?? ''))
     }
   }, [externalValue])
-  const handleChange = (v: string) => {
+  const handleChange = (raw: string) => {
+    // Только целые неотрицательные: отсекаем минус, точку, e и прочий мусор
+    let v = raw.replace(/\D/g, '').replace(/^0+(?=\d)/, '')
+    if (max !== undefined && v && Number(v) > max) v = String(max)
     setLocal(v)
     if (!debounceMs) {
       onChange?.(v)
@@ -61,13 +67,14 @@ export function UIRangeField({
   disabled,
   className,
   debounceMs,
+  max,
 }: RangeFieldProps) {
   const t = useTranslations('common');
   const fromId = useId();
   const toId = useId();
   const hasError = !!error;
-  const { local: localFrom, handleChange: handleFromChange } = useDebouncedInput(fromValue, onFromChange, debounceMs)
-  const { local: localTo,   handleChange: handleToChange   } = useDebouncedInput(toValue,   onToChange,   debounceMs)
+  const { local: localFrom, handleChange: handleFromChange } = useDebouncedInput(fromValue, onFromChange, debounceMs, max)
+  const { local: localTo,   handleChange: handleToChange   } = useDebouncedInput(toValue,   onToChange,   debounceMs, max)
   const inputCls = cn(
     'flex h-10 flex-1 items-center rounded-sm border bg-surface-page px-3 transition-colors',
     hasError
@@ -85,8 +92,9 @@ export function UIRangeField({
           <span className="mr-2 text-text-faint text-sm">{t('range_from')}</span>
           <input
             id={fromId}
-            type="number"
+            type="text"
             inputMode="numeric"
+            autoComplete="off"
             value={localFrom}
             onChange={(e) => handleFromChange(e.target.value)}
             placeholder={fromPlaceholder}
@@ -98,8 +106,9 @@ export function UIRangeField({
           <span className="mr-2 text-text-faint text-sm">{t('range_to')}</span>
           <input
             id={toId}
-            type="number"
+            type="text"
             inputMode="numeric"
+            autoComplete="off"
             value={localTo}
             onChange={(e) => handleToChange(e.target.value)}
             placeholder={toPlaceholder}

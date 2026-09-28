@@ -17,6 +17,14 @@ export type MapFiltersType = {
     ownerOnly?: boolean
     q?: string
 }
+// Верхние границы числовых полей фильтра — с запасом над реальными данными,
+// чтобы нельзя было ввести абсурд вроде цены в триллион или 10-значного этажа.
+export const FILTER_LIMITS = {
+    price: { USD: 20_000_000, EUR: 20_000_000, BYN: 60_000_000 },
+    area: 2_000,
+    storey: 100,
+    buildingYear: new Date().getFullYear() + 10,
+} as const
 export function normalizeFilters(filters: MapFiltersType): Record<string, unknown> {
     return Object.fromEntries(
         Object.entries(filters).filter(([, v]) =>

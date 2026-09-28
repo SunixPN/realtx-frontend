@@ -17,6 +17,9 @@ import { useIsIOSChrome } from '@/shared/hooks/use-is-ios-chrome'
 import {
     useWallMaterialLabels,
     useRepairStateLabels,
+    WALL_MATERIAL_CODES,
+    REPAIR_STATE_CODES,
+    FILTER_LIMITS,
     useMetroTimeOptions,
     useMinskDistrictOptions,
     type MapFiltersType,
@@ -79,10 +82,8 @@ function FiltersBody({
     const repairLabels = useRepairStateLabels()
     const metroTimeOptions = useMetroTimeOptions()
     const districtOptions = useMinskDistrictOptions()
-    const wallMaterialOptions = Object.entries(wallLabels).map(([v, l]) => ({ value: v, label: l }))
-    const repairStateOptions = Object.entries(repairLabels).map(([v, l]) => ({ value: v, label: l }))
-
-    console.log(filters, "FILTERS!!!")
+    const wallMaterialOptions = WALL_MATERIAL_CODES.map(c => ({ value: String(c), label: wallLabels[c] }))
+    const repairStateOptions = REPAIR_STATE_CODES.map(c => ({ value: String(c), label: repairLabels[c] }))
 
     return (
         <>
@@ -107,6 +108,7 @@ function FiltersBody({
                 <UIRangeField
                     label={<>{t('price_label_unit', { currency: '' })} {currencySymbol(currency)}</>}
                     unit={currencySymbol(currency)}
+                    max={FILTER_LIMITS.price[currency]}
                     fromValue={filters.priceMin ?? ''}
                     toValue={filters.priceMax ?? ''}
                     onFromChange={v => onChange(f => ({ ...f, priceMin: v ? Number(v) : undefined }))}
@@ -125,7 +127,7 @@ function FiltersBody({
                                 aria-pressed={active}
                                 onClick={() => onChange(f => {
                                     const cur = f.rooms ?? []
-                                    return { ...f, rooms: active ? cur.filter(x => x !== r) : [...cur, r] }
+                                    return { ...f, rooms: active ? cur.filter(x => x !== r) : [...cur, r].sort((a, b) => a - b) }
                                 })}
                                 className={cn(
                                     'flex h-11 flex-1 items-center justify-center rounded-sm border text-base font-medium transition-colors',
@@ -143,6 +145,7 @@ function FiltersBody({
             <Section title={t('section_area_storey')}>
                 <UIRangeField
                     label={t('area_total_label')}
+                    max={FILTER_LIMITS.area}
                     fromValue={filters.areaMin ?? ''}
                     toValue={filters.areaMax ?? ''}
                     onFromChange={v => onChange(f => ({ ...f, areaMin: v ? Number(v) : undefined }))}
@@ -151,6 +154,7 @@ function FiltersBody({
                 />
                 <UIRangeField
                     label={t('storey_label')}
+                    max={FILTER_LIMITS.storey}
                     fromValue={filters.storeyMin ?? ''}
                     toValue={filters.storeyMax ?? ''}
                     onFromChange={v => onChange(f => ({ ...f, storeyMin: v ? Number(v) : undefined }))}
@@ -166,6 +170,7 @@ function FiltersBody({
             <Section title={t('section_building')}>
                 <UIRangeField
                     label={t('year_label')}
+                    max={FILTER_LIMITS.buildingYear}
                     fromValue={filters.buildingYearMin ?? ''}
                     toValue={filters.buildingYearMax ?? ''}
                     fromPlaceholder={t('year_from')}
@@ -178,7 +183,7 @@ function FiltersBody({
                     label={t('wall_label')}
                     placeholder={t('any')}
                     options={wallMaterialOptions}
-                    value={filters.wallMaterial?.[0] ? String(filters.wallMaterial[0]) : undefined}
+                    value={filters.wallMaterial?.[0] != null ? String(filters.wallMaterial[0]) : undefined}
                     onChange={v => onChange(f => ({ ...f, wallMaterial: v ? [Number(v)] : undefined }))}
                     clearable
                 />
@@ -186,7 +191,7 @@ function FiltersBody({
                     label={t('repair_label')}
                     placeholder={t('any')}
                     options={repairStateOptions}
-                    value={filters.repairState?.[0] ? String(filters.repairState[0]) : undefined}
+                    value={filters.repairState?.[0] != null ? String(filters.repairState[0]) : undefined}
                     onChange={v => onChange(f => ({ ...f, repairState: v ? [Number(v)] : undefined }))}
                     clearable
                 />

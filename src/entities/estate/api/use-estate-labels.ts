@@ -9,22 +9,22 @@ export function useWallMaterialLabels(): Record<number, string> {
     const t = useTranslations('estate')
     return {
         1: t('wall_panel'),
-        2: t('wall_brick'),
+        0: t('wall_brick'),
         3: t('wall_monolith'),
-        4: t('wall_frame_block'),
-        5: t('wall_wooden'),
-        6: t('wall_aerated'),
+        5: t('wall_silicate'),
+        11: t('wall_frame_block'),
+        2: t('wall_block_rooms'),
+        6: t('wall_log'),
     }
 }
 export function useRepairStateLabels(): Record<number, string> {
     const t = useTranslations('estate')
     return {
-        1: t('repair_none'),
-        2: t('repair_needs'),
-        3: t('repair_cosmetic'),
-        4: t('repair_good'),
-        5: t('repair_euro'),
-        6: t('repair_designer'),
+        2: t('repair_good'),
+        3: t('repair_normal'),
+        5: t('repair_poor'),
+        7: t('repair_unfinished'),
+        8: t('repair_builder'),
     }
 }
 export function useMetroTimeOptions(): Array<{ value: string; label: string }> {
