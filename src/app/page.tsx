@@ -13,7 +13,8 @@ import {
 import { API_ROUTES } from '@/shared/const/api-routes'
 import { serverFetch } from '@/shared/api/server-fetch'
 import { getQueryClient } from '@/shared/api/query'
-import { dehydrate, HydrationBoundary, noop } from '@tanstack/react-query'
+import { dehydrate, noop } from '@tanstack/react-query'
+import { HydrateOnce } from '@/shared/api/hydrate-once'
 
 export default async function HomePage({
     searchParams,
@@ -74,10 +75,10 @@ export default async function HomePage({
     }
 
     return (
-        <HydrationBoundary state={dehydrate(queryClient)}>
+        <HydrateOnce state={dehydrate(queryClient)}>
             <MapProvider>
                 <MapWidget />
             </MapProvider>
-        </HydrationBoundary>
+        </HydrateOnce>
     )
 }
