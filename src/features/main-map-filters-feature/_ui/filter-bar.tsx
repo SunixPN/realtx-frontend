@@ -68,8 +68,10 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
         if (filters.areaMax) return t('area_to', { max: filters.areaMax })
         return undefined
     }
-    const extraCount = countActiveFilters(filters) -
-        (formatPriceLabel() ? 1 : 0) -
+    // Бейдж «Все фильтры» — активные фильтры без собственного чипа в панели.
+    // На мобилке чип только у цены, на десктопе ещё комнаты/площадь/район/метро.
+    const mobileExtraCount = countActiveFilters(filters) - (formatPriceLabel() ? 1 : 0)
+    const desktopExtraCount = mobileExtraCount -
         (formatRoomsLabel() ? 1 : 0) -
         (formatAreaLabel() ? 1 : 0) -
         (filters.districts?.length ? 1 : 0) -
@@ -205,7 +207,7 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
             </div>
         </UIChip>
     )
-    const allFiltersButton = (
+    const renderAllFiltersButton = (extraCount: number) => (
         <button
             key="all"
             type="button"
@@ -260,7 +262,7 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                     <>
                         <div className="-mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                             {priceChip}
-                            {allFiltersButton}
+                            {renderAllFiltersButton(mobileExtraCount)}
                         </div>
                         <MobileTrailing
                             total={total}
@@ -286,7 +288,7 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                     {areaChip}
                     {districtChip}
                     {metroChip}
-                    {allFiltersButton}
+                    {renderAllFiltersButton(desktopExtraCount)}
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="mx-1 h-6 w-px bg-border" />
