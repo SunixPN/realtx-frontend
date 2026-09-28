@@ -386,8 +386,6 @@
         "storey_label": "Этаж",
         "storey_not_first_last": "Не первый и не последний",
         "year_label": "Год постройки",
-        "year_from": "от",
-        "year_to": "до",
         "wall_label": "Тип дома",
         "repair_label": "Ремонт",
         "owners_only": "Только собственники",

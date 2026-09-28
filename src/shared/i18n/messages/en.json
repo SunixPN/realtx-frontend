@@ -386,8 +386,6 @@
         "storey_label": "Floor",
         "storey_not_first_last": "Not first or last floor",
         "year_label": "Year built",
-        "year_from": "from",
-        "year_to": "to",
         "wall_label": "Building type",
         "repair_label": "Renovation",
         "owners_only": "Owners only",

@@ -173,8 +173,6 @@ function FiltersBody({
                     max={FILTER_LIMITS.buildingYear}
                     fromValue={filters.buildingYearMin ?? ''}
                     toValue={filters.buildingYearMax ?? ''}
-                    fromPlaceholder={t('year_from')}
-                    toPlaceholder={t('year_to')}
                     onFromChange={v => onChange(f => ({ ...f, buildingYearMin: v ? Number(v) : undefined }))}
                     onToChange={v => onChange(f => ({ ...f, buildingYearMax: v ? Number(v) : undefined }))}
                     debounceMs={400}
@@ -268,7 +266,8 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
         const body = (
             <>
                 <FiltersDrawerHeader title={t('all_filters')} closeLabel={tCommon('close')} onClose={onClose} />
-                <div className="flex-1 overflow-y-auto overscroll-contain">
+                {/* --sheet-kb ставит UIFiltersSheet (iOS Chrome) — запас под клавиатуру */}
+                <div className="flex-1 overflow-y-auto overscroll-contain pb-[var(--sheet-kb,0px)]">
                     <FiltersBody
                         filters={filters}
                         onChange={onChange}
@@ -296,7 +295,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
                     open={isOpen}
                     onClose={onClose}
                     ariaLabel={t('all_filters_aria')}
-                    bottomInset={72}
                 >
                     {body}
                 </UIFiltersSheet>

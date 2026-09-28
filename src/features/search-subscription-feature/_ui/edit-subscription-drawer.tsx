@@ -187,7 +187,7 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
         </div>
     )
     const contentNode = (
-        <div data-kb-freeze className="flex-1 overflow-y-auto">
+        <div data-kb-freeze className="flex-1 overflow-y-auto pb-[var(--sheet-kb,0px)]">
             <Section title={t('form_name_title')}>
                 <UIInput
                     value={name}
@@ -308,7 +308,6 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
                         open={isOpen}
                         onClose={onClose}
                         ariaLabel={t('drawer_aria')}
-                        bottomInset={72}
                     >
                         {headerNode}
                         {contentNode}

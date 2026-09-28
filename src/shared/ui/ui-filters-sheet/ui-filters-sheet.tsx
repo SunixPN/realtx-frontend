@@ -15,7 +15,6 @@ type UIFiltersSheetProps = {
     ariaLabel?: string;
     children: ReactNode;
     className?: string;
-    bottomInset?: number;
 };
 
 const DURATION_MS = 280;
@@ -26,41 +25,54 @@ export function UIFiltersSheet({
     ariaLabel,
     children,
     className,
-    bottomInset = 0,
 }: UIFiltersSheetProps) {
     const [mounted, setMounted] = useState(false);
     const [rendered, setRendered] = useState(open);
     const [visible, setVisible] = useState(false);
-    const [geom, setGeom] = useState<{ top: number; height: number }>({
-        top: 0,
-        height: 0,
-    });
     const scrollYRef = useRef(0);
     const panelRef = useRef<HTMLDivElement>(null);
-    const bottomInsetRef = useRef(bottomInset);
-    bottomInsetRef.current = bottomInset;
+    const backdropRef = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => setMounted(true), []);
 
-    useEffect(() => {
+    // iOS Chrome при показе клавиатуры покадрово ужимает весь webview (100dvh
+    // и innerHeight уменьшаются), и шторка на 100dvh перестраивалась каждый
+    // кадр анимации — низ с кнопками «мигал». Поэтому высоту фиксируем в px
+    // на момент открытия: клавиатура просто перекрывает низ, как в Safari/Android.
+    // Высоту клавиатуры отдаём в --sheet-kb — прокручиваемая область добавляет
+    // её снизу отступом, чтобы нижние поля можно было поднять над клавиатурой.
+    useLayoutEffect(() => {
         if (!rendered) return;
         const vv = window.visualViewport;
-        const update = () => {
-            setGeom({
-                top: vv ? vv.offsetTop : 0,
-                height: vv ? vv.height : window.innerHeight,
-            });
+        let frozenHeight = window.innerHeight;
+        let rotateTimer = 0;
+        const applyHeight = () => {
+            const h = `${frozenHeight}px`;
+            if (panelRef.current) panelRef.current.style.height = h;
+            if (backdropRef.current) backdropRef.current.style.height = h;
         };
-        update();
-        window.addEventListener('resize', update);
-        window.addEventListener('orientationchange', update);
-        vv?.addEventListener('resize', update);
-        vv?.addEventListener('scroll', update);
+        const syncKeyboard = () => {
+            const visible = vv ? vv.offsetTop + vv.height : window.innerHeight;
+            const kb = Math.max(0, frozenHeight - visible);
+            panelRef.current?.style.setProperty('--sheet-kb', `${kb}px`);
+        };
+        const onOrientationChange = () => {
+            (document.activeElement as HTMLElement | null)?.blur();
+            window.clearTimeout(rotateTimer);
+            rotateTimer = window.setTimeout(() => {
+                frozenHeight = window.innerHeight;
+                applyHeight();
+                syncKeyboard();
+            }, 300);
+        };
+        applyHeight();
+        syncKeyboard();
+        vv?.addEventListener('resize', syncKeyboard);
+        window.addEventListener('orientationchange', onOrientationChange);
         return () => {
-            window.removeEventListener('resize', update);
-            window.removeEventListener('orientationchange', update);
-            vv?.removeEventListener('resize', update);
-            vv?.removeEventListener('scroll', update);
+            window.clearTimeout(rotateTimer);
+            vv?.removeEventListener('resize', syncKeyboard);
+            window.removeEventListener('orientationchange', onOrientationChange);
         };
     }, [rendered]);
 
@@ -95,7 +107,7 @@ export function UIFiltersSheet({
                 const rect = input.getBoundingClientRect();
                 const vvBottom = (vv?.offsetTop ?? 0) + (vv?.height ?? window.innerHeight);
                 const SAFE_MARGIN = 16;
-                const usableBottom = vvBottom - bottomInsetRef.current - SAFE_MARGIN;
+                const usableBottom = vvBottom - SAFE_MARGIN;
                 const overflow = rect.bottom - usableBottom;
                 if (overflow <= 0) return;
                 const scroller = findScrollableAncestor(input) ?? document.scrollingElement as HTMLElement | null;
@@ -179,22 +191,17 @@ export function UIFiltersSheet({
     if (!mounted || typeof document === 'undefined') return null;
     if (!rendered && !open) return null;
 
-    // If we haven't measured yet, fall back to full viewport values so the
-    // very first paint still positions the sheet sensibly.
-    const top = geom.height > 0 ? geom.top : 0;
-    const height = geom.height > 0 ? geom.height : window.innerHeight;
-
     return createPortal(
         <>
             <div
+                ref={backdropRef}
                 onClick={onClose}
                 aria-hidden
                 style={{
                     position: 'fixed',
-                    top: `${top}px`,
+                    top: 0,
                     left: 0,
                     width: '100%',
-                    height: `${height}px`,
                     zIndex: 80,
                 }}
                 className={cn(
@@ -210,10 +217,9 @@ export function UIFiltersSheet({
                 aria-label={ariaLabel}
                 style={{
                     position: 'fixed',
-                    top: `${top}px`,
+                    top: 0,
                     left: 0,
                     width: '100%',
-                    height: `100dvh`,
                     transform: visible ? 'translate3d(0,0,0)' : 'translate3d(0,100%,0)',
                     transition: `transform ${DURATION_MS}ms cubic-bezier(.32,.72,0,1)`,
                     willChange: 'transform',
