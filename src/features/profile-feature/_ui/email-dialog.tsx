@@ -15,10 +15,6 @@ import { useCountdown } from '../_hooks/use-countdown'
 
 const RESEND_SECONDS = 60
 
-/**
- * add    — у юзера нет email: форма → «Проверьте почту»
- * verify — email есть, но не подтверждён: сразу шлём письмо → «Проверьте почту»
- */
 export type EmailDialogMode = 'add' | 'verify'
 
 type EmailDialogProps = {
@@ -60,7 +56,6 @@ function EmailDialogBody({ mode, email }: { mode: EmailDialogMode; email: string
         } catch (e) {
             const wait = retryAfterOf(e)
             if (wait !== null) {
-                // Письмо уже уходило недавно — показываем «Проверьте почту» с остатком таймера
                 countdown.start(wait)
                 setStep('sent')
                 if (!auto) showToast({ status: 'error', text: profileErrorText(e, t) })

@@ -10,8 +10,6 @@ export default function useCustomRouter() {
 
     return useMemo(() => {
         const start = (href: string) => {
-            // если переходим на тот же путь, страница не сменится
-            // и полоса зависнет, поэтому не запускаем её
             if (href === pathname) return false;
             NProgress.start();
             return true;

@@ -18,7 +18,6 @@ type DeleteAccountDialogProps = {
 export function DeleteAccountDialog({ open, onClose }: DeleteAccountDialogProps) {
     const t = useTranslations('profile')
     const { trigger: deleteAccount, isMutating } = useDeleteAccountMutation()
-    // Не даём закрыть/нажать повторно, пока страница перезагружается
     const [isLeaving, setIsLeaving] = useState(false)
     const busy = isMutating || isLeaving
 
@@ -32,7 +31,6 @@ export function DeleteAccountDialog({ open, onClose }: DeleteAccountDialogProps)
         setIsLeaving(true)
         await clearTokensAction()
         showToastAfterReload({ status: 'success', text: t('delete_success_toast') })
-        // Полная перезагрузка: сбрасывает кэши удалённого пользователя, страница не мигает пустой
         window.location.replace(ROUTES.ROOT)
     }
 

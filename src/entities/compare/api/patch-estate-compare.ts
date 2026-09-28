@@ -2,7 +2,6 @@ import { mutate as swrMutate } from 'swr'
 import { QUERIES } from '@/shared/const/queries'
 import type { EstateType, HouseEstatesResponseType } from '@/entities/estate'
 
-// Patches `isInCompare` of an estate in the SWR caches (detail page + house estates lists)
 export function patchEstateIsInCompare(id: number, value: boolean) {
     swrMutate(
         (k: unknown) => Array.isArray(k) && k[0] === QUERIES.ESTATE_BY_ID && k[1] === id,

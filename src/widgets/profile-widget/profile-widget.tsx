@@ -20,7 +20,6 @@ type Dialog = 'email' | 'phone' | 'delete' | null
 export function ProfileWidget() {
     const { data: auth, isLoading } = useAuth()
     const [dialog, setDialog] = useState<Dialog>(null)
-    // Режим держим отдельно от open, чтобы контент не мигал во время анимации закрытия
     const [emailMode, setEmailMode] = useState<EmailDialogMode>('add')
     const user = auth?.user
     const t = useTranslations('profile')
@@ -28,7 +27,6 @@ export function ProfileWidget() {
     const justVerified = useSearchParams().has('email-verified')
     const toastShown = useRef(false)
 
-    // Пришли со страницы подтверждения email — сообщаем и убираем флаг из URL
     useEffect(() => {
         if (!justVerified || toastShown.current) return
         toastShown.current = true

@@ -32,7 +32,6 @@ export function useRemoveCompare() {
             patchEstateIsInCompare(id, false)
         },
         onError: (_error, id) => {
-            // Unroll optimistic patch if server rejected
             swrMutate(compareIdsKey())
             patchEstateIsInCompare(id, true)
         },

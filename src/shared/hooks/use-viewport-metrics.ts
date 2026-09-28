@@ -1,23 +1,6 @@
 'use client'
 import { useEffect } from 'react'
 
-/**
- * Синхронизирует два CSS-вара:
- *   --app-height — стабильная высота из window.innerHeight (НЕ реагирует на
- *                  клавиатуру iOS). Использовать вместо 100dvh для контейнеров,
- *                  которые не должны прыгать при появлении soft-keyboard.
- *   --kb-inset   — высота soft-keyboard = innerHeight − visualViewport.height.
- *                  Пока клавиатура открыта, ставится класс html.kb-open.
- *
- * Плюс — восстанавливает scrollTop у скроллируемого предка фокусного инпута.
- * iOS Safari при фокусе делает scrollIntoView, и эта позиция «зависает»
- * после закрытия клавиатуры (лаяут выглядит уехавшим до первого тапа).
- * Снимаем snapshot скролла на focusin (до Safari-скролла) и восстанавливаем
- * при закрытии клавы. Работает и для html/window, и для inner-scroll-контейнеров
- * (BottomSheet, drawer'ы) — на них плюс к этому CSS-правило [data-kb-freeze]
- * с overflow:hidden под html.kb-open, чтобы Safari шифтил visual viewport
- * вместо скролла (visual viewport сам сбрасывается при закрытии клавы).
- */
 
 type ScrollSnapshot = {
     element: HTMLElement | null
@@ -49,16 +32,6 @@ function isTextInput(el: Element | null): boolean {
     return (el as HTMLElement).isContentEditable === true
 }
 
-/**
- * Только «настоящий» Safari (macOS/iOS) — исключаем iOS-обёртки других
- * браузеров (Chrome/Firefox/Edge на iOS используют WebKit, но у них UA
- * содержит CriOS/FxiOS/EdgiOS). Виртуальная клавиатура на iOS Chrome
- * ведёт себя иначе (см. эксперименты сентября 2026 — kb-inset = 0, т.к.
- * innerHeight и visualViewport.height сжимаются вместе), поэтому вся
- * логика ниже с snapshot/restore и правилами kb-open нужна только Safari.
- * Для остальных браузеров возвращаемся к master-логике (только --app-height
- * и --kb-inset без snapshot).
- */
 function detectSafari(): boolean {
     if (typeof navigator === 'undefined') return false
     const ua = navigator.userAgent
@@ -72,8 +45,6 @@ export function useViewportMetrics() {
         const isSafari = detectSafari()
         if (isSafari) root.classList.add('is-safari')
 
-        // См. коммент выше: max стабильно = innerHeight на iOS Safari,
-        // = vv.height на iOS Chrome (когда обе величины меняются вместе).
         const syncAppHeight = () => {
             const h = Math.max(window.innerHeight, vv?.height ?? 0)
             root.style.setProperty('--app-height', `${h}px`)

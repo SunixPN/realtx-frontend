@@ -78,13 +78,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount, compar
         setDragging(false);
         const panelWidth = panelRef.current?.offsetWidth ?? 320;
         if (dx > panelWidth * 0.3 || (v > 0.5 && dx > 30) || v > 0.9) {
-            // Smooth exit: animate inline transform out to full width in
-            // parallel with the CSSTransition exit so the panel never snaps
-            // back to translateX(0) for a frame before unmounting.
-            // A very fast flick (v > 0.9) always dismisses even on tiny dx —
-            // otherwise the panel visually slid far right during the flick
-            // but snapped back on release, and the user tapped the still-
-            // visible backdrop to actually close it.
             dismissingRef.current = true;
             setDragX(panelWidth);
             onClose();
@@ -106,9 +99,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount, compar
         dragStart.current = { x: e.clientX, y: e.clientY, t: Date.now() };
         capturedRef.current = false;
         activePointerId.current = e.pointerId;
-        // Bind window-level listeners so Android's inner scroll container
-        // (which claims native pan-y) can't swallow subsequent pointermove
-        // events. React's delegated handlers on <aside> are unreliable here.
         const onWinMove = (ev: PointerEvent) => {
             if (activePointerId.current !== null && ev.pointerId !== activePointerId.current) return;
             const s = dragStart.current;
@@ -124,11 +114,6 @@ export function MobileMenu({ isOpen, onClose, user, favCount, freshCount, compar
                 setDragX(Math.max(0, dx));
             }
         };
-        // Native touchmove listener with passive:false. preventDefault on
-        // pointermove doesn't cancel scroll on Android Chrome — only touchmove
-        // does. Without this, a fast horizontal flick registers as a fling
-        // and Chrome's input arbiter suppresses subsequent taps for ~250ms,
-        // producing a dead zone where even window listeners don't fire.
         const onWinTouchMove = (ev: TouchEvent) => {
             if (capturedRef.current) ev.preventDefault();
         };

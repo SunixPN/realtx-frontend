@@ -16,10 +16,6 @@ import { ROUTES } from '@/shared/const/routes';
 type UseCodeStepFormArgs = {
     resetVerifier: () => RecaptchaVerifier | null;
     onResendDone:  () => void;
-    /**
-     * Что делать с Firebase ID токеном после верного кода. По умолчанию — вход.
-     * Вернуть true, если всё прошло успешно (ошибки показывает сам колбэк).
-     */
     onVerified?:   (idToken: string) => Promise<boolean>;
 };
 

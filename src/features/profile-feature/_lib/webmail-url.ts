@@ -1,4 +1,3 @@
-// Популярные почтовые сервисы → ссылка на входящие. mailto: открывает создание письма, а не ящик.
 const WEBMAIL: Record<string, string> = {
     'gmail.com': 'https://mail.google.com/mail/u/0/#inbox',
     'googlemail.com': 'https://mail.google.com/mail/u/0/#inbox',

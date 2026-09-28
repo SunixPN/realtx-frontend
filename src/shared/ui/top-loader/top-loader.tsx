@@ -4,23 +4,14 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 
-// ── Nav event bus (module-level, survives re-renders) ───────────────────────
 
 type Handler = () => void
 const startHandlers = new Set<Handler>()
 const doneHandlers = new Set<Handler>()
 
-// history.pushState в Next.js может вызываться внутри useInsertionEffect
-// (например при prefetch <Link>) — synchronous setState там запрещён.
-// Поэтому эмит навигационных событий откладываем в микротаск.
 function emitNavStart() { queueMicrotask(() => startHandlers.forEach(h => h())) }
 function emitNavDone()  { queueMicrotask(() => doneHandlers.forEach(h => h())) }
 
-// Публичное API — вызывать ПЕРЕД программной навигацией (router.push
-// после логина/регистрации). Next дёргает pushState на commit транзиции,
-// а к этому моменту RSC-fetch уже отработал — юзер успевает почувствовать
-// «залипание» без индикации. beginTopLoader стартует бар сразу,
-// NavWatcher закроет его при смене pathname.
 export function endTopLoader()   { emitNavDone() }
 
 let navListenersInstalled = false
@@ -29,8 +20,6 @@ function installNavListeners() {
     if (navListenersInstalled || typeof window === 'undefined') return
     navListenersInstalled = true
 
-    // ── Пользовательские клики по <a> ловим в capture-фазе — это самое
-    //    раннее «намерение навигации», ДО того как Next начнёт RSC-фетч.
     document.addEventListener('click', (e) => {
         if (e.defaultPrevented || e.button !== 0) return
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -47,29 +36,19 @@ function installNavListeners() {
         try {
             const url = new URL(anchor.href, window.location.origin)
             if (url.origin !== window.location.origin) return
-            // Тот же URL — навигации не будет, не мигаем баром.
             if (url.pathname === window.location.pathname && url.search === window.location.search) return
             emitNavStart()
-        } catch { /* ignore */ }
+        } catch {  }
     }, true)
 
-    // ── Fallback: программная навигация (router.push/replace) и history-API.
-    //    Сравниваем URL до/после — pushState может вызываться Next-ом без
-    //    реальной смены URL (server redirect обратно на текущий route),
-    //    в таком случае бар показывать не нужно.
     const origPush = window.history.pushState.bind(window.history)
     window.history.pushState = (...args: Parameters<typeof window.history.pushState>) => {
         const before = window.location.href
         origPush(...args)
         if (window.location.href !== before) emitNavStart()
     }
-    // popstate НЕ обрабатываем: back/forward обычно бьёт по кешу и завершается
-    // мгновенно, а если Next догружает RSC — click/pushState уже эмитнут start.
-    // Явный popstate-эмит давал зависший бар на server-redirect'ах, возвращающих
-    // на тот же route (proxy.ts guard).
 }
 
-// ── Watcher: fires emitNavDone when Next.js commits the new route ───────────
 
 function NavWatcher() {
     const pathname = usePathname()
@@ -77,10 +56,6 @@ function NavWatcher() {
     const firstRun = useRef(true)
     useEffect(() => {
         if (firstRun.current) { firstRun.current = false; return }
-        // При быстрых последовательных навигациях (клик A → клик B до завершения)
-        // Next.js всё равно закоммитит промежуточные состояния — usePathname
-        // моргнёт на A, потом станет B. Мы не хотим закрывать бар на промежуточном
-        // коммите, поэтому эмитим done только когда React догнал реальный URL.
         if (typeof window !== 'undefined') {
             const winSearch = window.location.search.replace(/^\?/, '')
             const reactSearch = params.toString()
@@ -91,16 +66,11 @@ function NavWatcher() {
     return null
 }
 
-// ── Main component ───────────────────────────────────────────────────────────
 
 type Phase = 'idle' | 'loading' | 'done'
 
 const TICK_MS = 80
-const FILL_TARGET = 84  // bar stops here until navigation completes
-// Короткий safety-нет на случай сетевых залипаний. Основная детекция
-// завершения — NavWatcher (смена pathname/search). start эмитим только
-// когда URL реально меняется (см. installNavListeners), поэтому длинный
-// timeout больше не нужен.
+const FILL_TARGET = 84
 const SAFETY_TIMEOUT_MS = 1500
 
 export function TopLoader() {
@@ -121,7 +91,7 @@ export function TopLoader() {
 
     const done = useCallback(() => {
         if (!mountedRef.current) return
-        if (phaseRef.current !== 'loading') return  // ignore spurious done
+        if (phaseRef.current !== 'loading') return
         stopInterval()
         stopSafetyTimeout()
         phaseRef.current = 'done'
@@ -139,8 +109,6 @@ export function TopLoader() {
     const start = useCallback(() => {
         if (!mountedRef.current) return
         stopSafetyTimeout()
-        // Если бар уже растёт — не сбрасываем прогресс на 0, только продлеваем
-        // safety-таймер. Иначе при быстрых кликах бар моргает.
         if (phaseRef.current !== 'loading') {
             stopInterval()
             phaseRef.current = 'loading'

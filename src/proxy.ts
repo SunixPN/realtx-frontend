@@ -37,16 +37,15 @@ function parseJwt(token: string): ParsedJwt | null {
     if (parts.length !== 3) return null;
 
     const [h, p, s] = parts;
-    if (!h || !p || !s) return null;          // пустые сегменты
-    if (!B64URL_RE.test(s)) return null;      // подпись тоже base64url
+    if (!h || !p || !s) return null;
+    if (!B64URL_RE.test(s)) return null;
 
     const header = decodeBase64UrlJson(h);
     const payload = decodeBase64UrlJson(p);
     if (!header || !payload) return null;
 
-    // Минимальные требования к заголовку
     if (typeof header.alg !== "string" || header.alg === "" ) return null;
-    if (header.alg.toLowerCase() === "none") return null; // "alg: none" — красный флаг
+    if (header.alg.toLowerCase() === "none") return null;
 
     return { header, payload };
 }
@@ -83,9 +82,6 @@ export const proxy: NextProxy = async (request) => {
     const domain = env.COOKIE_DOMAIN || undefined
 
     function clearAccessCookie(response: NextResponse) {
-        // На проде кука ставится с Domain=.realtx.online (COOKIE_DOMAIN),
-        // так что удалять надо с теми же атрибутами — иначе браузер игнорит
-        // Set-Cookie и возникает бесконечный редирект-луп при битом токене.
         response.cookies.set(TOKENS.ACCESS_TOKEN, '', {
             httpOnly: true,
             path: '/',
@@ -95,29 +91,12 @@ export const proxy: NextProxy = async (request) => {
         })
     }
 
-    // Рефрешим и когда access протух/битый, и когда его вообще нет,
-    // но refresh_token ещё жив. Иначе после 15 минут неактивности
-    // (particularly на мобильных, где вкладка бэкграундится) access
-    // естественным путём удаляется браузером — и мы без попытки refresh
-    // выбрасывали юзера на /sign-in, хотя refresh был бы успешным.
-    //
-    // Server actions (POST с заголовком next-action) не рефрешим: они ничего не рендерят,
-    // а сразу после логина фронт шлёт их пачкой (saveAccessToken, readCookie на каждый
-    // API-запрос) — с одним и тем же свежим refresh_token. Параллельные refresh'и
-    // ротируют токен наперегонки, проигравшие получают 401, и пользователь
-    // остаётся без сессии. Токен для API-запросов обновляет клиентский интерцептор
-    // (у него single-flight очередь).
     const isServerAction = request.method === "POST" && request.headers.has("next-action");
-    // И не редиректим: server action шлётся POST'ом на URL текущей страницы, и 307 на /sign-in
-    // Next применяет как результат экшена — рендерит страницу входа, не меняя URL в адресной строке.
-    // Авторизацию экшены проверяют сами (читают куки), а API-запросы — бэкенд.
     if (isServerAction) return NextResponse.next();
 
     const needsRefresh = hasRefresh && (!hasAccess || isInvalidOrExpired(accessToken));
     const isProtected = PROTECTED_ROUTES.includes(pathname);
 
-    // Refresh не удался: с защищённой страницы — на вход, с публичной — просто
-    // продолжаем гостем. Редирект с публичных (в т.ч. с самого /sign-in) давал луп.
     function onRefreshFailed(setCookie?: string | null) {
         const response = isProtected
             ? NextResponse.redirect(new URL(PROTECTED_REDIRECT_ROUTE, request.url))

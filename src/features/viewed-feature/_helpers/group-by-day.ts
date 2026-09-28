@@ -4,8 +4,6 @@ import { APP_TIME_ZONE } from '@/shared/const/time-zone'
 export type ViewedGroupKey = 'today' | 'yesterday' | 'earlier'
 export type ViewedGroup = { key: ViewedGroupKey; items: ViewedItemType[] }
 
-// 'YYYY-MM-DD' в APP_TIME_ZONE — одинаково на сервере (UTC) и в браузере,
-// иначе SSR и клиент раскладывают ночные просмотры в разные группы.
 const DAY_KEY = new Intl.DateTimeFormat('en-CA', {
     timeZone: APP_TIME_ZONE,
     year: 'numeric',
@@ -13,7 +11,6 @@ const DAY_KEY = new Intl.DateTimeFormat('en-CA', {
     day: '2-digit',
 })
 
-// today = сегодняшний день, yesterday = вчерашний, earlier = всё старше.
 export function groupByDay(items: ViewedItemType[]): ViewedGroup[] {
     const now = Date.now()
     const todayKey = DAY_KEY.format(now)

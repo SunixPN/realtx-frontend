@@ -2,7 +2,6 @@ import { ApiError } from '@/shared/api/api'
 
 type T = (key: string, values?: Record<string, number>) => string
 
-/** Текст ошибки профиля по машиночитаемому коду бека — чтобы работала локализация */
 export function profileErrorText(error: unknown, t: T): string {
     if (error instanceof ApiError) {
         switch (error.code) {
@@ -15,7 +14,6 @@ export function profileErrorText(error: unknown, t: T): string {
     return t('error_generic')
 }
 
-/** Сколько секунд ждать до повторной отправки, если бек ответил 429 */
 export function retryAfterOf(error: unknown): number | null {
     return error instanceof ApiError && error.code === 'EMAIL_RESEND_COOLDOWN'
         ? error.retryAfter ?? 60

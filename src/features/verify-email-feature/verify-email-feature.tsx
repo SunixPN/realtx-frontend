@@ -19,8 +19,6 @@ export default function VerifyEmailFeature() {
     const isError = !!error;
     useEffect(() => {
         if (!isSuccess) return;
-        // /auth/me в кэше SWR ещё с emailVerified: false — обновляем до перехода,
-        // иначе профиль покажет плашку «подтвердите email»
         mutate(authKey).finally(() => router.replace(`${ROUTES.PROFILE}?email-verified=1`));
     }, [isSuccess, router]);
     const renderContent = () => {

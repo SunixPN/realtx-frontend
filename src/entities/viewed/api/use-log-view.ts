@@ -8,9 +8,6 @@ import { QUERIES } from '@/shared/const/queries'
 import { viewedIdsKey } from './viewed-keys'
 import type { ViewedIdsType } from './viewed-types'
 
-// Логируем факт просмотра ровно один раз за маунт компонента-деталки.
-// Живёт на клиенте, поэтому Next.js RSC-префетч ссылок с /viewed сюда
-// не заходит и viewedAt не двигает.
 export function useLogView(estateId: number, enabled: boolean) {
     const queryClient = useQueryClient()
     const loggedRef = useRef<number | null>(null)

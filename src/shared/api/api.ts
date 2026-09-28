@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { env } from '@/shared/config/env';
-// Машиночитаемые поля ошибки бека (error.code, error.retryAfter)
 export type ApiErrorDetails = {
     code?: string;
     retryAfter?: number;

@@ -12,13 +12,10 @@ import { UIBottomSheet, useBottomSheetDrag } from '@/shared/ui/ui-bottom-sheet';
 type UIDialogProps = {
     open: boolean;
     onClose: () => void;
-    /** Заголовок в шапке. Если не передан — только крестик (контент сам рисует заголовок). */
     title?: ReactNode;
     ariaLabel: string;
     children: ReactNode;
-    /** Tailwind max-width класс для десктопной модалки */
     maxWidthClassName?: string;
-    /** Блокирует закрытие (например, пока идёт запрос) */
     dismissible?: boolean;
 };
 
@@ -37,9 +34,6 @@ const CARD_STYLE: Record<TransitionStatus, React.CSSProperties> = {
     unmounted: { opacity: 0, transform: 'scale(0.96) translateY(8px)' },
 };
 
-/**
- * Адаптивный диалог: центрированная модалка на ≥640px и bottom sheet на телефоне.
- */
 export function UIDialog({
     open,
     onClose,

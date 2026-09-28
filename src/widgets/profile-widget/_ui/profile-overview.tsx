@@ -22,7 +22,6 @@ function initials(name: string): string {
 export function ProfileHeader({ user }: { user: AuthUserType }) {
     const t = useTranslations('profile')
     const locale = useLocale()
-    // Контакты уже есть строкой ниже — в заголовок их не дублируем
     const name = user.name?.trim()
     const since = new Date(user.createdAt).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: APP_TIME_ZONE })
     return (

@@ -260,10 +260,6 @@ export function FiltersDrawer({ isOpen, filters, onChange, onClear, onClose, tot
     }, [isOpen, nested, isMobile])
 
     if (isMobile) {
-        // По умолчанию — UIBottomSheet: корректно отрабатывает Safari и
-        // Android Chrome. Только iOS Chrome (CriOS) получает UIFiltersSheet,
-        // где проблема с прыгающим bottom-sheet при появлении виртуальной
-        // клавиатуры решается через visualViewport-трекинг.
         const body = (
             <>
                 <FiltersDrawerHeader title={t('all_filters')} closeLabel={tCommon('close')} onClose={onClose} />

@@ -17,7 +17,6 @@ export function useAddFavorite() {
             return id
         },
         onMutate: (id) => {
-            // SWR: optimistically add to favoriteIds
             swrMutate(
                 favoriteIdsKey(),
                 (old?: FavoriteIdsType) => {

@@ -27,7 +27,6 @@ export function phoneStatusOf(user: AuthUserType): PhoneStatus {
     return user.phone && user.phoneVerified ? 'verified' : 'missing'
 }
 
-// --- Личные данные ---
 
 export function PersonalDataSection({
     user,
@@ -138,7 +137,6 @@ function AddButton({ label, onClick }: { label: string; onClick: () => void }) {
     )
 }
 
-// --- Каналы уведомлений ---
 
 export function NotificationChannelsSection({ user }: { user: AuthUserType }) {
     const t = useTranslations('profile')
@@ -226,7 +224,6 @@ function Channel({
     )
 }
 
-// --- Интерфейс ---
 
 export function InterfaceSection() {
     const t = useTranslations('profile')
@@ -269,7 +266,6 @@ export function InterfaceSection() {
     )
 }
 
-// --- Аккаунт ---
 
 export function AccountSection({ onDelete }: { onDelete: () => void }) {
     const t = useTranslations('profile')

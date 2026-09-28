@@ -15,31 +15,11 @@ type UIFiltersSheetProps = {
     ariaLabel?: string;
     children: ReactNode;
     className?: string;
-    /**
-     * Высота зафиксированного футера внутри панели (кнопки «Сбросить» /
-     * «Показать»). Учитывается при автоскролле сфокусированного инпута
-     * из-под клавиатуры — иначе инпут дотягивается ровно к футеру и
-     * остаётся им перекрыт.
-     */
     bottomInset?: number;
 };
 
 const DURATION_MS = 280;
 
-/**
- * Bottom sheet for the "All filters" mobile drawer.
- *
- * Sizing/positioning is driven by the visualViewport API — the panel is
- * pinned to whatever region is *actually visible* to the user. When the
- * virtual keyboard opens on iOS/Android Chrome, the panel snaps to the
- * space above the keyboard on the very same frame the keyboard appears.
- * Because we write top/height directly in pixels (no CSS transition on
- * those properties) and no viewport units are involved, there is no
- * inter-frame interpolation for the browser to jitter over.
- *
- * The only animated property is `transform: translateY` for the enter /
- * exit slide — decoupled from any viewport change.
- */
 export function UIFiltersSheet({
     open,
     onClose,
@@ -51,7 +31,6 @@ export function UIFiltersSheet({
     const [mounted, setMounted] = useState(false);
     const [rendered, setRendered] = useState(open);
     const [visible, setVisible] = useState(false);
-    // Live geometry from visualViewport (or a sensible fallback).
     const [geom, setGeom] = useState<{ top: number; height: number }>({
         top: 0,
         height: 0,
@@ -63,9 +42,6 @@ export function UIFiltersSheet({
 
     useLayoutEffect(() => setMounted(true), []);
 
-    // Backdrop/panel positioning: следим за visualViewport, чтобы top
-    // соответствовал видимой части экрана. Только setGeom — никакой
-    // логики скролла здесь.
     useEffect(() => {
         if (!rendered) return;
         const vv = window.visualViewport;
@@ -88,19 +64,6 @@ export function UIFiltersSheet({
         };
     }, [rendered]);
 
-    // Автоскролл к сфокусированному инпуту.
-    //
-    // Логика простая и одноразовая:
-    //   focusin (текстовый инпут внутри панели) →
-    //   ждём FOCUS_SETTLE_MS (клавиатура успевает открыться и viewport
-    //   стабилизируется) →
-    //   один раз измеряем позицию инпута и, если он перекрыт клавиатурой
-    //   и/или футером, докручиваем ближайший скролл-контейнер ровно на
-    //   нужную дельту.
-    //
-    // Никаких visualViewport-слушателей, никаких burst-событий, никакого
-    // риска двойного скролла. Если фокус переходит на другой инпут —
-    // pending-таймер отменяется и заводится новый.
     useEffect(() => {
         if (!rendered) return;
         const FOCUS_SETTLE_MS = 350;
@@ -161,9 +124,6 @@ export function UIFiltersSheet({
     useEffect(() => {
         if (open) {
             setRendered(true);
-            // Two rAFs so the mounted node paints with translateY(100%)
-            // first, THEN transitions to 0. One rAF is not always enough
-            // on iOS to flush the initial style.
             let raf2 = 0;
             const raf1 = requestAnimationFrame(() => {
                 raf2 = requestAnimationFrame(() => setVisible(true));
@@ -178,8 +138,6 @@ export function UIFiltersSheet({
         return () => window.clearTimeout(t);
     }, [open]);
 
-    // Body scroll lock via position:fixed. Preserves iOS scroll position
-    // through open/close.
     useEffect(() => {
         if (!rendered || !visible) return;
         scrollYRef.current = window.scrollY;

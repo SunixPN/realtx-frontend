@@ -11,7 +11,6 @@ type InlineEditFieldProps = {
     value: string | null
     placeholder: string
     maxLength: number
-    /** Пустое значение допустимо (очистить поле) */
     allowEmpty?: boolean
     emptyError?: string
     autoComplete?: string
@@ -64,7 +63,6 @@ export function InlineEditField({
             await onSave(next)
             setEditing(false)
         } catch {
-            // Тост показывает вызывающая сторона — поле остаётся в режиме редактирования
         } finally {
             setSaving(false)
         }

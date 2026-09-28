@@ -4,12 +4,6 @@ function toNum(v: unknown): number | null {
     return Number.isFinite(n) ? n : null
 }
 
-/**
- * Победители в строке: множество индексов с лучшим значением.
- * - Игнорируем null-ячейки (нет данных).
- * - Если все определённые значения равны — никого не подсвечиваем.
- * - Значения приводятся к числу: Postgres numeric приходит строкой.
- */
 export function bestIndices(values: (number | string | null)[], best: 'min' | 'max' | 'none'): Set<number> {
     if (best === 'none') return new Set()
     const nums = values.map(toNum)

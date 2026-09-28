@@ -6,10 +6,6 @@ type ProfileRowProps = {
     action?: ReactNode
 }
 
-/**
- * Строка «Личных данных»: подпись слева, значение и действие справа.
- * На телефоне подпись уезжает над значением — иначе email с бейджем не влезает.
- */
 export function ProfileRow({ label, value, action }: ProfileRowProps) {
     return (
         <div className="flex flex-col gap-1 border-b border-border py-3 last:border-0 sm:flex-row sm:items-center sm:gap-4 sm:py-2.5">

@@ -226,7 +226,6 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
     )
     return (
         <div className="rounded-lg border border-border bg-surface-page p-2 shadow-lg">
-            {/* Mobile layout: collapsible search + minimal chip set + inline count/save. */}
             <div className="flex items-center gap-2 lg:hidden">
                 {searchOpen ? (
                     <div ref={mobileSearchRef} className="min-w-0 flex-1">
@@ -273,7 +272,6 @@ export function FilterBar({ filters, onChange, onClear: _onClear, onOpenDrawer, 
                 )}
             </div>
 
-            {/* Desktop layout: unchanged. */}
             <div className="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-2">
                 <SearchSuggest
                     value={filters.q}

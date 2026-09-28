@@ -17,7 +17,7 @@ type Props = {
 }
 
 const SKELETON_COUNT = 6
-const ITEM_GAP = 12 // gap-3 = 12px
+const ITEM_GAP = 12
 
 export function HouseListView({ bbox, onSelect, onClose }: Props) {
     const t = useTranslations('estate')

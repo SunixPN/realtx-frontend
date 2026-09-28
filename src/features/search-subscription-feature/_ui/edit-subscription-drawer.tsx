@@ -94,7 +94,7 @@ export function EditSubscriptionDrawer({ isOpen, mode, onClose, onSaved, onDelet
         return () => window.removeEventListener('keydown', handler)
     }, [isOpen, filtersDrawerOpen, onClose])
     useEffect(() => {
-        if (isMobile) return // UIBottomSheet locks body scroll internally
+        if (isMobile) return
         document.body.style.overflow = isOpen ? 'hidden' : ''
         return () => { document.body.style.overflow = '' }
     }, [isOpen, isMobile])
@@ -390,8 +390,6 @@ function DrawerHeader({
     onClose: () => void
     closeAria: string
 }) {
-    // useBottomSheetDrag возвращает null вне UIBottomSheet — в desktop-варианте
-    // (внутри aside через CSSTransition) drag просто не применяется.
     const drag = useBottomSheetDrag()
     return (
         <div

@@ -17,12 +17,10 @@ export function useRemoveFavorite() {
             return id
         },
         onMutate: (id) => {
-            // Optimistic: patch all cached favorites list variants
             queryClient.setQueriesData<FavoriteItemType[]>(
                 { queryKey: [QUERIES.FAVORITES] },
                 (old) => old?.filter(item => item.id !== id),
             )
-            // SWR: patch favoriteIds + estate caches
             swrMutate(
                 favoriteIdsKey(),
                 (old?: FavoriteIdsType) =>

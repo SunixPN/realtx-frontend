@@ -19,7 +19,6 @@ export function CustomizeButton() {
     const isMobile = useIsMobile(768)
     const hiddenCount = hiddenRows.size
 
-    // Анимация закрытия popover на десктопе (аналог user-menu в хедере).
     const CLOSE_MS = 120
     const [closing, setClosing] = useState(false)
     const startClose = () => {
@@ -27,7 +26,6 @@ export function CustomizeButton() {
         setTimeout(() => { setOpen(false); setClosing(false) }, CLOSE_MS)
     }
 
-    // Клик вне попапа (desktop) закрывает его. На мобиле есть BottomSheet, туда не долетает.
     useEffect(() => {
         if (!open || isMobile) return
         const onDown = (e: MouseEvent) => {
@@ -66,7 +64,6 @@ export function CustomizeButton() {
                 )}
             </button>
 
-            {/* Desktop popover */}
             {!isMobile && (open || closing) && (
                 <div
                     role="dialog"

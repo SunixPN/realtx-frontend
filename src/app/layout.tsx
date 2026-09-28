@@ -32,9 +32,6 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
         title: t("meta_title"),
         description: t("app_description"),
-        // Фавикон дефолтный — Next сам подхватывает src/app/icon.png через
-        // файловую конвенцию. Никакой привязки к теме приложения нет,
-        // одна иконка на все случаи.
     };
 }
 

@@ -12,7 +12,6 @@ type Props = {
     apply: () => void
     isMutating: boolean
     onClose: () => void
-    /** Хедер отдельно, чтобы на мобиле его можно было сделать sticky и без крестика (сжимаемая шапка BottomSheet). */
     hideHeader?: boolean
     className?: string
 }

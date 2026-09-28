@@ -51,6 +51,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "eslint-plugin-storybook": "^10.6.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "playwright": "latest",
     "storybook": "^10.6.0",
     "tailwindcss": "^4",

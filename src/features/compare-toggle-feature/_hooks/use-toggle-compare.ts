@@ -35,7 +35,6 @@ export function useToggleCompare(estateId: number, serverIsInCompare: boolean) {
                 if (e.code === 'COMPARE_LIMIT_REACHED') {
                     showToast({ status: 'error', text: t('limit_reached_toast', { limit: e.limit ?? 4 }) })
                 } else if (e.code === 'ALREADY_IN_COMPARE') {
-                    // Already in — behave as success (override next render will resync)
                 } else {
                     showToast({ status: 'error', text: t('add_error_toast') })
                 }

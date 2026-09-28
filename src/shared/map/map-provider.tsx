@@ -39,9 +39,6 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
         })
         mapRef.current = instance
     }, [])
-    // Ресайз карты вешаем в MapCanvas через ResizeObserver — он ловит реальные
-    // изменения размеров контейнера, а не события viewport'а. Это работает
-    // одинаково в Safari и Chrome iOS и не дёргает canvas на closing клавиатуры.
     useEffect(() => {
         const instance = mapRef.current
         if (!instance || !map) return

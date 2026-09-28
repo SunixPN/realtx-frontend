@@ -27,9 +27,6 @@ export const houseEstatesKey = (
 ) => [QUERIES.HOUSE_ESTATES, displayCurrency, bboxKeyParts(bbox), normalizeFilters(filters)] as const
 type Key = ReturnType<typeof houseEstatesKey>
 
-// Небольшой отступ чтобы точечный bbox (min=max, когда все квартиры на одной точке)
-// не давал пустой результат из-за float-погрешности хранения координат в БД.
-// 1e-5° ≈ 1 м — достаточно для одного здания, слишком мало чтобы захватить соседнее.
 const BBOX_EPS = 1e-5
 
 const fetcher = async ([, displayCurrency, bboxParts, normFilters]: Key): Promise<HouseEstatesResponseType> => {

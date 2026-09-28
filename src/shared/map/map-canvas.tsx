@@ -14,9 +14,6 @@ export function MapCanvas({ className, style }: MapCanvasProps) {
         return unmountMap
     }, [mountMap, unmountMap])
 
-    // ResizeObserver реагирует ТОЛЬКО на реальные изменения размеров контейнера
-    // (в т.ч. когда меняется --app-height). Один resize на закрытие клавиатуры
-    // вместо десятка вызовов на visualViewport.resize → нет дёрганья canvas.
     useEffect(() => {
         if (!map || !containerRef.current) return
         const el = containerRef.current

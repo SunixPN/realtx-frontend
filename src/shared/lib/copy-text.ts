@@ -1,15 +1,9 @@
-/**
- * Копирует текст в буфер обмена. Пытается использовать navigator.clipboard
- * (доступен только в secure context: https/localhost); в http/старых WebView
- * фолбэчит на скрытый <textarea> + document.execCommand('copy').
- */
 export async function copyText(text: string): Promise<boolean> {
     if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
         try {
             await navigator.clipboard.writeText(text)
             return true
         } catch {
-            // fall through
         }
     }
     if (typeof document === 'undefined') return false

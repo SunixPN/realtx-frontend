@@ -3,9 +3,6 @@ import { useEffect } from 'react';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
-// global-error срабатывает, когда падает сам RootLayout. Здесь нет доступа
-// к next-intl/тем/провайдерам — только автономный HTML. Строки хардкодим
-// по-русски: iframe с фолбэком лучше, чем белый экран.
 const inter = Inter({ variable: '--font-inter', subsets: ['latin', 'cyrillic'], display: 'swap' });
 
 export default function GlobalError({
@@ -22,8 +19,6 @@ export default function GlobalError({
     return (
         <html lang="ru" className={inter.variable}>
             <head>
-                {/* RootLayout мёртв — Next-овская конвенция app/icon.png не
-                    применяется. Явный <link> на тот же файл из /public. */}
                 <link rel="icon" type="image/png" href="/logo.png" />
             </head>
             <body className="min-h-dvh bg-surface-page text-text-base antialiased">

@@ -9,8 +9,6 @@ export const showToast = ({ status, text }: ShowToastArgs) => {
 
 const PENDING_TOAST_KEY = 'pending-toast';
 
-// Тост, который надо показать уже после полной перезагрузки страницы
-// (выход, удаление аккаунта) — иначе он исчезнет вместе со страницей
 export const showToastAfterReload = (args: ShowToastArgs) => {
   try {
     sessionStorage.setItem(PENDING_TOAST_KEY, JSON.stringify(args));

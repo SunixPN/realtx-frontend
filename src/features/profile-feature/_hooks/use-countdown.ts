@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-/** Обратный отсчёт с перезапуском на произвольное число секунд (retryAfter от бека) */
 export function useCountdown() {
     const [secondsLeft, setSecondsLeft] = useState(0)
     useEffect(() => {

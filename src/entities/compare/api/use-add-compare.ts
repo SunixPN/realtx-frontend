@@ -29,7 +29,6 @@ export function useAddCompare() {
                 await api.post(API_ROUTES.COMPARE.ADD(id))
                 return id
             } catch (e) {
-                // Axios response interceptor wraps errors into ApiError with a `.status` field.
                 const status =
                     (e as { status?: number })?.status
                     ?? (e as AxiosError<{ error?: { statusCode?: number } }>).response?.status
@@ -51,9 +50,7 @@ export function useAddCompare() {
             patchEstateIsInCompare(id, true)
         },
         onError: (error, id) => {
-            // Force revalidate ids to unroll optimistic patch if server rejected
             swrMutate(compareIdsKey())
-            // 409 means the estate is already in compare — keep the optimistic flag
             if (error instanceof AddCompareError && error.code === 'ALREADY_IN_COMPARE') return
             patchEstateIsInCompare(id, false)
         },

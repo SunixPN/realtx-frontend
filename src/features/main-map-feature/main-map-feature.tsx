@@ -52,12 +52,7 @@ export default function MainMapFeature({ mapFilter, drawer, drawerOpen = false }
     useEffect(() => setMounted(true), [])
     return (
         <div className="map-container relative w-full" style={{ height: 'calc(var(--app-height, 100dvh) - var(--header-height))' }}>
-            {/* height биндится на --app-height из useViewportMetrics — стабильно,
-                не пересчитывается при появлении soft-keyboard iOS. */}
             {mapFilter && mapFilter({ total: points.length })}
-            {/* Mobile: общий контейнер внизу — рейтинг районов стоит над переключателем
-                и не налезает, даже если подпись переключателя переносится.
-                Desktop (lg:contents): каждый блок позиционируется сам. */}
             <div
                 className="absolute z-30 left-2 right-2 bottom-2 flex flex-col gap-2 lg:contents"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}

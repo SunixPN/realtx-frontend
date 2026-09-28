@@ -19,8 +19,6 @@ const EMPTY_HIDDEN: string[] = []
 
 const HEADER_COL = '240px'
 
-// Ширина колонки-метки берётся из CSS-переменной, чтобы на мобильном была уже (140px),
-// а на md+ — как в дизайне (220px). Inline-style не умеет media queries.
 function gridCols(cols: number, canAdd: boolean) {
     const item = `repeat(${cols}, minmax(220px, 1fr))`
     return canAdd ? `var(--label-col) ${item} ${HEADER_COL}` : `var(--label-col) ${item}`

@@ -49,7 +49,6 @@ export function Header() {
         const el = document.documentElement
         const attr = 'data-immersive-translate-page-theme'
 
-        // Начальное значение
         console.log(el.getAttribute(attr), 'THEME INIT')
 
         const observer = new MutationObserver(() => {
@@ -61,10 +60,10 @@ export function Header() {
 
         observer.observe(el, {
             attributes: true,
-            attributeFilter: [attr], // следим только за этим атрибутом
+            attributeFilter: [attr],
         })
 
-        return () => observer.disconnect() // отписка при размонтировании
+        return () => observer.disconnect()
     }, [])
 
 

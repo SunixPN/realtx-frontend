@@ -13,7 +13,6 @@ export type UpdateProfileBody = {
     notifyByEmail?: boolean
 }
 
-// Бек на все профильные мутации отвечает свежим `me` — сразу кладём его в кеш
 function useMeMutation<Body>(key: string, request: (body: Body) => Promise<AuthUserType>) {
     const { mutate } = useSWRConfig()
     return useSWRMutation<AuthUserType, Error, string, Body>(

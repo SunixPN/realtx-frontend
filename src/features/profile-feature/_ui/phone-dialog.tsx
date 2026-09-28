@@ -27,7 +27,6 @@ function PhoneDialogBody({ onDone }: { onDone: () => void }) {
     const t = useTranslations('profile')
     const [phase, setPhase] = useState<'phone' | 'code'>('phone')
     const [phone, setPhone] = useState<string | null>(null)
-    // Тот же Firebase-флоу, что при входе: invisible reCAPTCHA → SMS → код → ID токен
     const { containerRef, getVerifier, resetVerifier } = useRecaptcha()
     const { trigger: confirmPhone } = usePhoneConfirmMutation()
 

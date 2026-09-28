@@ -11,9 +11,6 @@ type QueryProviderProps = {
     children: ReactNode
 }
 
-// Восстановление вкладки из BFCache (мобильный Chrome/Safari после свайпа из recent apps)
-// не триггерит mount и не всегда даёт focus — SWR остаётся со stale state. Ручной revalidate
-// при persisted-pageshow поднимает свежую сессию через fetcher useAuth.
 function BFCacheRevalidator() {
     useEffect(() => {
         const onPageShow = (event: PageTransitionEvent) => {
